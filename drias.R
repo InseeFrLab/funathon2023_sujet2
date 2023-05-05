@@ -1,3 +1,6 @@
+# prétraitement des données Drias pour avoir un format simple à utiliser :
+# formats SIG et projections homogènes
+
 library(raster)
 library(tidyverse)
 library(janitor)
