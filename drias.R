@@ -100,4 +100,10 @@ drias_raster %>%
     bucket = "projet-funathon",
     opts = list("region" = ""))
 
+drias_raster %>% 
+  aws.s3::s3write_using(
+    readr::write_rds,
+    object = "2023/sujet2/resultats/drias.rds",
+    bucket = "projet-funathon",
+    opts = list("region" = ""))
 
