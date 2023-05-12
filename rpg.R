@@ -95,3 +95,32 @@ for (offset in offsets) {
   )
   write_sf(parcelles_part, cnx, Id(schema = "rpg", table = "parcelles"), append = T)
 }
+
+# renommages pour homogénéiser (on aurait pu faire un janitor::clean_names sur parcelles_part)
+dbExecute(cnx,
+          "ALTER TABLE rpg.parcelles RENAME \"ID_PARCEL\" TO id_parcel")
+dbExecute(cnx,
+          "ALTER TABLE rpg.parcelles RENAME \"SURF_PARC\" TO surf_parc")
+dbExecute(cnx,
+          "ALTER TABLE rpg.parcelles RENAME \"CODE_CULTU\" TO code_cultu")
+dbExecute(cnx,
+          "ALTER TABLE rpg.parcelles RENAME \"CODE_GROUP\" TO code_group")
+dbExecute(cnx,
+          "ALTER TABLE rpg.parcelles RENAME \"CULTURE_D1\" TO culture_d1")
+dbExecute(cnx,
+          "ALTER TABLE rpg.parcelles RENAME \"CULTURE_D2\" TO culture_d2")
+
+# Ajout des index, celui sur geom est important
+dbExecute(cnx,
+          "ALTER TABLE rpg.parcelles ADD CONSTRAINT parcelles_pk PRIMARY KEY (id_parcel)")
+dbExecute(cnx, 
+          "CREATE INDEX ON rpg.parcelles USING gist (geom)")
+dbExecute(cnx,
+          "CREATE INDEX ON rpg.parcelles USING btree (code_cultu)")
+dbExecute(cnx,
+          "CREATE INDEX ON rpg.parcelles USING btree (code_group)")
+dbExecute(cnx,
+          "CREATE INDEX ON rpg.parcelles USING btree (culture_d1)")
+dbExecute(cnx,
+          "CREATE INDEX ON rpg.parcelles USING btree (culture_d2)")
+
