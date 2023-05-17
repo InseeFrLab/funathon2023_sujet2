@@ -7,6 +7,7 @@ library(janitor)
 library(sf)
 library(readxl)
 library(aws.s3)
+library(RPostgres)
 
 # paramètres --------------------------------------------------------------
 
@@ -32,7 +33,7 @@ drias <- s3read_using(
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
   clean_names() %>%
-  select(-x20)
+  dplyr::select(-x20)
 
 # Les points lon/lat ne sont pas précisément sur une grille régulière qui
 # était à l'origine en Lambert2 étendu (grille Safran). On ne peut donc pas
@@ -50,7 +51,7 @@ grille <- s3read_using(
     object = "2023/sujet2/drias/grilleSafran_complete_drias2021.xls",
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
-  select(-unused)
+  dplyr::select(-unused)
 
 # contours admin simplifiés d'après adminexpress
 fr <- s3read_using(
@@ -106,4 +107,27 @@ drias_raster %>%
     object = "2023/sujet2/resultats/drias.rds",
     bucket = "projet-funathon",
     opts = list("region" = ""))
+
+# Voronoï à partir des points
+
+v <- st_voronoi(do.call(c, st_geometry(drias_sf)))
+
+# Export PostgreSQL  ----------------------------------------------------------
+
+cnx <- dbConnect(Postgres(),
+                 user = "projet-funathon",
+                 password = postgresql_password,
+                 host = "postgresql-438832",
+                 dbname = "defaultdb",
+                 port = 5432,
+                 check_interrupts = TRUE,
+                 application_name = paste(paste0(version[["language"]], " ",
+                                                 version[["major"]], ".",
+                                                 version[["minor"]]),
+                                          tryCatch(basename(rstudioapi::getActiveDocumentContext()[["path"]]),
+                                                   error = function(e) ''),
+                                          sep = " - "))
+
+# On peuple la table PostgreSQL
+dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS drias")
 
