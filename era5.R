@@ -2,6 +2,11 @@
 # https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators
 
 
+# paramètres --------------------------------------------------------------
+
+rep_era5 <- "donnees/era5"
+
+
 # config ------------------------------------------------------------------
 
 library(ag5Tools)
@@ -9,10 +14,19 @@ library(glue)
 library(tidyverse)
 library(fs)
 
+# ag5Tools a besoin de python et de l'appli d'accès à copernicus
+
+# windows
 # installer python (Anaconda)
 # installer l'appli CDS API
 #
 # $> pip install cdsapi
+
+# SSPLab
+system("curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py")
+system("python3 get-pip.py")
+system('export PATH="/home/onyxia/.local/bin" && pip3 install cdsapi')
+
 
 # Création du fichier de credentials nécessaire à l'appli CDS API
 # variable d'environnement CDS_UID et CDS_API_KEY à récupérer depuis
@@ -22,10 +36,8 @@ write_lines(
        "key: {Sys.getenv('CDS_UID')}:{Sys.getenv('CDS_API_KEY')}"),
   path_expand("~/.cdsapirc"))
 
-
-# paramètres --------------------------------------------------------------
-
-rep_era5 <- glue(path_real("donnees/era5"), "/")
+dir_create(rep_era5)
+rep_era5_full <- glue(path_real(rep_era5), "/")
 
 
 # téléchargement -----------------------------------------------------------
@@ -33,13 +45,13 @@ rep_era5 <- glue(path_real("donnees/era5"), "/")
 # Températures moyennes journalières
 # 1 fichier NetCDF par jour -> 2 Go/an
 # de 2007 (premier millésime du RPG) à 2022
-2007:2022 %>%
+2022 %>%
   walk(~ ag5_download(variable = "2m_temperature",
                       statistic = "24_hour_mean",
                       day = "all",
                       month = "all",
                       year = .x,
-                      path = rep_era5))
+                      path = rep_era5_full))
 
 
 # ex. utilisation ---------------------------------------------------------
@@ -56,7 +68,7 @@ temp_points <- points %>%
   ag5_extract(variable = "Temperature-Air-2m",
               statistic = "Mean-24h",
               celsius = TRUE,
-              path = rep_era5) %>%
+              path = rep_era5_full) %>%
   imap(~ pivot_longer(.x,
                       everything(),
                       names_to = "date",
