@@ -61,3 +61,4 @@ write_sf(point, cnx, append = T)
 # st_write(point,dsn=cnx,layer="point",delete_layer = TRUE)
 
 
+
