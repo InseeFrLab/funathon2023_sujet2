@@ -14,20 +14,20 @@ library(glue)
 library(tidyverse)
 library(fs)
 
-# ag5Tools a besoin de python et de l'appli d'accès à copernicus
+# ag5Tools a besoin de python et de l'appli d'accès à copernicus ----------
 
-# windows
+## windows ----
 # installer python (Anaconda)
 # installer l'appli CDS API
 #
 # $> pip install cdsapi
 
-# SSPLab
+## SSPLab ----
 system("curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py")
 system("python3 get-pip.py")
 system('export PATH="/home/onyxia/.local/bin" && pip3 install cdsapi')
 
-
+## config ----
 # Création du fichier de credentials nécessaire à l'appli CDS API
 # variable d'environnement CDS_UID et CDS_API_KEY à récupérer depuis
 # https://cds.climate.copernicus.eu/
@@ -45,7 +45,7 @@ rep_era5_full <- glue(path_real(rep_era5), "/")
 # Températures moyennes journalières
 # 1 fichier NetCDF par jour -> 2 Go/an
 # de 2007 (premier millésime du RPG) à 2022
-2022 %>%
+2015:2021 %>%
   walk(~ ag5_download(variable = "2m_temperature",
                       statistic = "24_hour_mean",
                       day = "all",
@@ -53,6 +53,14 @@ rep_era5_full <- glue(path_real(rep_era5), "/")
                       year = .x,
                       path = rep_era5_full))
 
+
+# stockage ----------------------------------------------------------------
+
+# avec la valeur dans
+# Mon compte > Connexion au stockage > Pour accéder au stockage > MC client
+# $ export MC_HOST_s3=...
+#
+# $ mc cp -r funathon2023_sujet2/donnees/era5/2022/ s3/projet-funathon/2023/sujet2/era5/2022
 
 # ex. utilisation ---------------------------------------------------------
 
@@ -82,3 +90,5 @@ temp_points %>%
   ggplot(aes(date, temp_moy_c, color = ville)) +
   geom_point(alpha = 0.3) +
   geom_smooth(span = 0.2)
+
+
