@@ -1,10 +1,17 @@
-# Récupération des données de température
+# Récupération des données de température passées ERA5
+# Monde entier - raster (netCDF), environ 10 km / pixel
 # https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators
 
 
 # paramètres --------------------------------------------------------------
 
+# où sauver les données dans le stockage "local"
 rep_era5 <- "donnees/era5"
+
+# Années(s) à télécharger
+# de 2015 (premier millésime du RPG  utilisé dans nos exemples) à 2022
+# periode <- 2022
+periode <- 2015:2022
 
 
 # config ------------------------------------------------------------------
@@ -31,6 +38,7 @@ system('export PATH="/home/onyxia/.local/bin" && pip3 install cdsapi')
 # Création du fichier de credentials nécessaire à l'appli CDS API
 # variable d'environnement CDS_UID et CDS_API_KEY à récupérer depuis
 # https://cds.climate.copernicus.eu/
+# et stockées dans ~/.Renviron
 write_lines(
   glue("url: https://cds.climate.copernicus.eu/api/v2\n",
        "key: {Sys.getenv('CDS_UID')}:{Sys.getenv('CDS_API_KEY')}"),
@@ -44,8 +52,8 @@ rep_era5_full <- glue(path_real(rep_era5), "/")
 
 # Températures moyennes journalières
 # 1 fichier NetCDF par jour -> 2 Go/an
-# de 2007 (premier millésime du RPG) à 2022
-2015:2021 %>%
+# 40 min/an
+periode %>%
   walk(~ ag5_download(variable = "2m_temperature",
                       statistic = "24_hour_mean",
                       day = "all",
@@ -54,13 +62,18 @@ rep_era5_full <- glue(path_real(rep_era5), "/")
                       path = rep_era5_full))
 
 
-# stockage ----------------------------------------------------------------
+# stockage persitant S3 ---------------------------------------------------
 
 # avec la valeur dans
 # Mon compte > Connexion au stockage > Pour accéder au stockage > MC client
 # $ export MC_HOST_s3=...
-#
+# puis par ex. :
 # $ mc cp -r funathon2023_sujet2/donnees/era5/2022/ s3/projet-funathon/2023/sujet2/era5/2022
+
+# ne marche pas :
+# periode %>%
+#   walk(~ system(glue("export MC_HOST_s3=\"{Sys.getenv('MC_HOST_s3')}\" && mc cp -r {rep_era5_full}{.x}/ s3/projet-funathon/2023/sujet2/era5/{.x}")))
+
 
 # ex. utilisation ---------------------------------------------------------
 
