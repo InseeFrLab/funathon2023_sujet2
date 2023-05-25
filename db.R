@@ -6,7 +6,7 @@ library(sf)
 
 cnx <- dbConnect(Postgres(),
                  user = "projet-funathon",
-                 password = "1tfawt3nj7fgzo3w7cma",
+                 password = rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL"),
                  host = "postgresql-438832",
                  dbname = "defaultdb",
                  port = 5432,
