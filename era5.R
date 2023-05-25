@@ -16,6 +16,8 @@ periode <- 2015:2022
 
 # config ------------------------------------------------------------------
 
+install.packages("ag5Tools")
+
 library(ag5Tools)
 library(glue)
 library(tidyverse)
@@ -47,6 +49,8 @@ write_lines(
 dir_create(rep_era5)
 rep_era5_full <- glue(path_real(rep_era5), "/")
 
+Sys.setlocale("LC_ALL", "fr_FR.UTF-8")
+
 
 # téléchargement -----------------------------------------------------------
 
@@ -62,25 +66,28 @@ periode %>%
                       path = rep_era5_full))
 
 
-# stockage persitant S3 ---------------------------------------------------
+# sauvegarde vers stockage persitant S3 -----------------------------------
 
-# avec la valeur dans
+# s'il y a eu "déconnexion", avec la valeur dans
 # Mon compte > Connexion au stockage > Pour accéder au stockage > MC client
 # $ export MC_HOST_s3=...
 # puis par ex. :
 # $ mc cp -r funathon2023_sujet2/donnees/era5/2022/ s3/projet-funathon/2023/sujet2/era5/2022
 
-# ne marche pas :
+# ne marche pas (?) :
 # periode %>%
 #   walk(~ system(glue("export MC_HOST_s3=\"{Sys.getenv('MC_HOST_s3')}\" && mc cp -r {rep_era5_full}{.x}/ s3/projet-funathon/2023/sujet2/era5/{.x}")))
 
 
 # ex. utilisation ---------------------------------------------------------
 
+# copier les données
+system(glue("mc cp -r  s3/projet-funathon/2023/sujet2/era5 {rep_era5_full}"))
+
 # un exemple de localisations avec date début-fin
 points <- tribble(~ville,       ~lon,   ~lat, ~start_date,  ~end_date,
-                  "Talissieu", 5.725, 45.864, "2022-01-01", "2022-12-31",
-                  "Toulouse",  1.434, 43.591, "2022-01-01", "2022-12-31") %>%
+                  "Talissieu", 5.725, 45.864, "2015-01-01", "2022-12-31",
+                  "Toulouse",  1.434, 43.591, "2015-01-01", "2022-12-31") %>%
   mutate(id = row_number())
 
 # Extraction des températures moyennes journalières à ces points
@@ -99,9 +106,28 @@ temp_points <- points %>%
   bind_rows() %>%
   inner_join(points, by = "id")
 
+# exemple graphique pour toutes les villes en 2022
 temp_points %>%
+  filter(year(date) == 2022) %>% 
   ggplot(aes(date, temp_moy_c, color = ville)) +
   geom_point(alpha = 0.3) +
   geom_smooth(span = 0.2)
+
+# exemple graphique une ville, toutes les années
+ville_sel <- "Toulouse"
+temp_points %>%
+  filter(ville == ville_sel) %>% 
+  mutate(annee = year(date),
+         jour_virtuel = as.Date(glue("2020-{format(date, '%j')}"), "%Y-%j")) %>% 
+  ggplot(aes(jour_virtuel, temp_moy_c, group = annee, color = factor(annee))) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(span = 0.2, se = FALSE) +
+  scale_color_viridis_d(guide = guide_legend(reverse = TRUE)) +
+  scale_x_date(date_breaks = "months", date_labels = "%b") +
+  labs(title = "Température",
+       subtitle = ville_sel,
+       x = "jour",
+       y = "température moyenne journalière (°C)",
+       color = "année")
 
 
