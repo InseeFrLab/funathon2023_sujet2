@@ -24,7 +24,7 @@ library(RPostgres)
 # library(tictoc)
 # library(openxlsx)
 
-# ajout
+# test commit
  
 # 1 - Créer une table avec un point en récupérant les coordonnées GPS --------
 
