@@ -29,7 +29,7 @@ lat<- 43.44763763593564
 lon<- 1.2887755354488053
 rayon<-5000
 
-point<-data.frame(lon,lat) %>% 
+point<-data.frame(lon,lat,rayon) %>% 
   st_as_sf(coords = c("lon","lat"),crs = "EPSG:4326") %>%
   mutate(coord_pt_gps=st_as_text(geometry)) %>% 
   st_transform("EPSG:2154") %>% clean_names() %>% st_sf() 
