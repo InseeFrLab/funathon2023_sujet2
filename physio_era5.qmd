@@ -1,0 +1,180 @@
+---
+title: "Évolution de la date théorique de récolte"
+pagetitle: "ERA5"
+subtitle: "Agronomie et données climatiques rétrospectives avec ERA5"
+author: "Michaël Delorme"
+author-meta: "`r Sys.info()['user']`"
+date: "`r Sys.Date()`"
+date-meta: "`r Sys.Date()`"
+abstract-title: Résumé
+keywords: ["productions végétales", "agronomie", "climat", "ERA5", "France"]
+lang: fr
+language: 
+  title-block-author-single: ""
+  title-block-affiliation-single: ""
+  title-block-published: ""
+format: 
+  html:
+    anchor-sections: true
+    smooth-scroll: true
+    self-contained: true
+    toc: true
+    toc-depth: 3
+    theme: united
+    code-fold: true
+    code-tools: true
+    code-summary: "voir le code"
+number-sections: true
+mainfont: "Marianne"
+monofont: "Fira Code"
+code-fold: true
+crossref:
+  fig-prefix: figure
+  fig-title:  Figure
+  tbl-prefix: tableau
+  tbl-title:  Tableau
+  title-delim: " &ndash; "
+  sec-prefix: chapitre
+editor_options: 
+  chunk_output_type: console
+execute: 
+  eval: true
+  echo: true
+  message: false
+  warning: false
+  error: false
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+    out.width: 100%
+---
+
+Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur pour se développer. La notion de *degrés jours* a été introduite par les biologistes pour quantifier ce besoin physiologique. Il s'exprime par la somme des différences entre la température moyenne journalière et une température de base[^1].
+
+[^1]: [Degré jour de croissance. *Wikipedia*](https://fr.wikipedia.org/wiki/Degr%C3%A9_jour_de_croissance)
+
+$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{j, max} - T_{j, min}}{2} - T_{base}}$
+
+Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable selon la précocité de la variété) pour être récolté pour l'ensilage[^2] destiné à nourrir le bétail, ou 1700 DJ pour le maïs grain. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^3].
+
+[^2]: [*Spotifarm*](https://blog.spotifarm.fr/tour-de-plaine-spotifarm/somme-de-temperature-pourquoi-suivre-levolution-des-degres-jours)
+
+[^3]: [Céré'Obs. *FranceAgrimer*](https://cereobs.franceagrimer.fr/cereobs-sp/assets/pdfjs/web/viewer.html?file=blob:https://cereobs.franceagrimer.fr/f05c19c6-aff4-4701-9af4-80fdef7118d3)
+
+**Peut-on voir comment a évolué la date de récolte théorique d'une parcelle de maïs au cours des dernières années ?**
+
+# Données
+
+-   Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agricuteurs : données graphiques et leur culture principale, pour récupérer les cordonnées géographiques d'une parcelle de maïs.  
+Les données sont disponibles dans une base PostGIS.
+
+-   [ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données qui fournit des données météorologiques de surface quotidiennes pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 10 km en France).  
+Les données 2017-2022 ont été préchargées sur Minio et limitées à l'emprise de la métropole. Elle sont au format NetCDF. Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
+
+# Préparation
+
+```{r}
+#| label: setup
+
+# install.packages("ag5Tools")
+
+library(ag5Tools)
+library(tidyverse)
+library(glue)
+library(fs)
+library(knitr)
+
+# localisation des données dans le stockage "local"
+# $ mc cp -r funathon2023_sujet2/donnees/era5/ s3/projet-funathon/2023/sujet2/era5
+rep_era5 <- "donnees/era5"
+rep_era5_full <- glue(path_real(rep_era5), "/")
+
+invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
+```
+
+# Extraction
+
+```{r}
+#| label: donnees
+#| cache: true
+#| results: hide
+# un exemple de localisations avec date début-fin
+points <- tribble(~ville,       ~lon,   ~lat,
+                  "Talissieu", 5.725, 45.864,
+                  "Toulouse",  1.434, 43.591) %>%
+  mutate(id = row_number(),
+         start_date = "2015-01-01",
+         end_date   = "2022-12-31")
+
+# Extraction des températures moyennes journalières à ces points
+temp_points <- points %>%
+  as.data.frame() %>%
+  ag5_extract(variable = "Temperature-Air-2m",
+              statistic = "Mean-24h",
+              celsius = TRUE,
+              path = rep_era5_full) %>%
+  imap(~ pivot_longer(.x,
+                      everything(),
+                      names_to = "date",
+                      values_to = "temp_moy_c",
+                      names_transform = ymd) %>%
+         mutate(id = .y)) %>%
+  bind_rows() %>%
+  inner_join(points, by = "id")
+```
+
+# Calcul des degrés jour et des dates de récolte
+
+```{r}
+#| label: traitement
+
+# la date n'est pas un bon indicateur pour suivre une évolution journalière à
+# cause des années bissextiles ; on utilisaera le day of year (doy)
+# yday(ymd("2020-04-01"))
+# yday(ymd("2023-04-01"))
+
+base <- 6 # °C
+besoin <- 1700 # DJ
+
+recolte <- temp_points %>% 
+  select(date, id, ville, temp_moy_c) %>% 
+  group_by(ville, annee = year(date)) %>% 
+  mutate(dj = case_when(yday(date) < 91 ~ 0,
+                        temp_moy_c > 30 ~ 0,
+                        temp_moy_c < base ~ 0,
+                        TRUE ~ temp_moy_c - base),
+         sdj = cumsum(dj)) %>%
+  filter(sdj > besoin) %>% 
+  slice_min(date) %>% 
+  ungroup() %>% 
+  select(date, annee, id, ville)
+```
+
+```{r}
+#| label: tbl-resultats
+#| echo: false
+#| tbl-cap: Dates de récolte potentielles
+kable(recolte)
+```
+
+# Visualisation
+
+```{r}
+#| label: fig-date-recolte
+#| fig-cap: Évolution de la date de récolte potentielle du maïs grain
+recolte %>% 
+  mutate(doy = yday(date),
+         date_virtuelle = as_date(parse_date_time(glue("2020-{str_pad(doy, 3, 'left', '0')}"), 
+                                                  orders = "yj"))) %>% 
+  ggplot(aes(annee, date_virtuelle, color = ville)) +
+  geom_point() +
+  geom_smooth() +
+  scale_y_date(date_breaks = "months", date_labels = "%b") +
+  labs(title = "Date de récolte potentielle",
+       subtitle = "Maïs grain",
+       x = "année",
+       y = "jour",
+       color = "lieu",
+       caption = glue("d'après données agroclimatiques ERA5
+                       pour une précocité moyenne ({besoin} DJ, base {base} °C"))
+```
