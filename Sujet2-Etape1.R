@@ -12,7 +12,7 @@
 library(tidyverse); 
 library(aws.s3)
 library(sf)
-library(RPostgres)
+library(RPostgreSQL)
 
 # library(janitor);
 # library(ggplot2)
@@ -30,7 +30,7 @@ library(RPostgres)
 
 lat<- 43.44763763593564
 lon<- 1.2887755354488053
-rayon<-5000
+rayon<-10000
 
 # janitor (clean_names) non disponible (?)
 point<-data.frame(lon,lat,rayon) %>% 
@@ -50,22 +50,23 @@ st_as_text(st_sfc(point$geom, crs = 4326), EWKT = TRUE)
 
 # le mot de passe est stocké dans un secret Vault
 postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
-
+postgresql_password <- "1tfawt3nj7fgzo3w7cma"
+  
 # Connection à PostgreSQL
-cnx <- dbConnect(Postgres(),
+cnx <- dbConnect(PostgreSQL(),
                  user = "projet-funathon",
                  password = postgresql_password,
                  host = "postgresql-438832",
                  dbname = "defaultdb",
                  port = 5432,
-                 check_interrupts = TRUE,
-                 options="-c search_path=rpg,public", # specify what schema to connect to
-                 application_name = paste(paste0(version[["language"]], " ",
-                                                 version[["major"]], ".",
-                                                 version[["minor"]]),
-                                          tryCatch(basename(rstudioapi::getActiveDocumentContext()[["path"]]),
-                                                   error = function(e) ''),
-                                          sep = " - "))
+                 # check_interrupts = TRUE,
+                 options="-c search_path=rpg,public") # specify what schema to connect to
+                 # application_name = paste(paste0(version[["language"]], " ",
+                 #                                 version[["major"]], ".",
+                 #                                 version[["minor"]]),
+                 #                          tryCatch(basename(rstudioapi::getActiveDocumentContext()[["path"]]),
+                 #                                   error = function(e) ''),
+                 #                          sep = " - "))
 
 # suppression de la table «point» si elle existe
 dbSendQuery(cnx,"DROP TABLE IF EXISTS rpg.point CASCADE;")
@@ -78,30 +79,22 @@ dbSendQuery(cnx,"ALTER TABLE rpg.point ADD CONSTRAINT point_pkey PRIMARY KEY(coo
 
 # ajout d'un index
 dbSendQuery(cnx,"CREATE INDEX ON rpg.point USING gist(geom);")
-dbExecute(cnx,"CREATE INDEX ON rpg.point USING gist(geom);")
+# dbExecute(cnx,"CREATE INDEX ON rpg.point USING gist(geom);")
 
 # 3 - Exécution de la requête de découpage du RPG autour du point sur PostGis  -------
 
-tic()
 dbSendQuery(cnx,"DROP TABLE IF EXISTS rpg.parc_prox CASCADE;")
-toc()
 
-tic()
 dbSendQuery(cnx,"CREATE TABLE rpg.parc_prox AS
 	SELECT row_number() OVER () AS row_id, p.coord_pt_gps, p.rayon, r.*  
 	FROM rpg.point p, rpg.parcelles r 
 	WHERE ST_DWithin(p.geom,r.geom,p.rayon);")
-toc()
 
 # ajout d'une clé primaire
-tic()
-dbSendQuery(cnx,"ALTER TABLE rpg.parc_prox ADD CONSTRAINT parc_prox_pk PRIMARY KEY(gid);")
-toc()
+dbSendQuery(cnx,"ALTER TABLE rpg.parc_prox ADD CONSTRAINT parc_prox_pk PRIMARY KEY(id_parcel);")
 
 # ajout d'un index
-tic()
 dbSendQuery(cnx,"CREATE INDEX parc_prox_geom_idx ON rpg.parc_prox USING gist(geom);")
-toc()
 
 
 # 4 - Téléchargement des parcelles proches sous R-------------------------------
@@ -111,12 +104,6 @@ toc()
 parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 
 plot(st_geometry(parc_prox))
-
-parc_prox %>% 
-  summary(parc_prox$code_cultu)
-
-summary(parc_prox$surface)
-describe(parc_prox$code_cultu)
 
 
 
