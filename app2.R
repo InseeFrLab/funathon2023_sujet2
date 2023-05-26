@@ -110,7 +110,7 @@ drias_raster <- s3read_using(
 names(drias_raster)
 
 raster::plot(x = drias_raster,
-             main = "Cumuls de précipitations d'avril à octobre (mm) en 2050")
+             main = "Cumuls de précipitations d'avril à octobre (mm) annuels sur la période 2021-2050")
 
 nbands(drias_raster)
 bandnr(drias_raster)
@@ -123,7 +123,7 @@ drias_raster_arra <- s3read_using(
   opts = list("region" = ""))
 
 raster::plot(x = drias_raster_arra,
-             main = "Ecarts des cumuls de précipitations d'avril à octobre (mm) entre 2021 et 2050")
+             main = "Ecarts des cumuls de précipitations d'avril à octobre (mm) entre 2021-2050 et 1976-2005")
 
 # Avec palette custom
 palette <- c("#1457ff", "#3c9aff", "#6dc4ff", "#a8e1ff", "#dff1fb", "#f8e9eb", "#fca8ab", "#f9575d", "#f2060b", "#a20102")
@@ -132,9 +132,10 @@ breaks <- c(-200, -160, -120, -80, -40, -0, 40, 80, 120, 160, 200)
 raster::plot(x = drias_raster_arra,
              col = rev(palette),
              breaks = breaks,
-             main = "Ecarts des cumuls de précipitations d'avril à octobre (mm) entre 2021 et 2050")
-# Petite différence avec les visualisation disponibles sur le site du DRIAS, à creuser
-# Modèle différent ou interpolation lors de la création du raster ?
+             main = "Ecarts des cumuls de précipitations d'avril à octobre (mm) entre 2021-2050 et 1976-2005")
+# Petites différences avec les visualisations disponibles sur le site du DRIAS
+# http://www.drias-climat.fr/decouverte/cartezoom/experience/EUROCORDEX2020_ELAB/ALADIN63_CNRM-CM5/RCP8.5/RCP8.5/H1/ARRA/ARRA/A1
+# Interpolation lors de la création du raster ?
 
 # Bande ASDA
 drias_raster_asda <- s3read_using(
@@ -144,8 +145,56 @@ drias_raster_asda <- s3read_using(
   opts = list("region" = ""))
 
 raster::plot(x = drias_raster_asda,
-             main = "Ecarts de nombre de jours d'été d'avril à juin entre 2021 et 2050")
+             main = "Ecarts de nombre de jours d'été d'avril à juin entre 2021-2050 et 1976-2005")
 
+# On essaye de plot la même chose à partir de la base PostGIS
+query <- "
+SELECT *
+FROM drias.previsions
+"
+drias_sf <- st_read(cnx, query = query)
+
+# On récupère les régions françaises pour réduire la taille des cellules aux frontières
+query <- "
+SELECT * FROM adminexpress.region
+"
+region_sf <- st_read(cnx, query = query)
+region_sf <- region_sf %>% st_transform(
+  "EPSG:2154"
+)
+metropole_sf <- region_sf %>%
+  dplyr::filter(!(insee_reg %in% c("03", "04", "06", "01", "02", "01_SBSM")))
+drias_sf_intersected <- st_intersection(drias_sf, st_combine(metropole_sf))
+
+ggplot() + 
+  geom_sf(data = drias_sf_intersected, aes(fill = arra), color = NA) +
+  binned_scale(aesthetics = "fill", scale_name = "custom", 
+               palette = ggplot2:::binned_pal(scales::manual_pal(values = palette)),
+               guide = "bins",
+               breaks = breaks)
+
+drias_sf_intersected <- drias_sf_intersected %>%
+  mutate(arra_class = case_when(
+    arra < -160 ~ "1",
+    arra < -120 ~ "2",
+    arra < -80 ~ "3",
+    arra < -40 ~ "4",
+    arra < 0 ~ "5",
+    arra < 40 ~ "6",
+    arra < 80 ~ "7",
+    arra < 120 ~ "8",
+    arra < 160 ~ "9",
+    arra < 200 ~ "10",
+  ))
+
+ggplot() + 
+  geom_sf(data = drias_sf_intersected, aes(fill = arra_class), color = NA) +
+  scale_fill_discrete(type = palette)
+
+# Problème à régler..
+
+# On veut regarder où se trouvent les cultures pour lesquelles on anticipe une forte baisse d'apport
+# en eau de pluie, PMV et MAC
 
 
 # Autres manières de faire
