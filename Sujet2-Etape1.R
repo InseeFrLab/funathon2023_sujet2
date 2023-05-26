@@ -107,10 +107,52 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 
 plot(st_geometry(parc_prox))
 
-# 5 - Lecture des cultures agrégées ---------------------------------------
+# 5 - Lecture et appariement des cultures agrégées ---------------------------------------
 
-cult_agreg<-s3read_using(FUN = read.csv, 
+cult_agreg<-s3read_using(FUN = read_csv, 
                          object = "2023/sujet2/ign/rpg/n-cultures-2021.csv", 
+                         col_types = cols(.default = col_character()),
                          bucket = "projet-funathon",
-                         opts = list("region" = ""))
+                         opts = list("region" = "")) %>% select(-nom_sous_chapitre,-categorie_surf_agricole)
+  
+
+parc_prox <- parc_prox %>% left_join(cult_agreg,by=c("code_cultu"="code_culture"))
+
+
+# 5 - lecture des libelles des groupes de culture --------------------------------------
+
+lib_group_cult<-s3read_using(FUN = read_csv2, 
+                         object = "2023/sujet2/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
+                         col_types = cols(.default = col_character()),
+                         bucket = "projet-funathon",
+                         opts = list("region" = "")) %>% 
+  select(CODE_GROUPE_CULTURE,LIBELLE_GROUPE_CULTURE) %>% 
+  distinct(CODE_GROUPE_CULTURE,.keep_all=T) %>% 
+  rename (code_group_culture=CODE_GROUPE_CULTURE,libelle_groupe_culture=LIBELLE_GROUPE_CULTURE)
+
+
+# 6 - Calcul des surfaces par culture France métro (sur PostGIS)------------------------
+
+stat_sql_group_cult_fm<-dbGetQuery(cnx,"select code_group, count(*), round(sum(surf_parc)) as surf_ha 
+from rpg.parcelles group by code_group order by code_group::numeric;")  
+
+stat_group_cult_fm<-stat_sql_group_cult_fm %>% 
+  left_join(lib_group_cult,by=c("code_group"="code_group_culture")) %>% 
+  select(code_group,libelle_groupe_culture,everything()) %>% 
+  add_tally(count) %>% add_tally(surf_ha) %>% 
+  mutate(pct_count=round(100*count/n,1),pct_surf=round(100*surf_ha/nn,1), surf_moy=round(surf_ha/count,1)) %>% 
+  select(code_group,libelle_groupe_culture,count,pct_count, surf_ha, pct_surf, surf_moy)
+
+s3saveRDS(stat_group_cult_fm, 
+          bucket = "projet-funathon", 
+          object = "/2023/sujet2/resultats/stat_group_cult_fm.rds", 
+          opts = list("region" = ""))
+
+s3write_using(stat_group_cult_fm,
+              FUN = write_csv, 
+             object = "/2023/sujet2/resultats/stat_group_cult_fm.csv",
+             bucket = "projet-funathon",
+             opts = list("region" = "")) 
+  
+
 
