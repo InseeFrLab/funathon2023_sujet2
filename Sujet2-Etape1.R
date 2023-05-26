@@ -24,8 +24,10 @@ library(RPostgreSQL)
 # library(tictoc)
 # library(openxlsx)
 
-# test commit 2
- 
+# données -----------------------------------------------------------------
+
+aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/ign/rpg")
+
 # 1 - Créer une table avec un point en récupérant les coordonnées GPS --------
 
 lat<- 43.44763763593564
@@ -105,6 +107,10 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 
 plot(st_geometry(parc_prox))
 
+# 5 - Lecture des cultures agrégées ---------------------------------------
 
-
+cult_agreg<-s3read_using(FUN = read.csv, 
+                         object = "2023/sujet2/ign/rpg/n-cultures-2021.csv", 
+                         bucket = "projet-funathon",
+                         opts = list("region" = ""))
 
