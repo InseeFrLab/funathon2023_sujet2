@@ -22,6 +22,8 @@ library(ag5Tools)
 library(glue)
 library(tidyverse)
 library(fs)
+library(terra)
+library(fs)
 
 # ag5Tools a besoin de python et de l'appli d'accès à copernicus ----------
 
@@ -36,7 +38,7 @@ system("curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py")
 system("python3 get-pip.py")
 system('export PATH="/home/onyxia/.local/bin" && pip3 install cdsapi')
 
-## config ----
+## config CDS ----
 # Création du fichier de credentials nécessaire à l'appli CDS API
 # variable d'environnement CDS_UID et CDS_API_KEY à récupérer depuis
 # https://cds.climate.copernicus.eu/
@@ -54,7 +56,7 @@ Sys.setlocale("LC_ALL", "fr_FR.UTF-8")
 
 # téléchargement -----------------------------------------------------------
 
-# Températures moyennes journalières
+# Températures moyennes journalières - Monde
 # 1 fichier NetCDF par jour -> 2 Go/an
 # 40 min/an
 periode %>%
@@ -64,6 +66,15 @@ periode %>%
                       month = "all",
                       year = .x,
                       path = rep_era5_full))
+
+
+# nettoyage ---------------------------------------------------------------
+
+# découper l'emprise uniquement sur la France métropolitaine
+dir_ls(rep_era5_full, recurse = TRUE, glob = "*.nc") %>% 
+  walk(\(x) { rast(x) %>% 
+                crop(ext(-5.5, 10, 41, 51.5)) %>% 
+                writeCDF(x, overwrite = TRUE)})
 
 
 # sauvegarde vers stockage persitant S3 -----------------------------------
@@ -81,14 +92,16 @@ periode %>%
 
 # ex. utilisation ---------------------------------------------------------
 
-# copier les données
-system(glue("mc cp -r  s3/projet-funathon/2023/sujet2/era5 {rep_era5_full}"))
+# copier les données depuis le stockage persistant S3
+system(glue("mc cp -r  s3/projet-funathon/2023/sujet2/era5/ {rep_era5_full}"))
 
 # un exemple de localisations avec date début-fin
-points <- tribble(~ville,       ~lon,   ~lat, ~start_date,  ~end_date,
-                  "Talissieu", 5.725, 45.864, "2015-01-01", "2022-12-31",
-                  "Toulouse",  1.434, 43.591, "2015-01-01", "2022-12-31") %>%
-  mutate(id = row_number())
+points <- tribble(~ville,       ~lon,   ~lat,
+                  "Talissieu", 5.725, 45.864,
+                  "Toulouse",  1.434, 43.591) %>%
+  mutate(id = row_number(),
+         start_date = "2015-01-01",
+         end_date   = "2022-12-31")
 
 # Extraction des températures moyennes journalières à ces points
 temp_points <- points %>%
@@ -106,14 +119,15 @@ temp_points <- points %>%
   bind_rows() %>%
   inner_join(points, by = "id")
 
-# exemple graphique pour toutes les villes en 2022
+# exemple de graphique pour toutes les villes, par année
 temp_points %>%
-  filter(year(date) == 2022) %>% 
   ggplot(aes(date, temp_moy_c, color = ville)) +
   geom_point(alpha = 0.3) +
-  geom_smooth(span = 0.2)
+  geom_smooth(span = 0.2) +
+  scale_x_date(date_breaks = "2 months", date_labels = "%b") +
+  facet_wrap(~ year(date), scales = "free_x")
 
-# exemple graphique une ville, toutes les années
+# exemple de graphique pour une ville, toutes les années
 ville_sel <- "Toulouse"
 temp_points %>%
   filter(ville == ville_sel) %>% 
