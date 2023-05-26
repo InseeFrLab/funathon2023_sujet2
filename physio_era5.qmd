@@ -49,6 +49,12 @@ knitr:
     out.width: 100%
 ---
 
+```{css}
+code {font-size: .8em}
+.toc-section-number:after, .header-section-number:after {content: ". "}
+q {quotes:'« ' ' »' '“' '”' '‘' '’'}
+```
+
 Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur pour se développer. La notion de *degrés jours* a été introduite par les biologistes pour quantifier ce besoin physiologique. Il s'exprime par la somme des différences entre la température moyenne journalière et une température de base[^1].
 
 [^1]: [Degré jour de croissance. *Wikipedia*](https://fr.wikipedia.org/wiki/Degr%C3%A9_jour_de_croissance)
