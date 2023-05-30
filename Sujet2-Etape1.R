@@ -154,5 +154,23 @@ s3write_using(stat_group_cult_fm,
              bucket = "projet-funathon",
              opts = list("region" = "")) 
   
+# 7 - Ajout des codes commune, departement, region dans la table parcelles -----
+
+dbSendQuery(cnx,"ALTER TABLE rpg.parcelles ADD COLUMN insee_com text;")
+dbSendQuery(cnx,"ALTER TABLE rpg.parcelles ADD COLUMN insee_dep text;")
+dbSendQuery(cnx,"ALTER TABLE rpg.parcelles ADD COLUMN insee_reg text;")
+dbSendQuery(cnx,"ALTER TABLE rpg.parcelles ADD COLUMN nom_com text;")
+
+dbSendQuery(cnx,
+            "WITH  sel AS (
+  SELECT r.id_parcel, c.insee_com, c.insee_dep, c.insee_reg, c.nom FROM 
+  rpg.parcelles r, adminexpress.commune c
+  WHERE st_intersects(st_pointonsurface(r.geom), st_transform(c.geom,2154))
+)
+UPDATE rpg.parcelles r
+SET insee_com = sel.insee_com, insee_dep=sel.insee_dep, insee_reg=sel.insee_reg, nom_com=sel.nom 
+FROM sel
+WHERE r.id_parcel = sel.id_parcel;"
+)
 
 
