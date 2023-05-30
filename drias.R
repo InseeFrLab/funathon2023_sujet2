@@ -109,8 +109,25 @@ drias_raster %>%
     opts = list("region" = ""))
 
 # Voronoï à partir des points
+g <- st_combine(st_geometry(drias_sf))
+v <- st_voronoi(g)
+v <- st_collection_extract(v)
+v <- v[unlist(st_intersects(drias_sf, v))]
+drias_sf <- st_set_geometry(drias_sf, v)
 
-v <- st_voronoi(do.call(c, st_geometry(drias_sf)))
+# On récupère les régions françaises pour réduire la taille des cellules aux frontières
+query <- "
+SELECT * FROM adminexpress.region
+"
+region_sf <- st_read(cnx, query = query)
+region_sf <- region_sf %>% st_transform(
+  "EPSG:2154"
+)
+metropole_sf <- region_sf %>%
+  dplyr::filter(!(insee_reg %in% c("03", "04", "06", "01", "02", "01_SBSM")))
+
+# Intersection
+drias_sf_intersected <- st_intersection(drias_sf, st_combine(metropole_sf))
 
 # Export PostgreSQL  ----------------------------------------------------------
 
@@ -130,4 +147,4 @@ cnx <- dbConnect(Postgres(),
 
 # On peuple la table PostgreSQL
 dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS drias")
-
+write_sf(drias_sf_intersected, cnx, Id(schema = "drias", table = "previsions"))

@@ -8,6 +8,8 @@ library(dplyr)
 library(aws.s3)
 library(ggplot2)
 library(raster)
+library(sf)
+library(janitor)
 
 # Première idée, on fait un spatial join entre DRIAS et RPG,
 # on peut obtenir par carreau DRIAS la surface de parcelles pour chaque type de culture
@@ -48,7 +50,7 @@ drias <- s3read_using(
   object = "2023/sujet2/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
   bucket = "projet-funathon",
   opts = list("region" = "")) %>%
-  clean_names() %>%
+  janitor::clean_names() %>%
   dplyr::select(-c(x20, latitude, longitude, contexte, periode))
 
 results_df <- results_df %>%
@@ -154,48 +156,84 @@ FROM drias.previsions
 "
 drias_sf <- st_read(cnx, query = query)
 
-# On récupère les régions françaises pour réduire la taille des cellules aux frontières
-query <- "
-SELECT * FROM adminexpress.region
-"
-region_sf <- st_read(cnx, query = query)
-region_sf <- region_sf %>% st_transform(
-  "EPSG:2154"
-)
-metropole_sf <- region_sf %>%
-  dplyr::filter(!(insee_reg %in% c("03", "04", "06", "01", "02", "01_SBSM")))
-drias_sf_intersected <- st_intersection(drias_sf, st_combine(metropole_sf))
-
 ggplot() + 
-  geom_sf(data = drias_sf_intersected, aes(fill = arra), color = NA) +
+  geom_sf(data = drias_sf, aes(fill = arra), color = NA) +
   binned_scale(aesthetics = "fill", scale_name = "custom", 
-               palette = ggplot2:::binned_pal(scales::manual_pal(values = palette)),
+               palette = ggplot2:::binned_pal(scales::manual_pal(values = rev(palette)[-1])),
                guide = "bins",
                breaks = breaks)
 
-drias_sf_intersected <- drias_sf_intersected %>%
-  mutate(arra_class = case_when(
-    arra < -160 ~ "1",
-    arra < -120 ~ "2",
-    arra < -80 ~ "3",
-    arra < -40 ~ "4",
-    arra < 0 ~ "5",
-    arra < 40 ~ "6",
-    arra < 80 ~ "7",
-    arra < 120 ~ "8",
-    arra < 160 ~ "9",
-    arra < 200 ~ "10",
-  ))
+# On veut regarder où se trouvent les cultures pour lesquelles on anticipe une forte baisse d'apport
+# en eau : PVP, MID, SGE, ARA
+query_pvp <- "
+SELECT id_parcel, geom
+FROM rpg.parcelles
+WHERE code_cultu = 'PVP'
+"
+pvp_df <- st_read(cnx, query = query_pvp)
+
+# On veut plot les parcelles avec les frontières régionales
+# Récupération des frontières régionales
+region_sf <- st_read(
+  cnx, query = "SELECT * FROM adminexpress.region"
+)
+region_sf <- region_sf %>% st_transform(
+  "EPSG:2154"
+)
+region_sf <- region_sf %>%
+  dplyr::filter(!(insee_reg %in% c("03", "04", "06", "01", "02", "01_SBSM")))
 
 ggplot() + 
-  geom_sf(data = drias_sf_intersected, aes(fill = arra_class), color = NA) +
-  scale_fill_discrete(type = palette)
+  geom_sf(data = region_sf) +
+  geom_sf(data = pvp_df, fill = "#fca8ab", color = NA)
+# Les parcelles sont trop petites, on fait un buffer pour la visualisation
 
-# Problème à régler..
+ggplot() + 
+  geom_sf(data = region_sf) +
+  geom_sf(data = st_buffer(pvp_df, 5000), fill = "#fca8ab", color = NA)
+# On aura envie de regarder de manière plus fine quelles parcelles vont avoir des 
+# problèmes
 
-# On veut regarder où se trouvent les cultures pour lesquelles on anticipe une forte baisse d'apport
-# en eau de pluie, PMV et MAC
+# Mais doux
+query_mid <- "
+SELECT id_parcel, geom
+FROM rpg.parcelles
+WHERE code_cultu = 'MID'
+"
+pvp_mid <- st_read(cnx, query = query_mid)
+ggplot() + 
+  geom_sf(data = region_sf) +
+  geom_sf(data = st_buffer(pvp_mid, 5000), fill = "#fca8ab", color = NA)
 
+# A contrario on regarde les cultures qui vont être trop arrosées
+# AGR Agrume                                       
+# CTG Châtaigne
+# LUD Luzerne déshydratée
+
+# Agrume
+query_agr <- "
+SELECT id_parcel, geom
+FROM rpg.parcelles
+WHERE code_cultu = 'AGR'
+"
+pvp_agr <- st_read(cnx, query = query_agr)
+ggplot() + 
+  geom_sf(data = region_sf) +
+  geom_sf(data = st_buffer(pvp_agr, 5000), fill = "#fca8ab", color = NA)
+
+# Luzerne déshydratée
+query_lud <- "
+SELECT id_parcel, geom
+FROM rpg.parcelles
+WHERE code_cultu = 'LUD'
+"
+pvp_lud <- st_read(cnx, query = query_lud)
+ggplot() + 
+  geom_sf(data = region_sf) +
+  geom_sf(data = st_buffer(pvp_lud, 5000), fill = "#fca8ab", color = NA)
+
+# On voudrait regarder la perte en %age
+# Cultures qui ont besoin de bcp d'eau ?
 
 # Autres manières de faire
 # On calcule l'intersection au lieu de faire confiance à la variable surf_parc
