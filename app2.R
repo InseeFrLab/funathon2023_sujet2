@@ -234,6 +234,7 @@ ggplot() +
 
 # On voudrait regarder la perte en %age
 # Cultures qui ont besoin de bcp d'eau ?
+# Horizon lointain ?
 
 # Autres manières de faire
 # On calcule l'intersection au lieu de faire confiance à la variable surf_parc
