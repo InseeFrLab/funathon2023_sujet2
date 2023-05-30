@@ -12,6 +12,7 @@ rep_era5 <- "donnees/era5"
 # de 2015 (premier millésime du RPG  utilisé dans nos exemples) à 2022
 # periode <- 2022
 periode <- 2015:2022
+periode <- 2010:2014
 
 
 # config ------------------------------------------------------------------
@@ -56,28 +57,35 @@ Sys.setlocale("LC_ALL", "fr_FR.UTF-8")
 
 # téléchargement -----------------------------------------------------------
 
+#' Téléchargement et découpage sur la France des données ERA5 pour une année
+#'
+#' @param annee 
+#'
+#' @return NULL (enregistrement fichiers sur disque)
+telecharger_decouper <- function(annee) {
+  # télécharger l'année
+  ag5_download(variable = "2m_temperature",
+               statistic = "24_hour_mean",
+               day = "all",
+               month = "all",
+               year = annee,
+               path = rep_era5_full)
+  
+  # découper l'emprise uniquement sur la France métropolitaine
+  dir_ls(path(rep_era5_full, annee), glob = "*.nc") %>%
+    walk(\(x) { rast(x) %>%
+        crop(ext(-5.5, 10, 41, 51.5)) %>% 
+        writeCDF(x, overwrite = TRUE)})
+}
+
 # Températures moyennes journalières - Monde
 # 1 fichier NetCDF par jour -> 2 Go/an
 # 40 min/an
 periode %>%
-  walk(~ ag5_download(variable = "2m_temperature",
-                      statistic = "24_hour_mean",
-                      day = "all",
-                      month = "all",
-                      year = .x,
-                      path = rep_era5_full))
+  walk(telecharger_decouper)
 
 
-# nettoyage ---------------------------------------------------------------
-
-# découper l'emprise uniquement sur la France métropolitaine
-dir_ls(rep_era5_full, recurse = TRUE, glob = "*.nc") %>% 
-  walk(\(x) { rast(x) %>% 
-                crop(ext(-5.5, 10, 41, 51.5)) %>% 
-                writeCDF(x, overwrite = TRUE)})
-
-
-# sauvegarde vers stockage persitant S3 -----------------------------------
+# sauvegarde vers stockage persistant S3 ----------------------------------
 
 # s'il y a eu "déconnexion", avec la valeur dans
 # Mon compte > Connexion au stockage > Pour accéder au stockage > MC client

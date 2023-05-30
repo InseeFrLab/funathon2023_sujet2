@@ -174,7 +174,7 @@ recolte %>%
                                                   orders = "yj"))) %>% 
   ggplot(aes(annee, date_virtuelle, color = ville)) +
   geom_point() +
-  geom_smooth() +
+  geom_smooth(method = lm) +
   scale_y_date(date_breaks = "months", date_labels = "%b") +
   labs(title = "Date de récolte potentielle",
        subtitle = "Maïs grain",
