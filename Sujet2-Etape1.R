@@ -161,11 +161,24 @@ dbSendQuery(cnx,"ALTER TABLE rpg.parcelles ADD COLUMN insee_dep text;")
 dbSendQuery(cnx,"ALTER TABLE rpg.parcelles ADD COLUMN insee_reg text;")
 dbSendQuery(cnx,"ALTER TABLE rpg.parcelles ADD COLUMN nom_com text;")
 
+# Création d'une table commune avec SRID=2154
+# suppression de la table «point» si elle existe
+dbSendQuery(cnx,"DROP TABLE IF EXISTS rpg.com CASCADE;")
+
+dbSendQuery(cnx,"CREATE TABLE rpg.com AS
+SELECT id, nom, insee_com, insee_dep, insee_reg, st_transform(geom,2154) as geom 
+FROM adminexpress.commune")
+
+dbGetQuery(cnx,"SELECT st_srid(geom) FROM rpg.com LIMIT 1;")  
+
+dbSendQuery(cnx,"ALTER TABLE rpg.com ADD CONSTRAINT com_pk PRIMARY KEY(id);")       
+dbSendQuery(cnx,"CREATE INDEX ON rpg.com USING gist(geom);")
+
 dbSendQuery(cnx,
             "WITH  sel AS (
   SELECT r.id_parcel, c.insee_com, c.insee_dep, c.insee_reg, c.nom FROM 
   rpg.parcelles r, adminexpress.commune c
-  WHERE st_intersects(st_pointonsurface(r.geom), st_transform(c.geom,2154))
+  WHERE st_intersects(st_pointonsurface(r.geom), c.geom)
 )
 UPDATE rpg.parcelles r
 SET insee_com = sel.insee_com, insee_dep=sel.insee_dep, insee_reg=sel.insee_reg, nom_com=sel.nom 
