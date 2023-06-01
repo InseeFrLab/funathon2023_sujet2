@@ -9,4 +9,4 @@ knitr:
     out.width: 100%
 ---
 
-A compléter.
+A compléter davantage.
