@@ -43,6 +43,12 @@ jobs:
       - name: Install libcurl4
         run:  sudo apt install libcurl4-openssl-dev
         
+      - name: Install GDAL
+        run: |
+          sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+          sudo apt-get update
+          sudo apt-get install libudunits2-dev libgdal-dev libgeos-dev libproj-dev
+
       - name: Install R Dependencies
         uses: r-lib/actions/setup-renv@v2
         with:
@@ -56,7 +62,7 @@ jobs:
           wget -q https://dl.min.io/client/mc/release/linux-amd64/mc -O /usr/local/bin/mc
           chmod +x /usr/local/bin/mc
           export 
-       
+
       - name: Retrieve stores from s3
         run: |
           export MC_HOST_s3=https://$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY@$AWS_S3_ENDPOINT
