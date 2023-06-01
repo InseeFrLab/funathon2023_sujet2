@@ -50,8 +50,10 @@ jobs:
         run:  sudo apt install libcurl4-openssl-dev
       
       - name: Install terra package
-        run: R -e 'remotes::install_github("rspatial/terra")'
-      
+        run: |
+          R -e 'install.packages('remotes')
+          R -e 'remotes::install_github("rspatial/terra")'
+                
       - name: Install R Dependencies
         uses: r-lib/actions/setup-renv@v2
         with:
