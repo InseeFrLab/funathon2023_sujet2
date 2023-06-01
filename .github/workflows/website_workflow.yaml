@@ -48,8 +48,8 @@ jobs:
         with:
           cache-version: 1
           
-      - name: Run ldconfig
-        run: sudo ldconfig
+      - name: Extend LD library path
+        run: export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 
       - name: Install Latex
         run:  quarto install tinytex
