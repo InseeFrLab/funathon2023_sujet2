@@ -1,0 +1,76 @@
+project:
+  type: book
+
+book:
+  repo-subdir: website
+  repo-url: https://github.com/InseeFrLab/funathon2023_sujet2
+  title: Funathon 2023 - Sujet 2
+  author:
+  - name: Bertrand Ballet
+    email: bertrand.ballet@agriculture.gouv.fr
+  - name: Michaël Delorme
+    email: michael.delorme@agriculture.gouv.fr
+  - name: Tom Seimandi
+    email: tom.seimandi@insee.fr
+
+  date: last-modified
+  chapters:
+    - index.qmd
+    - app0.qmd
+    - app1.qmd
+    - app2.qmd
+    - physio_era5.qmd
+    - text: "---"
+    - references.qmd
+
+  downloads: [pdf]
+
+lang: fr
+
+language: 
+  title-block-author-single: ""
+  title-block-affiliation-single: ""
+  title-block-published: ""
+
+bibliography: bibliography.bib
+
+format:
+  html:
+    theme: cosmo
+    reference-location: margin
+    fig-align: center
+    smooth-scroll: true
+    code-fold: true
+    code-tools: true
+    code-summary: "voir le code"
+    
+  pdf:
+    keep-tex: true
+    toc: true
+    toc-title: Contents
+    fig-pos: 'H'
+    fig-align: center
+
+mainfont: "Marianne"
+monofont: "Fira Code"
+code-fold: true
+
+crossref:
+  fig-prefix: figure
+  fig-title:  Figure
+  tbl-prefix: tableau
+  tbl-title:  Tableau
+  title-delim: " &ndash; "
+  sec-prefix: chapitre
+  
+editor_options: 
+  chunk_output_type: console
+  
+execute: 
+  eval: true
+  echo: true
+  message: false
+  warning: false
+  error: false
+  
+editor: visual
