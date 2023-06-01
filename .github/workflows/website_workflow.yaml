@@ -51,7 +51,7 @@ jobs:
       
       - name: Install terra package
         run: |
-          R -e 'install.packages('remotes')
+          R -e 'install.packages("remotes")'
           R -e 'remotes::install_github("rspatial/terra")'
                 
       - name: Install R Dependencies
