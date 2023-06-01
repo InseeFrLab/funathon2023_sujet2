@@ -12,7 +12,7 @@ rep_era5 <- "donnees/era5"
 # de 2015 (premier millésime du RPG  utilisé dans nos exemples) à 2022
 # periode <- 2022
 periode <- 2015:2022
-periode <- 2010:2014
+periode <- 2000:2004
 
 
 # config ------------------------------------------------------------------
@@ -52,13 +52,16 @@ write_lines(
 dir_create(rep_era5)
 rep_era5_full <- glue(path_real(rep_era5), "/")
 
-Sys.setlocale("LC_ALL", "fr_FR.UTF-8")
+invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 
 
 # téléchargement -----------------------------------------------------------
 
 #' Téléchargement et découpage sur la France des données ERA5 pour une année
-#'
+#' 
+#' rep_era5_full :  le répertoire des données (chemin complet) doit être
+#' dispo dans l'environnement
+#' 
 #' @param annee 
 #'
 #' @return NULL (enregistrement fichiers sur disque)
