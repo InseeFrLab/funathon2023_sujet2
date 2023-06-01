@@ -53,6 +53,8 @@ jobs:
         run: |
           R -e 'install.packages("remotes")'
           R -e 'remotes::install_github("rspatial/terra")'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
                 
       - name: Install R Dependencies
         uses: r-lib/actions/setup-renv@v2
