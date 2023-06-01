@@ -186,4 +186,27 @@ FROM sel
 WHERE r.id_parcel = sel.id_parcel;"
 )
 
+# 8 - Calcul des surfaces par culture dans le département du point (sur PostGIS)------------------------
+
+# jointure spatiale point x com pour récupérer le département du point
+com<-st_read(cnx,query="select insee_com, insee_dep, geom from rpg.com;")
+df<-point %>% st_join(com) %>% st_drop_geometry() %>% select(insee_dep) 
+dep_pt<-df[1,1]
+
+stat_sql_group_cult_dep<-dbGetQuery(cnx,str_glue("select insee_dep,code_group, count(*), round(sum(surf_parc)) as surf_ha 
+from rpg.parcelles where insee_dep='{dep_pt}' group by insee_dep, code_group order by code_group::numeric;"))  
+
+stat_group_cult_dep<-stat_sql_group_cult_dep %>% 
+  left_join(lib_group_cult,by=c("code_group"="code_group_culture")) %>% 
+  select(code_group,libelle_groupe_culture,everything()) %>% 
+  add_tally(count) %>% add_tally(surf_ha) %>% 
+  mutate(pct_count=round(100*count/n,1),pct_surf=round(100*surf_ha/nn,1), surf_moy=round(surf_ha/count,1)) %>% 
+  select(insee_dep,code_group,libelle_groupe_culture,count,pct_count, surf_ha, pct_surf, surf_moy)
+
+s3write_using(stat_group_cult_dep,
+              FUN = write_csv, 
+              object = "/2023/sujet2/resultats/stat_group_cult_dep.csv",
+              bucket = "projet-funathon",
+              opts = list("region" = "")) 
+
 
