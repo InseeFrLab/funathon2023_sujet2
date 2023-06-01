@@ -8,41 +8,7 @@ date: "`r Sys.Date()`"
 date-meta: "`r Sys.Date()`"
 abstract-title: Résumé
 keywords: ["productions végétales", "agronomie", "climat", "ERA5", "France"]
-lang: fr
-language: 
-  title-block-author-single: ""
-  title-block-affiliation-single: ""
-  title-block-published: ""
-format: 
-  html:
-    anchor-sections: true
-    smooth-scroll: true
-    self-contained: true
-    toc: true
-    toc-depth: 3
-    theme: united
-    code-fold: true
-    code-tools: true
-    code-summary: "voir le code"
 number-sections: true
-mainfont: "Marianne"
-monofont: "Fira Code"
-code-fold: true
-crossref:
-  fig-prefix: figure
-  fig-title:  Figure
-  tbl-prefix: tableau
-  tbl-title:  Tableau
-  title-delim: " &ndash; "
-  sec-prefix: chapitre
-editor_options: 
-  chunk_output_type: console
-execute: 
-  eval: true
-  echo: true
-  message: false
-  warning: false
-  error: false
 knitr:
   opts_chunk: 
     dev: "ragg_png"
@@ -86,7 +52,7 @@ library(knitr)
 
 # localisation des données dans le stockage "local"
 # $ mc cp -r funathon2023_sujet2/donnees/era5/ s3/projet-funathon/2023/sujet2/era5
-rep_era5 <- "donnees/era5"
+rep_era5 <- "../donnees/era5"
 rep_era5_full <- glue(path_real(rep_era5), "/")
 
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
