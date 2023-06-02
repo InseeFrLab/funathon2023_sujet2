@@ -66,7 +66,7 @@ jobs:
           cache-version: 1
       
       - name: Reinstall terra
-        run: R -e 'install.packages("terra")'
+        run: sudo R -e 'install.packages("terra")'
         
       - name: Extend LD library path
         run: export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
