@@ -5,10 +5,45 @@ subtitle: "Agronomie et données climatiques rétrospectives avec ERA5"
 author: "Michaël Delorme"
 author-meta: "`r Sys.info()['user']`"
 date: "`r Sys.Date()`"
-date-meta: "`r Sys.Date()`"
+date-meta: "`r Sys.time()`"
 abstract-title: Résumé
 keywords: ["productions végétales", "agronomie", "climat", "ERA5", "France"]
+lang: fr
+language: 
+  title-block-author-single: ""
+  title-block-affiliation-single: ""
+  title-block-published: ""
+format: 
+  html:
+    anchor-sections: true
+    smooth-scroll: true
+    self-contained: true
+    toc: true
+    toc-depth: 3
+    theme: united
+    code-fold: true
+    code-tools: true
+    code-summary: "voir le code"
+    toc-title: "Sommaire"
 number-sections: true
+mainfont: "Marianne"
+monofont: "Fira Code"
+code-fold: true
+crossref:
+  fig-prefix: figure
+  fig-title:  Figure
+  tbl-prefix: tableau
+  tbl-title:  Tableau
+  title-delim: " &ndash; "
+  sec-prefix: chapitre
+editor_options: 
+  chunk_output_type: console
+execute: 
+  eval: true
+  echo: true
+  message: false
+  warning: false
+  error: false
 knitr:
   opts_chunk: 
     dev: "ragg_png"
@@ -19,7 +54,7 @@ Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur
 
 [^1]: [Degré jour de croissance. *Wikipedia*](https://fr.wikipedia.org/wiki/Degr%C3%A9_jour_de_croissance)
 
-$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{j, max} - T_{j, min}}{2} - T_{base}}$
+$$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{max, j} - T_{min, j}}{2} - T_{base}}$$
 
 Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable selon la précocité de la variété) pour être récolté pour l'ensilage[^2] destiné à nourrir le bétail, ou 1700 DJ pour le maïs grain. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^3].
 
@@ -34,29 +69,36 @@ Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable 
 -   Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agricuteurs : données graphiques et leur culture principale, pour récupérer les cordonnées géographiques d'une parcelle de maïs.  
 Les données sont disponibles dans une base PostGIS.
 
--   [ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données qui fournit des données météorologiques de surface quotidiennes pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 10 km en France).  
-Les données 2017-2022 ont été préchargées sur Minio et limitées à l'emprise de la métropole. Elle sont au format NetCDF. Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
+-   [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
+Il fournit des paramètres météorologiques de surface quotidiens pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France).  
+Les données 20xx-2022 ont été préchargées sur Minio et limitées à l'emprise de la métropole. Elle sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
 
 # Préparation
+
+Il faut avoir préalablement copié les données depuis le stockage S3 Minio :
+
+`$ mc cp -r s3/projet-funathon/2023/sujet2/era5/ funathon2023_sujet2/donnees/era5/`
 
 ```{r}
 #| label: setup
 
-# install.packages("ag5Tools")
+if (!"ag5Tools" %in% installed.packages()) { install.packages("ag5Tools") }
+if (!"gtsummary" %in% installed.packages()) { install.packages("gtsummary") }
 
 library(ag5Tools)
 library(tidyverse)
 library(glue)
 library(fs)
 library(knitr)
+library(gtsummary)
 
 # localisation des données dans le stockage "local"
-# $ mc cp -r funathon2023_sujet2/donnees/era5/ s3/projet-funathon/2023/sujet2/era5
 rep_era5 <- "../donnees/era5"
 rep_era5_full <- glue(path_real(rep_era5), "/")
 
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 ```
+
 
 # Extraction
 
@@ -69,11 +111,11 @@ points <- tribble(~ville,       ~lon,   ~lat,
                   "Talissieu", 5.725, 45.864,
                   "Toulouse",  1.434, 43.591) %>%
   mutate(id = row_number(),
-         start_date = "2015-01-01",
+         start_date = "1979-01-01",
          end_date   = "2022-12-31")
 
 # Extraction des températures moyennes journalières à ces points
-temp_points <- points %>%
+temp_points <- points %>% 
   as.data.frame() %>%
   ag5_extract(variable = "Temperature-Air-2m",
               statistic = "Mean-24h",
@@ -89,17 +131,22 @@ temp_points <- points %>%
   inner_join(points, by = "id")
 ```
 
+
 # Calcul des degrés jour et des dates de récolte
 
 ```{r}
 #| label: traitement
 
-# la date n'est pas un bon indicateur pour suivre une évolution journalière à
-# cause des années bissextiles ; on utilisaera le day of year (doy)
+# la date n'est pas un bon indicateur pour suivre précisémment une évolution 
+# journalière à cause des années bissextiles 
+#   -> on utilisaera le day of year (doy)
 # yday(ymd("2020-04-01"))
 # yday(ymd("2023-04-01"))
 
+# base de calcul pour maïs : 6 °C
 base <- 6 # °C
+
+# besoin total à récolte pour un maïs grain de précocité moyenne : 1700 DJ
 besoin <- 1700 # DJ
 
 recolte <- temp_points %>% 
@@ -123,6 +170,7 @@ recolte <- temp_points %>%
 kable(recolte)
 ```
 
+
 # Visualisation
 
 ```{r}
@@ -134,7 +182,7 @@ recolte %>%
                                                   orders = "yj"))) %>% 
   ggplot(aes(annee, date_virtuelle, color = ville)) +
   geom_point() +
-  geom_smooth() +
+  geom_smooth(method = lm) +
   scale_y_date(date_breaks = "months", date_labels = "%b") +
   labs(title = "Date de récolte potentielle",
        subtitle = "Maïs grain",
@@ -142,5 +190,23 @@ recolte %>%
        y = "jour",
        color = "lieu",
        caption = glue("d'après données agroclimatiques ERA5
-                       pour une précocité moyenne ({besoin} DJ, base {base} °C"))
+                       pour une précocité moyenne ({besoin} DJ, base {base} °C)"))
+```
+
+# Tendance
+
+```{r}
+#| label: tendance
+mod <- recolte %>% 
+  mutate(doy = yday(date)) %>% 
+  glm(doy ~ annee + ville, data = .)
+
+tbl_regression(mod)
+```
+
+```{css}
+#| echo: false
+code {font-size: .8em}
+.toc-section-number:after, .header-section-number:after {content: ". "}
+q {quotes:'« ' ' »' '“' '”' '‘' '’'}
 ```
