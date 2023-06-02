@@ -45,3 +45,28 @@ dbExecute(cnx, "COMMENT ON TABLE adminexpress.region IS
 $$polygones des régions françaises Adminexpress COG 2023
 géométrie simplifiée pour carto nationale
 EPSG:WGS84$$")
+
+# ouvrir la couche des communes
+com <- s3read_using(
+  FUN = sf::read_sf,
+  layer = "commune",
+  object = "2023/sujet2/ign/adminexpress_cog_simpl_000_2023.gpkg",
+  bucket = "projet-funathon",
+  opts = list("region" = ""))
+
+
+# importer 
+dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS adminexpress")
+
+write_sf(com, cnx, Id(schema = "adminexpress", table = "commune"))
+dbExecute(cnx, "COMMENT ON TABLE adminexpress.commune IS
+$$polygones des communes françaises Adminexpress COG 2023
+géométrie simplifiée pour carto nationale
+EPSG:WGS84$$")
+
+# Ajout des index, celui sur geom est important
+dbExecute(cnx,
+          "ALTER TABLE adminexpress.commune ADD CONSTRAINT commune_pk PRIMARY KEY (id)")
+dbExecute(cnx, 
+          "CREATE INDEX ON adminexpress.commune USING gist (geom)")
+

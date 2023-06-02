@@ -1,0 +1,12 @@
+---
+title: "Exploration des données RPG"
+pagetitle: "RPG"
+keywords: ["RPG", "visualisation"]
+number-sections: true
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+    out.width: 100%
+---
+
+A compléter davantage.

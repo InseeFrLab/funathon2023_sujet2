@@ -1,0 +1,12 @@
+---
+title: "Cultures et prévisions climatiques"
+pagetitle: "Prévisions"
+keywords: ["RPG", "prévisions, cultures"]
+number-sections: true
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+    out.width: 100%
+---
+
+A compléter.
