@@ -32,9 +32,9 @@ jobs:
       - name: Retrieve stores from s3
         run: |
           export MC_HOST_s3=https://$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY@$AWS_S3_ENDPOINT
-          mc cp -r s3/projet-funathon/2023/sujet2/era5.zip donnees/era5.zip
-          unzip donnees/era5.zip
-          rm donnees/era5.zip
+          mc cp -r s3/projet-funathon/2023/sujet2/era5.zip .
+          unzip era5.zip
+          rm era5.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
