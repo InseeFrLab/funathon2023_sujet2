@@ -8,11 +8,8 @@
 # où sauver les données dans le stockage "local"
 rep_era5 <- "donnees/era5"
 
-# Années(s) à télécharger
-# de 2015 (premier millésime du RPG  utilisé dans nos exemples) à 2022
-# periode <- 2022
-periode <- 2015:2022
-periode <- 2000:2004
+# Années(s) à télécharger : de 1979 à 2022
+periode <- 1979:2022
 
 
 # config ------------------------------------------------------------------

@@ -5,7 +5,7 @@ subtitle: "Agronomie et données climatiques rétrospectives avec ERA5"
 author: "Michaël Delorme"
 author-meta: "`r Sys.info()['user']`"
 date: "`r Sys.Date()`"
-date-meta: "`r Sys.Time()`"
+date-meta: "`r Sys.time()`"
 abstract-title: Résumé
 keywords: ["productions végétales", "agronomie", "climat", "ERA5", "France"]
 lang: fr
@@ -24,6 +24,7 @@ format:
     code-fold: true
     code-tools: true
     code-summary: "voir le code"
+    toc-title: "Sommaire"
 number-sections: true
 mainfont: "Marianne"
 monofont: "Fira Code"
@@ -108,11 +109,11 @@ points <- tribble(~ville,       ~lon,   ~lat,
                   "Talissieu", 5.725, 45.864,
                   "Toulouse",  1.434, 43.591) %>%
   mutate(id = row_number(),
-         start_date = "2005-01-01",
+         start_date = "1979-01-01",
          end_date   = "2022-12-31")
 
 # Extraction des températures moyennes journalières à ces points
-temp_points <- points %>%
+temp_points <- points %>% 
   as.data.frame() %>%
   ag5_extract(variable = "Temperature-Air-2m",
               statistic = "Mean-24h",
@@ -134,12 +135,16 @@ temp_points <- points %>%
 ```{r}
 #| label: traitement
 
-# la date n'est pas un bon indicateur pour suivre une évolution journalière à
-# cause des années bissextiles ; on utilisaera le day of year (doy)
+# la date n'est pas un bon indicateur pour suivre précisémment une évolution 
+# journalière à cause des années bissextiles 
+#   -> on utilisaera le day of year (doy)
 # yday(ymd("2020-04-01"))
 # yday(ymd("2023-04-01"))
 
+# base de calcul pour maïs : 6 °C
 base <- 6 # °C
+
+# besoin total à récolte pour un maïs grain de précocité moyenne : 1700 DJ
 besoin <- 1700 # DJ
 
 recolte <- temp_points %>% 
@@ -193,6 +198,8 @@ mod <- recolte %>%
   mutate(doy = yday(date)) %>% 
   glm(doy ~ annee + ville, data = .)
 summary(mod)
+
+confint(mod)
 ```
 
 ```{css}
