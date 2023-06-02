@@ -54,6 +54,9 @@ jobs:
         with:
           r-version: '4.2.3'
 
+      - name: Install terra
+        run: sudo R -e 'install.packages("terra")'
+        
       - name: Reconfigure Java support 
         run: sudo R CMD javareconf
 
@@ -64,13 +67,7 @@ jobs:
         uses: r-lib/actions/setup-renv@v2
         with:
           cache-version: 1
-      
-      - name: Reinstall terra
-        run: sudo R -e 'install.packages("terra")'
-        
-      - name: Extend LD library path
-        run: export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
-
+       
       - name: Install Latex
         run:  quarto install tinytex
       
