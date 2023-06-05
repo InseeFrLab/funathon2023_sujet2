@@ -131,7 +131,7 @@ temp_points <- era5 %>%
 
 # la date n'est pas un bon indicateur pour suivre précisémment une évolution 
 # journalière à cause des années bissextiles 
-#   -> on utilisaera le day of year (doy)
+#   -> on utilisara le day of year (doy)
 # yday(ymd("2020-04-01"))
 # yday(ymd("2023-04-01"))
 
