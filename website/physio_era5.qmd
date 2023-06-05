@@ -71,7 +71,9 @@ Les données sont disponibles dans une base PostGIS.
 
 -   [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
 Il fournit des paramètres agro-météorologiques de surface quotidiens pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France).  
-Les données de température moyenne 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go). Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
+Les données de température moyenne 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
+Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
+Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/.
 
 # Préparation
 
@@ -81,11 +83,7 @@ Il faut avoir préalablement copié les données depuis le stockage S3 Minio :
 
 ```{r}
 #| label: setup
-
-if (!"ag5Tools" %in% installed.packages()) { install.packages("ag5Tools") }
-if (!"gtsummary" %in% installed.packages()) { install.packages("gtsummary") }
-
-library(ag5Tools)
+library(stars)
 library(tidyverse)
 library(glue)
 library(fs)
@@ -94,7 +92,6 @@ library(gtsummary)
 
 # localisation des données dans le stockage "local"
 rep_era5 <- "../donnees/era5"
-rep_era5_full <- glue(path_real(rep_era5), "/")
 
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 ```
@@ -102,33 +99,28 @@ invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 
 # Extraction
 
+Exemple avec une couche contenant 2 points.
+
 ```{r}
 #| label: donnees
 #| cache: true
 #| results: hide
-# un exemple de localisations avec date début-fin
+# un exemple de localisations
 points <- tribble(~ville,       ~lon,   ~lat,
                   "Talissieu", 5.725, 45.864,
-                  "Toulouse",  1.434, 43.591) %>%
-  mutate(id = row_number(),
-         start_date = "1979-01-01",
-         end_date   = "2022-12-31")
+                  "Toulouse",  1.434, 43.591) %>% 
+  st_as_sf(coords = c("lon", "lat"), crs = "EPSG:4326")
 
-# Extraction des températures moyennes journalières à ces points
-temp_points <- points %>% 
-  as.data.frame() %>%
-  ag5_extract(variable = "Temperature-Air-2m",
-              statistic = "Mean-24h",
-              celsius = TRUE,
-              path = rep_era5_full) %>%
-  imap(~ pivot_longer(.x,
-                      everything(),
-                      names_to = "date",
-                      values_to = "temp_moy_c",
-                      names_transform = ymd) %>%
-         mutate(id = .y)) %>%
-  bind_rows() %>%
-  inner_join(points, by = "id")
+era5 <- dir_ls(rep_era5, recurse = TRUE, glob = "*.nc") %>% 
+  read_stars() %>% 
+  rename(temp_moy_k = 1)
+
+temp_points <- era5 %>% 
+  st_extract(points) %>%
+  as_tibble() %>% 
+  mutate(temp_moy_c = temp_moy_k - 273.15,
+         date = as_date(time)) %>% 
+  full_join(points, ., by = "geometry")
 ```
 
 
@@ -150,7 +142,7 @@ base <- 6 # °C
 besoin <- 1700 # DJ
 
 recolte <- temp_points %>% 
-  select(date, id, ville, temp_moy_c) %>% 
+  select(date, ville, temp_moy_c) %>% 
   group_by(ville, annee = year(date)) %>% 
   mutate(dj = case_when(yday(date) < 91 ~ 0,
                         temp_moy_c > 30 ~ 0,
@@ -160,14 +152,21 @@ recolte <- temp_points %>%
   filter(sdj > besoin) %>% 
   slice_min(date) %>% 
   ungroup() %>% 
-  select(date, annee, id, ville)
+  select(date, annee, ville)
 ```
 
 ```{r}
 #| label: tbl-resultats
 #| echo: false
 #| tbl-cap: Dates de récolte potentielles
-kable(recolte)
+options(knitr.kable.NA = '')
+recolte %>% 
+  arrange(ville, annee) %>% 
+  group_by(ville) %>%
+  slice_head(n = 2) %>% 
+  ungroup() %>% 
+  add_row(ville = "...") %>% 
+  kable()
 ```
 
 
