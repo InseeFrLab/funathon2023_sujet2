@@ -9,6 +9,8 @@ on:
     paths:
       - website/
 
+permissions: write-all
+
 jobs:
   publish-website:
     runs-on: ubuntu-latest
