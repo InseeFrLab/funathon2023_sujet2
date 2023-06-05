@@ -9,6 +9,13 @@
     ]
   },
   "Packages": {
+    "BH": {
+      "Package": "BH",
+      "Version": "1.81.0-1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "68122010f01c4dcfbe58ce7112f2433d"
+    },
     "DBI": {
       "Package": "DBI",
       "Version": "1.1.3",
@@ -123,6 +130,30 @@
         "utils"
       ],
       "Hash": "e749cae40fa9ef469b6050959517453c"
+    },
+    "RcppArmadillo": {
+      "Package": "RcppArmadillo",
+      "Version": "0.12.4.0.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "5402c9d935b45fe528538703b5edf680"
+    },
+    "RcppParallel": {
+      "Package": "RcppParallel",
+      "Version": "5.1.7",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "a45594a00f5dbb073d5ec9f48592a08a"
     },
     "RcppTOML": {
       "Package": "RcppTOML",
@@ -284,6 +315,13 @@
       ],
       "Hash": "40415719b5a479b87949f3aa0aee737c"
     },
+    "brew": {
+      "Package": "brew",
+      "Version": "1.0-8",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "d69a786e85775b126bddbee185ae6084"
+    },
     "broom": {
       "Package": "broom",
       "Version": "1.0.4",
@@ -345,6 +383,25 @@
         "sass"
       ],
       "Hash": "a7fbf03946ad741129dc81098722fca1"
+    },
+    "btb": {
+      "Package": "btb",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "BH",
+        "R",
+        "Rcpp",
+        "RcppArmadillo",
+        "RcppParallel",
+        "dplyr",
+        "magrittr",
+        "mapsf",
+        "methods",
+        "sf"
+      ],
+      "Hash": "52a3215a13f3fa61c280860f7ce2c3cf"
     },
     "cachem": {
       "Package": "cachem",
@@ -484,6 +541,19 @@
         "utils"
       ],
       "Hash": "e8a1e41acf02548751f45c718d55aa6a"
+    },
+    "crosstalk": {
+      "Package": "crosstalk",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R6",
+        "htmltools",
+        "jsonlite",
+        "lazyeval"
+      ],
+      "Hash": "6aa54f69598c32177e920eb3402e8293"
     },
     "curl": {
       "Package": "curl",
@@ -644,6 +714,21 @@
       "Repository": "RSPM",
       "Hash": "8106d78941f34855c440ddb946b8f7a5"
     },
+    "fasterize": {
+      "Package": "fasterize",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "RcppArmadillo",
+        "methods",
+        "raster",
+        "sp"
+      ],
+      "Hash": "c19e62cd6b599af318f8e62c52b7c452"
+    },
     "fastmap": {
       "Package": "fastmap",
       "Version": "1.1.1",
@@ -722,6 +807,31 @@
         "methods"
       ],
       "Hash": "15e9634c0fcd294799e9b2e929ed1b86"
+    },
+    "geojsonsf": {
+      "Package": "geojsonsf",
+      "Version": "2.0.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "geometries",
+        "jsonify",
+        "rapidjsonr",
+        "sfheaders"
+      ],
+      "Hash": "8d077646c6713838233e8710910ef92e"
+    },
+    "geometries": {
+      "Package": "geometries",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Rcpp"
+      ],
+      "Hash": "09604531daa57d9c3884b7a15488bab9"
     },
     "ggplot2": {
       "Package": "ggplot2",
@@ -811,6 +921,20 @@
         "withr"
       ],
       "Hash": "fd7b97bd862a14297b0bb7ed28a3dada"
+    },
+    "gridExtra": {
+      "Package": "gridExtra",
+      "Version": "2.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "grDevices",
+        "graphics",
+        "grid",
+        "gtable",
+        "utils"
+      ],
+      "Hash": "7d7f283939f563670a697165b2cf5560"
     },
     "gt": {
       "Package": "gt",
@@ -970,6 +1094,21 @@
       ],
       "Hash": "a865aa85bcb2697f47505bfd70422471"
     },
+    "httpuv": {
+      "Package": "httpuv",
+      "Version": "1.6.11",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "R6",
+        "Rcpp",
+        "later",
+        "promises",
+        "utils"
+      ],
+      "Hash": "838602f54e32c1a0f8cc80708cefcefa"
+    },
     "httr": {
       "Package": "httr",
       "Version": "1.4.6",
@@ -1039,6 +1178,18 @@
       ],
       "Hash": "5aab57a3bd297eee1c1d862735972182"
     },
+    "jsonify": {
+      "Package": "jsonify",
+      "Version": "1.2.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "rapidjsonr"
+      ],
+      "Hash": "49a9775e4f8c96c654b6018739067055"
+    },
     "jsonlite": {
       "Package": "jsonlite",
       "Version": "1.8.4",
@@ -1103,6 +1254,17 @@
       ],
       "Hash": "bf5e8a9e9a64b779a338a81c54c2a2a3"
     },
+    "later": {
+      "Package": "later",
+      "Version": "1.3.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Rcpp",
+        "rlang"
+      ],
+      "Hash": "40401c9cf2bc2259dfe83311c9384710"
+    },
     "lattice": {
       "Package": "lattice",
       "Version": "0.20-45",
@@ -1117,6 +1279,86 @@
         "utils"
       ],
       "Hash": "b64cdbb2b340437c4ee047a1f4c4377b"
+    },
+    "lazyeval": {
+      "Package": "lazyeval",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "d908914ae53b04d4c0c0fd72ecc35370"
+    },
+    "leafem": {
+      "Package": "leafem",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "base64enc",
+        "geojsonsf",
+        "htmltools",
+        "htmlwidgets",
+        "leaflet",
+        "methods",
+        "png",
+        "raster",
+        "sf"
+      ],
+      "Hash": "db6e565a81ce81f137660467644e6fcd"
+    },
+    "leaflet": {
+      "Package": "leaflet",
+      "Version": "2.1.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "RColorBrewer",
+        "base64enc",
+        "crosstalk",
+        "htmltools",
+        "htmlwidgets",
+        "leaflet.providers",
+        "magrittr",
+        "markdown",
+        "methods",
+        "png",
+        "raster",
+        "scales",
+        "sp",
+        "stats",
+        "viridis"
+      ],
+      "Hash": "ac2c7f21c2a6d2579eed8aaae4c42610"
+    },
+    "leaflet.providers": {
+      "Package": "leaflet.providers",
+      "Version": "1.9.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "d3082a7beac4a1aeb96100ff06265d7e"
+    },
+    "leafpop": {
+      "Package": "leafpop",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "base64enc",
+        "brew",
+        "htmltools",
+        "htmlwidgets",
+        "sf",
+        "svglite",
+        "uuid"
+      ],
+      "Hash": "0c1e9e9a79598ec5acb1820d1948dae8"
     },
     "lifecycle": {
       "Package": "lifecycle",
@@ -1166,6 +1408,50 @@
         "R"
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
+    },
+    "mapsf": {
+      "Package": "mapsf",
+      "Version": "0.6.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "classInt",
+        "grDevices",
+        "graphics",
+        "methods",
+        "sf",
+        "stats",
+        "utils"
+      ],
+      "Hash": "5236952e6f302a43c0858b6f47cb791e"
+    },
+    "mapview": {
+      "Package": "mapview",
+      "Version": "2.11.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "base64enc",
+        "htmltools",
+        "htmlwidgets",
+        "lattice",
+        "leafem",
+        "leaflet",
+        "leafpop",
+        "methods",
+        "png",
+        "raster",
+        "satellite",
+        "scales",
+        "servr",
+        "sf",
+        "sp",
+        "webshot"
+      ],
+      "Hash": "204c456b6b2742e196209a2a70eb5679"
     },
     "markdown": {
       "Package": "markdown",
@@ -1305,6 +1591,17 @@
       "Repository": "RSPM",
       "Hash": "09eb987710984fc2905c7129c7d85e65"
     },
+    "plyr": {
+      "Package": "plyr",
+      "Version": "1.8.8",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp"
+      ],
+      "Hash": "d744387aef9047b0b48be2933d78e862"
+    },
     "png": {
       "Package": "png",
       "Version": "0.1-8",
@@ -1347,6 +1644,21 @@
         "prettyunits"
       ],
       "Hash": "14dc9f7a3c91ebb14ec5bb9208a07061"
+    },
+    "promises": {
+      "Package": "promises",
+      "Version": "1.2.0.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R6",
+        "Rcpp",
+        "later",
+        "magrittr",
+        "rlang",
+        "stats"
+      ],
+      "Hash": "4ab2c43adb4d4699cf3690acd378d75d"
     },
     "proxy": {
       "Package": "proxy",
@@ -1396,6 +1708,13 @@
         "textshaping"
       ],
       "Hash": "690bc058ea2b1b8a407d3cfe3dce3ef9"
+    },
+    "rapidjsonr": {
+      "Package": "rapidjsonr",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "88b9f48c93d17cdb811b54079a6a414f"
     },
     "rappdirs": {
       "Package": "rappdirs",
@@ -1652,6 +1971,27 @@
       ],
       "Hash": "cc3ec7dd33982ef56570229b62d6388e"
     },
+    "satellite": {
+      "Package": "satellite",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "grDevices",
+        "graphics",
+        "methods",
+        "plyr",
+        "raster",
+        "stats",
+        "stats4",
+        "terra",
+        "tools",
+        "utils"
+      ],
+      "Hash": "6bb739cedb7a0a9e5f9604d599223298"
+    },
     "scales": {
       "Package": "scales",
       "Version": "1.2.1",
@@ -1683,6 +2023,20 @@
       ],
       "Hash": "3838071b66e0c566d55cc26bd6e27bf4"
     },
+    "servr": {
+      "Package": "servr",
+      "Version": "0.27",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "httpuv",
+        "jsonlite",
+        "mime",
+        "xfun"
+      ],
+      "Hash": "f4d1414c2ddc0a34ea27923134ac3c7b"
+    },
     "sf": {
       "Package": "sf",
       "Version": "1.0-12",
@@ -1705,6 +2059,18 @@
         "utils"
       ],
       "Hash": "5b41b4f0bd22b38661d82205a87deb4b"
+    },
+    "sfheaders": {
+      "Package": "sfheaders",
+      "Version": "0.4.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "geometries"
+      ],
+      "Hash": "0b835f43939178a3cac6712fbe8cc2e8"
     },
     "snakecase": {
       "Package": "snakecase",
@@ -1782,6 +2148,18 @@
         "vctrs"
       ],
       "Hash": "671a4d384ae9d32fc47a14e98bfa3dc8"
+    },
+    "svglite": {
+      "Package": "svglite",
+      "Version": "2.1.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "cpp11",
+        "systemfonts"
+      ],
+      "Hash": "29442899581643411facb66f4add846a"
     },
     "sys": {
       "Package": "sys",
@@ -2000,6 +2378,19 @@
       ],
       "Hash": "a745bda7aff4734c17294bb41d4e4607"
     },
+    "viridis": {
+      "Package": "viridis",
+      "Version": "0.6.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "ggplot2",
+        "gridExtra",
+        "viridisLite"
+      ],
+      "Hash": "0d774f552202add033efc43a30293b3f"
+    },
     "viridisLite": {
       "Package": "viridisLite",
       "Version": "0.4.2",
@@ -2035,6 +2426,19 @@
         "withr"
       ],
       "Hash": "8318e64ffb3a70e652494017ec455561"
+    },
+    "webshot": {
+      "Package": "webshot",
+      "Version": "0.5.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "callr",
+        "jsonlite",
+        "magrittr"
+      ],
+      "Hash": "cfd9342c76693ae53108a474aafa1641"
     },
     "withr": {
       "Package": "withr",

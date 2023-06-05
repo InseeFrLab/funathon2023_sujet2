@@ -66,14 +66,13 @@ Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable 
 
 # Données
 
--   Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agricuteurs : données graphiques et leur culture principale, pour récupérer les cordonnées géographiques d'une parcelle de maïs.  
-Les données sont disponibles dans une base PostGIS.
+[ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
+Il fournit des paramètres agro-météorologiques de surface quotidiens pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France). 
 
--   [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
-Il fournit des paramètres agro-météorologiques de surface quotidiens pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France).  
 Les données de température moyenne 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
+
 Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
-Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/.
+Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/).
 
 # Préparation
 
@@ -93,6 +92,7 @@ library(gtsummary)
 # localisation des données dans le stockage "local"
 rep_era5 <- "../donnees/era5"
 
+# pour avoir les noms de dates en français
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 ```
 
