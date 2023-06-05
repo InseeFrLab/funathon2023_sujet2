@@ -1730,7 +1730,7 @@
       "Package": "raster",
       "Version": "3.6-20",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "Rcpp",
