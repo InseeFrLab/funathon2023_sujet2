@@ -62,17 +62,23 @@ Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable 
 
 [^3]: [Céré'Obs. *FranceAgrimer*](https://cereobs.franceagrimer.fr/cereobs-sp/assets/pdfjs/web/viewer.html?file=blob:https://cereobs.franceagrimer.fr/f05c19c6-aff4-4701-9af4-80fdef7118d3)
 
-**Peut-on voir comment a évolué la date de récolte théorique d'une parcelle de maïs au cours des dernières années ?**
+**Peut-on voir comment a évolué la date de récolte théorique du maïs au cours des 40 dernières années ?**
+
 
 # Données
 
-[ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
+- Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agricuteurs : données graphiques et leur culture principale, pour récupérer les cordonnées géographiques d'une parcelle de maïs.
+
+  Les données sont disponibles dans une base PostGIS.
+
+- [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
 Il fournit des paramètres agro-météorologiques de surface quotidiens pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France). 
 
-Les données de température moyenne 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
+  Les données de température moyenne 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
 
-Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
+  Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
 Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/).
+
 
 # Préparation
 
@@ -82,39 +88,288 @@ Il faut avoir préalablement copié les données depuis le stockage S3 Minio :
 
 ```{r}
 #| label: setup
+
 library(stars)
+library(terra)
 library(tidyverse)
 library(glue)
 library(fs)
 library(knitr)
 library(gtsummary)
+library(RPostgres)
+library(sf)
+library(leaflet)
 
 # localisation des données dans le stockage "local"
-rep_era5 <- "../donnees/era5"
+rep_era5 <- "donnees/era5"
 
 # pour avoir les noms de dates en français
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
+
+options(knitr.kable.NA = "")
+
+cnx <- dbConnect(Postgres(),
+                 user = "projet-funathon",
+                 password = Sys.getenv("PASS_POSTGRESQL"),
+                 host = "postgresql-438832",
+                 dbname = "defaultdb",
+                 port = 5432,
+                 check_interrupts = TRUE)
+```
+
+# Définition des bassins de production du maïs grain
+
+On peut, par exemple, extraire les 10 zones où la densité de culture est la plus forte.
+
+```{r}
+#| label: fonctions-lissage
+
+# Lissage
+#
+# michael.delorme - 2021-08-26
+
+# utils -------------------------------------------------------------------
+
+#' rounding
+#' from plyr
+#'
+#' @param x
+#' @param accuracy
+#' @param f
+#'
+#' @return
+round_any <- function(x, accuracy, f = round) {
+  
+  f(x / accuracy) * accuracy
+}
+
+#' Generate a grid of coordinates from a spatial layer
+#'
+#' Memoised to get a faster result when used multiple times on the same extent
+#'
+#' @param zone sf object (polygons) : spatial extent
+#' @param margin number : buffer of bounding box
+#' @param resolution number : distance between nodes
+#'
+#' @return dataframe of coordinates (x, y)
+generate_grid <- memoise::memoise(function(zone, margin, resolution) {
+  
+  zone_bbox <- sf::st_bbox(zone)
+  
+  zone %>%
+    sf::st_make_grid(cellsize = resolution,
+                     offset = c(round_any(zone_bbox[1] - margin, resolution, floor),
+                                round_any(zone_bbox[2] - margin, resolution, floor)),
+                     what = "centers") %>%
+    sf::st_sf() %>%
+    sf::st_join(zone, join = st_intersects, left = FALSE) %>%
+    sf::st_coordinates() %>%
+    tibble::as_tibble() %>%
+    dplyr::select(x = X, y = Y)
+})
+
+
+# main function -----------------------------------------------------------
+
+#' Kernel weighted smoothing with arbitrary bounding area
+#'
+#' @param df sf object (points) : features to smooth
+#' @param field expression : weight field in df (unquoted) ; the values must not have NAs
+#' @param bandwidth numeric : kernel bandwidth (output map units)
+#' @param resolution numeric : output grid resolution (output map units)
+#' @param zone sf objet (polygons) : study zone boundary. If null will use df extent
+#' @param out_crs integer : EPSG code projection for output raster (should be an equal-area projection)
+#' @param ... other arguments passed to btb::kernelSmoothing
+#'
+#' @return a raster object
+#' @export
+#' @import btb, raster, fasterize, dplyr, sf, rlang, memoise
+lissage <- function(df, field, bandwidth, resolution, zone = NULL, out_crs = 3035, ...) {
+  
+  field_name <- rlang::as_name(rlang::enquo(field))
+  
+  if (!"sf" %in% class(df)
+      | sf::st_geometry_type(df, FALSE) != "POINT") {
+    stop("« df » should be a point sf object.")
+  }
+  
+  if (!is.numeric(bandwidth)) stop("bandwidth sould be numeric.")
+  if (!is.numeric(resolution)) stop("resolution sould be numeric.")
+  
+  nb_na <- sum(is.na(dplyr::pull(df, {{field}})))
+  if (nb_na > 0) {
+    warning(paste("removing", nb_na, "NA",
+                  paste0("value", ifelse(nb_na > 1, "s", "")),
+                  "in «", field_name, "»..."))
+    df <- tidyr::drop_na(df, {{field}}) %>%
+      sf::st_as_sf()
+  }
+  
+  # check projections
+  if (is.na(sf::st_crs(df))) {
+    stop("missing projection in sf object « df ».")
+  }
+  
+  if (sf::st_crs(df)$epsg != out_crs) {
+    message("reprojecting data...")
+    df <- sf::st_transform(df, out_crs)
+  }
+  
+  if (!is.null(zone)) {
+    if (!"sf" %in% class(zone)
+        |!sf::st_geometry_type(zone, FALSE) %in% c("POLYGON", "MULTIPOLYGON")) {
+      stop("« zone » should be a polygon/multiploygon sf object.")
+    }
+    
+    # check projections
+    if (is.na(sf::st_crs(zone))) {
+      stop("missing projection in sf object « zone ».")
+    }
+    
+    if (sf::st_crs(zone)$epsg != out_crs) {
+      message("reprojecting study zone...")
+      zone <- sf::st_transform(zone, out_crs)
+    }
+    
+    # grid generation
+    if (memoise::has_cache(generate_grid)(zone, bandwidth, resolution)) {
+      message("retrieving reference grid from cache...")
+    } else {
+      message("generating reference grid...")
+    }
+    
+    zone_xy <- generate_grid(zone, bandwidth, resolution)
+    zone_bbox <- sf::st_bbox(zone)
+    
+  } else {
+    message("using default reference grid...")
+    
+    zone_xy <- NULL
+    zone_bbox <- sf::st_bbox(df)
+  }
+  
+  # kernel
+  message(paste0("computing kernel on « ", field_name, " »..."))
+  kernel <- df %>%
+    bind_cols(., sf::st_coordinates(.) %>% # si pas de données renvoie vecteur non nommé
+                as.data.frame() %>%     # donc on le modifie
+                set_names(c("x", "y"))) %>%
+    sf::st_drop_geometry() %>%
+    dplyr::select(x, y, {{ field }}) %>%
+    btb::btb_smooth(sEPSG = out_crs,
+                    iCellSize = resolution,
+                    iBandwidth = bandwidth,
+                    dfCentroids = zone_xy, ...)
+  
+  # rasterization
+  message("\nrasterizing...")
+  raster::raster(xmn = round_any(zone_bbox[1] - bandwidth, resolution, floor),
+                 ymn = round_any(zone_bbox[2] - bandwidth, resolution, floor),
+                 xmx = round_any(zone_bbox[3] + bandwidth, resolution, ceiling),
+                 ymx = round_any(zone_bbox[4] + bandwidth, resolution, ceiling),
+                 resolution = resolution,
+                 crs = sf::st_crs(out_crs)$input
+  ) %>%
+    fasterize::fasterize(kernel, ., field = field_name)
+}
+```
+
+
+```{r}
+#| label: lissage
+#| cache: true
+
+# contour de la métropole (pour limiter le lissage à l'intérieur des frontières)
+fr <- read_sf(cnx, query = "
+  SELECT 
+    st_union(st_transform(geom, 3035)) as geom
+  FROM adminexpress.region
+  WHERE insee_reg > '06'")
+
+# communes (pour donner un nom à nos bassins de production)
+com <- read_sf(cnx, query = "
+  SELECT 
+    nom,
+    population,
+    st_transform(geom, 3035) as geom
+  FROM adminexpress.commune
+  WHERE insee_reg > '06'")
+
+# un point par parcelle de maïs avec sa surface qui servira de poids au lissage
+mais <- read_sf(cnx, query = "
+  SELECT 
+    st_transform(st_pointonsurface(geom), 3035) as geom,
+    surf_parc
+  FROM rpg.parcelles
+  WHERE code_cultu = 'MIS'")
+
+# lissage à 10 km de "bande passante" avec un pixel de 1 km
+mais_liss <- mais %>% 
+  lissage(surf_parc, 10000, 1000, zone = fr) %>% 
+  rast()
+
+plot(mais_liss)
+```
+
+On peut garder par exemple les densités supérieures à 8 ha/km².
+
+```{r}
+#| label: clusters
+
+tmp <- mais_liss > 8
+
+plot(tmp)
+
+# vectorisation et conservation des 10 + grandes zones
+cluster_liss <- tmp %>% 
+  as.polygons() %>% 
+  st_as_sf() %>% 
+  filter(layer == 1) %>% 
+  st_cast("POLYGON") %>% 
+  mutate(surf = st_area(geometry)) %>% 
+  slice_max(surf, n = 10) %>% 
+  mutate(id = row_number())
+
+# nommage des clusters avec le nom de la plus grosse ville de la zone
+noms <- cluster_liss %>% 
+  st_join(com, left = TRUE) %>% 
+  st_drop_geometry() %>% 
+  group_by(id) %>% 
+  slice_max(population, n = 1, with_ties = FALSE) %>% 
+  select(id, nom)
+
+# préparations de points pour l'extraction des températures
+points <- cluster_liss %>% 
+  inner_join(noms) %>% 
+  st_point_on_surface() %>% 
+  st_transform("EPSG:4326")
+```
+
+```{r}
+#| label: clusters-carto
+
+cluster_liss %>% 
+  inner_join(noms) %>% 
+  st_transform("EPSG:4326") %>% 
+  leaflet() %>% 
+  addPolygons(popup = ~ nom) %>% 
+  addTiles()
 ```
 
 
 # Extraction
 
-Exemple avec une couche contenant 2 points.
-
 ```{r}
-#| label: donnees
+#| label: donnees-climat
 #| cache: true
 #| results: hide
-# un exemple de localisations
-points <- tribble(~ville,       ~lon,   ~lat,
-                  "Talissieu", 5.725, 45.864,
-                  "Toulouse",  1.434, 43.591) %>% 
-  st_as_sf(coords = c("lon", "lat"), crs = "EPSG:4326")
 
-era5 <- dir_ls(rep_era5, recurse = TRUE, glob = "*.nc") %>% 
+# données climato
+era5 <- dir_ls(here::here(rep_era5), recurse = TRUE, glob = "*.nc") %>% 
   read_stars() %>% 
   rename(temp_moy_k = 1)
 
+# extraction
 temp_points <- era5 %>% 
   st_extract(points) %>%
   as_tibble() %>% 
@@ -142,8 +397,8 @@ base <- 6 # °C
 besoin <- 1700 # DJ
 
 recolte <- temp_points %>% 
-  select(date, ville, temp_moy_c) %>% 
-  group_by(ville, annee = year(date)) %>% 
+  select(date, nom, temp_moy_c) %>% 
+  group_by(nom, annee = year(date)) %>% 
   mutate(dj = case_when(yday(date) < 91 ~ 0,
                         temp_moy_c > 30 ~ 0,
                         temp_moy_c < base ~ 0,
@@ -152,20 +407,20 @@ recolte <- temp_points %>%
   filter(sdj > besoin) %>% 
   slice_min(date) %>% 
   ungroup() %>% 
-  select(date, annee, ville)
+  select(date, annee, nom)
 ```
 
 ```{r}
 #| label: tbl-resultats
 #| echo: false
 #| tbl-cap: Dates de récolte potentielles
-options(knitr.kable.NA = '')
+
 recolte %>% 
-  arrange(ville, annee) %>% 
-  group_by(ville) %>%
+  arrange(nom, annee) %>% 
+  group_by(nom) %>%
   slice_head(n = 2) %>% 
   ungroup() %>% 
-  add_row(ville = "...") %>% 
+  add_row(nom = "...") %>% 
   kable()
 ```
 
@@ -175,11 +430,12 @@ recolte %>%
 ```{r}
 #| label: fig-date-recolte
 #| fig-cap: Évolution de la date de récolte potentielle du maïs grain
-recolte %>% 
+
+recolte  %>% 
   mutate(doy = yday(date),
          date_virtuelle = as_date(parse_date_time(glue("2020-{str_pad(doy, 3, 'left', '0')}"), 
                                                   orders = "yj"))) %>% 
-  ggplot(aes(annee, date_virtuelle, color = ville)) +
+  ggplot(aes(annee, date_virtuelle, color = nom)) +
   geom_point() +
   geom_smooth(method = lm) +
   scale_y_date(date_breaks = "months", date_labels = "%b") +
@@ -192,13 +448,15 @@ recolte %>%
                        pour une précocité moyenne ({besoin} DJ, base {base} °C)"))
 ```
 
+
 # Tendance
 
 ```{r}
 #| label: tendance
+
 mod <- recolte %>% 
   mutate(doy = yday(date)) %>% 
-  glm(doy ~ annee + ville, data = .)
+  glm(doy ~ annee + nom, data = .)
 
 tbl_regression(mod)
 ```
