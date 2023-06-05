@@ -29,6 +29,9 @@ jobs:
           chmod +x /usr/local/bin/mc
           export 
 
+      - name: Install system requirements
+        run: sudo apt-get -y update && sudo apt-get install -y libudunits2-dev libgdal-dev libgeos-dev libproj-dev
+      
       - name: Retrieve stores from s3
         run: |
           export MC_HOST_s3=https://$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY@$AWS_S3_ENDPOINT
@@ -39,7 +42,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
-          
+      
       - name: Install python
         uses: actions/setup-python@v4
         with:
