@@ -67,7 +67,7 @@ Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable 
 
 # Données
 
-- Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agricuteurs : données graphiques et leur culture principale, pour récupérer les cordonnées géographiques d'une parcelle de maïs.
+- Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agricuteurs : données graphiques et leur culture principale.
 
   Les données sont disponibles dans une base PostGIS.
 
@@ -79,6 +79,9 @@ Il fournit des paramètres agro-météorologiques de surface quotidiens pour la 
   Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools).
 Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/).
 
+# Proposition
+
+Estimer l'évolution des dates potentielles de récolte du maïs grain (code culture : `MIS`) dans les différents bassins de productions français depuis 1980.
 
 # Préparation
 
@@ -86,19 +89,22 @@ Il faut avoir préalablement copié les données depuis le stockage S3 Minio :
 
 `$ mc cp -r s3/projet-funathon/2023/sujet2/era5/ funathon2023_sujet2/donnees/era5/`
 
+Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme  variable d'environnement en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *~/.Renviron*.
+
 ```{r}
 #| label: setup
+#| echo: true
 
-library(stars)
-library(terra)
-library(tidyverse)
-library(glue)
-library(fs)
-library(knitr)
-library(gtsummary)
-library(RPostgres)
-library(sf)
-library(leaflet)
+library(stars) # manipulation de rasters
+library(terra) # manipulation de rasters
+library(tidyverse) # manipulation des données
+library(glue)      # interpolation de chaine de caractères
+library(fs)        # gestion du système de fichier
+library(gtsummary) # tableaux de modèles stat
+library(RPostgres) # connxion PostgreSQL
+library(sf)        # manipulation de données spatiales vecteur
+library(leaflet)   # carto web
+library(knitr)     # génération du document
 
 # localisation des données dans le stockage "local"
 rep_era5 <- "donnees/era5"
@@ -119,10 +125,10 @@ cnx <- dbConnect(Postgres(),
 
 # Définition des bassins de production du maïs grain
 
-On peut, par exemple, extraire les 10 zones où la densité de culture est la plus forte.
+On peut, par exemple, extraire les 10 principales zones où la densité de culture est la plus forte. Cela peut se faire par commune ou avec un lissage.
 
 ```{r}
-#| label: fonctions-lissage
+#| label: lissage-fonctions
 
 # Lissage
 #
@@ -274,9 +280,8 @@ lissage <- function(df, field, bandwidth, resolution, zone = NULL, out_crs = 303
 }
 ```
 
-
 ```{r}
-#| label: lissage
+#| label: lissage-donnees
 #| cache: true
 
 # contour de la métropole (pour limiter le lissage à l'intérieur des frontières)
@@ -302,26 +307,31 @@ mais <- read_sf(cnx, query = "
     surf_parc
   FROM rpg.parcelles
   WHERE code_cultu = 'MIS'")
+```
+
+
+```{r}
+#| label: lissage-traitement
 
 # lissage à 10 km de "bande passante" avec un pixel de 1 km
 mais_liss <- mais %>% 
   lissage(surf_parc, 10000, 1000, zone = fr) %>% 
   rast()
 
-plot(mais_liss)
+plot(mais_liss, main = "Densité de culture de maïs grain 2022 (ha/km²)")
+
+seuil_lissage <- 8 # seuil de densité à prendre en compte (ha/km²)
 ```
 
-On peut garder par exemple les densités supérieures à 8 ha/km².
+On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/km².
 
 ```{r}
 #| label: clusters
 
-tmp <- mais_liss > 8
-
-plot(tmp)
+plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2022 (> {seuil_lissage} ha/km²)"))
 
 # vectorisation et conservation des 10 + grandes zones
-cluster_liss <- tmp %>% 
+cluster_liss <- (mais_liss > seuil_lissage) %>% 
   as.polygons() %>% 
   st_as_sf() %>% 
   filter(layer == 1) %>% 
@@ -382,7 +392,7 @@ temp_points <- era5 %>%
 # Calcul des degrés jour et des dates de récolte
 
 ```{r}
-#| label: traitement
+#| label: calcul-degres-jours
 
 # la date n'est pas un bon indicateur pour suivre précisémment une évolution 
 # journalière à cause des années bissextiles 
@@ -443,7 +453,7 @@ recolte  %>%
        subtitle = "Maïs grain",
        x = "année",
        y = "jour",
-       color = "lieu",
+       color = "bassin de production",
        caption = glue("d'après données agroclimatiques ERA5
                        pour une précocité moyenne ({besoin} DJ, base {base} °C)"))
 ```
