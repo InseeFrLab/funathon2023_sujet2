@@ -43,13 +43,6 @@ format:
     code-fold: true
     code-tools: true
     code-summary: "voir le code"
-    
-  pdf:
-    keep-tex: true
-    toc: true
-    toc-title: Contents
-    fig-pos: 'H'
-    fig-align: center
 
 mainfont: "Marianne"
 monofont: "Fira Code"
