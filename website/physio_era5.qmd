@@ -54,14 +54,6 @@ Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur
 
 [^1]: [Degré jour de croissance. *Wikipedia*](https://fr.wikipedia.org/wiki/Degr%C3%A9_jour_de_croissance)
 
-$$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{max, j} - T_{min, j}}{2} - T_{base}}$$
-
-Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable selon la précocité de la variété) pour être récolté pour l'ensilage[^2] destiné à nourrir le bétail, ou 1700 DJ pour le maïs grain. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^3].
-
-[^2]: [*Spotifarm*](https://blog.spotifarm.fr/tour-de-plaine-spotifarm/somme-de-temperature-pourquoi-suivre-levolution-des-degres-jours)
-
-[^3]: [Céré'Obs. *FranceAgrimer*](https://cereobs.franceagrimer.fr/cereobs-sp/assets/pdfjs/web/viewer.html?file=blob:https://cereobs.franceagrimer.fr/f05c19c6-aff4-4701-9af4-80fdef7118d3)
-
 **Peut-on voir comment a évolué la date de récolte théorique du maïs au cours des 40 dernières années ?**
 
 
@@ -369,6 +361,8 @@ cluster_liss %>%
 
 # Extraction
 
+Pour chaque bassin de production, on peut prendre un "centroïde" et récupérer les données de température journalières pour ces points.
+
 ```{r}
 #| label: donnees-climat
 #| cache: true
@@ -390,6 +384,16 @@ temp_points <- era5 %>%
 
 
 # Calcul des degrés jour et des dates de récolte
+
+
+$$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{max, j} - T_{min, j}}{2} - T_{base}}$$
+
+Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable selon la précocité de la variété) pour être récolté pour l'ensilage[^2] destiné à nourrir le bétail, ou 1700 DJ pour le maïs grain. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^3].
+
+[^2]: [*Spotifarm*](https://blog.spotifarm.fr/tour-de-plaine-spotifarm/somme-de-temperature-pourquoi-suivre-levolution-des-degres-jours)
+
+[^3]: [Céré'Obs. *FranceAgrimer*](https://cereobs.franceagrimer.fr/cereobs-sp/assets/pdfjs/web/viewer.html?file=blob:https://cereobs.franceagrimer.fr/f05c19c6-aff4-4701-9af4-80fdef7118d3)
+
 
 ```{r}
 #| label: calcul-degres-jours
