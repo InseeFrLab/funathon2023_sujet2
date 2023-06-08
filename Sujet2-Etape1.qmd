@@ -5,7 +5,7 @@ format: html
 # standalone: true
 self-contained: true
 toc: true
-toc-depth: 2
+toc-depth: 3
 number-sections: true
 toc-location: left
 css: styles.css
@@ -22,6 +22,8 @@ library(aws.s3)
 library(sf)
 library(RPostgreSQL)
 library(janitor)
+if (!"kableExtra" %in% installed.packages()) { install.packages("kableExtra") }
+library(kableExtra)
 
 # données -----------------------------------------------------------------
 aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/ign/rpg")
@@ -37,10 +39,12 @@ clic droit sur la carte + clic gauche sur les coordonnées (copiées dans le pre
 J'indique un rayon en mètres pour sélectionner les parcelles autour du point
 
 ```{r}
-coord_gmaps<- rstudioapi::showPrompt(title = "Collez les coordonnées", message = "coordonnées Gmaps", default = "")
+# coord_gmaps<- rstudioapi::showPrompt(title = "Collez les coordonnées", message = "coordonnées Gmaps", default = "")
+coord_gmaps<-"46.46946179131805, -1.4932577154775046"
 lat<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,1])
 lon<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,2])
-rayon<-as.numeric(rstudioapi::showPrompt(title = "Rayon", message = "Rayon (en m)", default = ""))
+# rayon<-as.numeric(rstudioapi::showPrompt(title = "Rayon", message = "Rayon (en m)", default = ""))
+rayon<-5000
 
 # création d'une table sf «point» avec les coordonnées saisies
 # transformation des coordonnées en syst de proj 2154 (Lambert II - Français) 
@@ -58,12 +62,13 @@ point<-data.frame(lon,lat,rayon) %>%
 
 La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL/PostGIS.
 
-Je me connecte au serveur PostgreSQL avec le mot de passe disponible sur Onyxia/Mes services/PostgreSQL/Read me
+### Je me connecte au serveur PostgreSQL avec le mot de passe disponible sur Onyxia/Mes services/PostgreSQL/Read me
 
 ```{r}
 # le mot de passe est stocké dans un secret Vault
-postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
-# postgresql_password <- "1tfawt3nj7fgzo3w7cma"
+
+# postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
+postgresql_password <- "1tfawt3nj7fgzo3w7cma"
   
 # Connection à PostgreSQL
 cnx <- dbConnect(PostgreSQL(),
@@ -76,7 +81,7 @@ cnx <- dbConnect(PostgreSQL(),
                  
 ```
 
-je lance une requête SQL pour sélectionner les parcelles situées autour de mon point dans le rayon choisi.
+### je lance une requête SQL pour sélectionner les parcelles situées autour de mon point dans le rayon choisi.
 
 ```{r}
 # suppression de la table «point» si elle existe
@@ -116,10 +121,57 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 
 ```
 
-J'affiche les parcelles autour de mon point (prévoir un leaflet ?)
+### J'affiche les parcelles autour de mon point (prévoir un leaflet ?)
 
 ```{r}
 plot(st_geometry(parc_prox))
+```
+
+### Quelle est la structure des parcelles agricoles autour de mon point ?
+
+```{r lecture des libelles des groupes de culture}
+lib_group_cult<-s3read_using(FUN = read_csv2, 
+                         object = "2023/sujet2/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
+                         col_types = cols(.default = col_character()),
+                         bucket = "projet-funathon",
+                         opts = list("region" = "")) %>% 
+  select(CODE_GROUPE_CULTURE,LIBELLE_GROUPE_CULTURE) %>% 
+  distinct(CODE_GROUPE_CULTURE,.keep_all=T) %>% 
+  rename (code_group_culture=CODE_GROUPE_CULTURE,libelle_groupe_culture=LIBELLE_GROUPE_CULTURE)
+
+```
+
+```{r}
+#comptage des parcelles
+t1 <- parc_prox %>% st_drop_geometry() %>% count(code_group) %>% 
+  add_tally(n) %>% 
+  mutate(n_pct=round(100*n/nn,1)) %>% 
+  select(-nn) %>% rename(n_parcelles=n) %>%
+  # adorn_totals() %>% 
+cbind(
+  # comptage des surfaces
+parc_prox %>% st_drop_geometry() %>% count(code_group,wt=surf_parc) %>% 
+      add_tally(n) %>% 
+      mutate(surf_pct=round(100*n/nn,1)) %>%
+      select(-nn) %>%  
+      rename(surf_parc_ha=n) %>% select(surf_parc_ha, surf_pct) # %>% 
+       # adorn_totals()
+) %>% left_join(lib_group_cult,by=c("code_group"="code_group_culture")) %>% 
+  select(code_group,libelle_groupe_culture,everything()) %>% 
+  arrange(as.numeric(code_group)) %>% adorn_totals() %>% 
+  mutate(taille_moy_parc=round(surf_parc_ha/n_parcelles,1))
+
+kable(t1,
+format="html"
+,format.args = list(decimal.mark = ",", big.mark = " ")
+,booktabs = TRUE) %>%
+  kable_styling(font_size = 15) %>% 
+  gsub("font-size: initial !important;",
+       "font-size: 20pt !important;",.)%>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  row_spec(nrow(t1), bold = T, color = "white", background = "grey")
+
+rm(t1)
 ```
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
