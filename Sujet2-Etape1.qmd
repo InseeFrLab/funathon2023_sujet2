@@ -1,0 +1,142 @@
+---
+title: "Sujet2-Etape1"
+format: html
+# embed-resources: true
+# standalone: true
+self-contained: true
+toc: true
+toc-depth: 2
+number-sections: true
+toc-location: left
+css: styles.css
+theme: united
+editor: visual
+output-file: Sujet2-Etape1.html
+---
+
+```{r setup, include=FALSE}
+#| echo: false
+#| # chargement des packages
+library(tidyverse) 
+library(aws.s3)
+library(sf)
+library(RPostgreSQL)
+library(janitor)
+
+# données -----------------------------------------------------------------
+aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/ign/rpg")
+
+```
+
+## Etape 1 : Première manipulation du RPG
+
+### Je choisis un point sur la carte (<https://www.google.fr/maps>)
+
+clic droit sur la carte + clic gauche sur les coordonnées (copiées dans le presse-papier)
+
+J'indique un rayon en mètres pour sélectionner les parcelles autour du point
+
+```{r}
+coord_gmaps<- rstudioapi::showPrompt(title = "Collez les coordonnées", message = "coordonnées Gmaps", default = "")
+lat<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,1])
+lon<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,2])
+rayon<-as.numeric(rstudioapi::showPrompt(title = "Rayon", message = "Rayon (en m)", default = ""))
+
+# création d'une table sf «point» avec les coordonnées saisies
+# transformation des coordonnées en syst de proj 2154 (Lambert II - Français) 
+point<-data.frame(lon,lat,rayon) %>% 
+  st_as_sf(coords = c("lon","lat"),crs = "EPSG:4326") %>%
+  mutate(coord_pt_gps=st_as_text(geometry)) %>% 
+  st_transform("EPSG:2154") %>% 
+  st_sf() %>% clean_names() %>% 
+  rename(geom=geometry)
+
+# st_crs(point)
+# st_geometry_type(point)
+# plot(point)
+```
+
+La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL/PostGIS.
+
+Je me connecte au serveur PostgreSQL avec le mot de passe disponible sur Onyxia/Mes services/PostgreSQL/Read me
+
+```{r}
+# le mot de passe est stocké dans un secret Vault
+postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
+# postgresql_password <- "1tfawt3nj7fgzo3w7cma"
+  
+# Connection à PostgreSQL
+cnx <- dbConnect(PostgreSQL(),
+                user = "projet-funathon",
+                password = postgresql_password,
+                host = "postgresql-438832",
+                dbname = "defaultdb",
+                port = 5432,
+                options="-c search_path=rpg,public") # specify what schema to connect to
+                 
+```
+
+je lance une requête SQL pour sélectionner les parcelles situées autour de mon point dans le rayon choisi.
+
+```{r}
+# suppression de la table «point» si elle existe
+dbSendQuery(cnx,"DROP TABLE IF EXISTS rpg.point CASCADE;")
+
+# écriture de la table point dans la base PostGis
+write_sf(point, cnx, append = T)
+
+# ajout d'une clé primaire
+dbSendQuery(cnx,"ALTER TABLE rpg.point ADD CONSTRAINT point_pkey PRIMARY KEY(coord_pt_gps);")
+
+# ajout d'un index
+dbSendQuery(cnx,"CREATE INDEX ON rpg.point USING gist(geom);")
+# dbExecute(cnx,"CREATE INDEX ON rpg.point USING gist(geom);")
+
+# 3 - Exécution de la requête de découpage du RPG autour du point sur PostGis  -------
+
+dbSendQuery(cnx,"DROP TABLE IF EXISTS rpg.parc_prox CASCADE;")
+
+dbSendQuery(cnx,"CREATE TABLE rpg.parc_prox AS
+	SELECT row_number() OVER () AS row_id, p.coord_pt_gps, p.rayon, r.*  
+	FROM rpg.point p, rpg.parcelles r 
+	WHERE ST_DWithin(p.geom,r.geom,p.rayon);")
+
+# ajout d'une clé primaire
+dbSendQuery(cnx,"ALTER TABLE rpg.parc_prox ADD CONSTRAINT parc_prox_pk PRIMARY KEY(id_parcel);")
+
+# ajout d'un index
+dbSendQuery(cnx,"CREATE INDEX parc_prox_geom_idx ON rpg.parc_prox USING gist(geom);")
+
+
+# 4 - Téléchargement des parcelles proches sous R-------------------------------
+
+# parc_prox<-read_sf(cnx,parc_prox)
+
+parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
+
+```
+
+J'affiche les parcelles autour de mon point (prévoir un leaflet ?)
+
+```{r}
+plot(st_geometry(parc_prox))
+```
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
