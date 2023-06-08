@@ -14,6 +14,8 @@ library(aws.s3)
 library(sf)
 library(RPostgreSQL)
 
+renv::restore()
+
 # library(janitor);
 # library(ggplot2)
 # library(cowplot)
@@ -208,5 +210,77 @@ s3write_using(stat_group_cult_dep,
               object = "/2023/sujet2/resultats/stat_group_cult_dep.csv",
               bucket = "projet-funathon",
               opts = list("region" = "")) 
+
+# 9 - Boucle pour calculer les stats sur tous les départements
+
+#téléchargement des comptages par strates par département
+
+liste_dep_metro<-c('01','02','03','04','05','06','07','08','09','10',
+                   '11','12','13','14','15','16','17','18','19','2A','2B',
+                   '21','22','23','24','25','26','27','28','29','30',
+                   '31','32','33','34','35','36','37','38','39','40',
+                   '41','42','43','44','45','46','47','48','49','50',
+                   '51','52','53','54','55','56','57','58','59','60',
+                   '61','62','63','64','65','66','67','68','69','70',
+                   '71','72','73','74','75','76','77','78','79','80',
+                   '81','82','83','84','85','86','87','88','89','90',
+                   '91','92','93','94','95')
+
+# liste_dep_metro<-c('01','02')
+
+t1<-Sys.time()
+options(scipen = 15); 
+for (num_dep in liste_dep_metro)
+{
+  cat("comptage stats département",num_dep,"\n")
+  stat_dep<-dbGetQuery(cnx,str_glue("select insee_dep,code_group, count(*), round(sum(surf_parc)) as surf_ha 
+from rpg.parcelles where insee_dep='{num_dep}' group by insee_dep, code_group order by code_group::numeric;"))  
+  if (num_dep == liste_dep_metro[1]) 
+  {
+    stats_group_cult_by_dep<-stat_dep
+    rm(stat_dep)
+  } else
+  {
+    #concatenation des département    
+    stats_group_cult_by_dep<-stats_group_cult_by_dep %>% rbind(stat_dep)
+    rm(stat_dep)
+  }
+  cat(Sys.time()-t1,"\n")
+}
+Sys.time()-t1
+
+#vérification
+
+stats_group_cult_by_dep %>% group_by(insee_dep) %>% count() 
+stats_group_cult_by_dep %>% group_by(code_group) %>% count() 
+
+# calcul des totaux par département
+tot_by_dep<-stats_group_cult_by_dep %>% group_by(insee_dep) %>% 
+  summarise_at(vars(count,surf_ha),~sum(.)) %>% 
+  rename(nparc_tot_dep=count,surf_tot_dep=surf_ha)
+
+stat_group_cult_by_dep<-stats_group_cult_by_dep %>% 
+  left_join(tot_by_dep, by="insee_dep") %>% 
+  left_join(lib_group_cult,by=c("code_group"="code_group_culture")) %>% 
+  select(insee_dep,code_group,libelle_groupe_culture,everything()) %>% 
+  # add_tally(count) %>% add_tally(surf_ha) %>% 
+  mutate(pct_count=round(100*count/nparc_tot_dep,1),
+         pct_surf=round(100*surf_ha/surf_tot_dep,1), 
+         surf_moy=round(surf_ha/count,1)) %>% 
+  select(insee_dep,code_group,libelle_groupe_culture,count,pct_count, surf_ha, pct_surf, surf_moy)
+
+s3write_using(stat_group_cult_by_dep,
+              FUN = write_csv, 
+              object = "/2023/sujet2/resultats/stat_group_cult_by_dep.csv",
+              bucket = "projet-funathon",
+              opts = list("region" = "")) 
+s3write_using(
+  stat_group_cult_by_dep,
+  readr::write_rds,
+  object = "2023/sujet2/resultats/stat_group_cult_by_dep.rds",
+  bucket = "projet-funathon",
+  opts = list("region" = ""))
+
+
 
 
