@@ -17,7 +17,7 @@ format:
   html:
     anchor-sections: true
     smooth-scroll: true
-    self-contained: true
+    self-contained: false
     toc: true
     toc-depth: 3
     theme: united
@@ -97,6 +97,8 @@ library(RPostgres) # connxion PostgreSQL
 library(sf)        # manipulation de données spatiales vecteur
 library(leaflet)   # carto web
 library(knitr)     # génération du document
+library(ggrepel)   # étiquettage graphiques
+
 
 # localisation des données dans le stockage "local"
 rep_era5 <- "donnees/era5"
@@ -430,14 +432,29 @@ recolte <- temp_points %>%
 #| tbl-cap: Dates de récolte potentielles
 
 recolte %>% 
+  st_drop_geometry() %>% 
   arrange(nom, annee) %>% 
   group_by(nom) %>%
   slice_head(n = 2) %>% 
   ungroup() %>% 
-  add_row(nom = "...") %>% 
+  add_row(nom = "<i>etc.</i>") %>% 
   kable()
 ```
 
+```{r}
+#| label: tendance
+
+mod <- recolte %>% 
+  mutate(doy = yday(date)) %>% 
+  glm(doy ~ annee + nom, data = .)
+
+# préparation des étiquettes pour la visualisation
+etiquettes <- tibble(nom = unique(recolte$nom),
+                     annee = max(recolte$annee) + 1) %>% 
+  bind_cols(doy = predict(mod, newdata = .)) %>% 
+  mutate(date_virtuelle = as_date(parse_date_time(glue("2020-{str_pad(round(doy, 0), 3, 'left', '0')}"), 
+                                                  orders = "yj")))
+```
 
 # Visualisation
 
@@ -451,7 +468,9 @@ recolte  %>%
                                                   orders = "yj"))) %>% 
   ggplot(aes(annee, date_virtuelle, color = nom)) +
   geom_point() +
-  geom_smooth(method = lm) +
+  geom_smooth(method = glm) +
+  geom_text_repel(data = etiquettes, aes(label = str_wrap(nom, 10, whitespace_only = FALSE)),
+                  nudge_x = 1, size = 3, direction = "y", lineheight = 0.6) +
   scale_y_date(date_breaks = "months", date_labels = "%b") +
   labs(title = "Date de récolte potentielle",
        subtitle = "Maïs grain",
@@ -459,19 +478,19 @@ recolte  %>%
        y = "jour",
        color = "bassin de production",
        caption = glue("d'après données agroclimatiques ERA5
-                       pour une précocité moyenne ({besoin} DJ, base {base} °C)"))
+                       pour une précocité moyenne ({besoin} DJ, base {base} °C)")) +
+  theme(legend.position = "none",
+        plot.caption = element_text(size = 6))
 ```
 
 
 # Tendance
 
 ```{r}
-#| label: tendance
+#| label: tbl-tendance
+#| tbl-cap: Près de 1 jour de précocité par an
 
-mod <- recolte %>% 
-  mutate(doy = yday(date)) %>% 
-  glm(doy ~ annee + nom, data = .)
-
+theme_gtsummary_language("fr")
 tbl_regression(mod)
 ```
 
