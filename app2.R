@@ -105,14 +105,31 @@ precip_df %>%
 aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/resultats")
 
 drias_raster <- s3read_using(
-  function(f) readAll(raster(f)),
+  function(f) readAll(brick(f)),
   object = "2023/sujet2/resultats/drias.tif",
   bucket = "projet-funathon",
   opts = list("region" = ""))
-names(drias_raster)
-
-raster::plot(x = drias_raster,
-             main = "Cumuls de précipitations d'avril à octobre (mm) annuels sur la période 2021-2050")
+drias_df <- as.data.frame(drias_raster, xy = TRUE) %>% tidyr::drop_na()
+colnames(drias_df) <- c(
+  "x",
+  "y",
+  "NORRRA",
+  "NORSTM6",
+  "NORSTM0",
+  "NORSDA",
+  "NORDATEVEG",
+  "NORDATEDG",
+  "NORDATEPG",
+  "ARRA",
+  "ASTM6",
+  "ASTM0",
+  "ASDA",
+  "ADATEVEG",
+  "ADATEDG",
+  "ADATEPG",
+  "ALTI"
+)
+drias_df
 
 nbands(drias_raster)
 bandnr(drias_raster)
@@ -123,6 +140,8 @@ drias_raster_arra <- s3read_using(
   object = "2023/sujet2/resultats/drias.tif",
   bucket = "projet-funathon",
   opts = list("region" = ""))
+as.data.frame(drias_raster_arra, xy = TRUE)
+
 
 raster::plot(x = drias_raster_arra,
              main = "Ecarts des cumuls de précipitations d'avril à octobre (mm) entre 2021-2050 et 1976-2005")
