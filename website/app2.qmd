@@ -30,6 +30,7 @@ library(ggplot2)
 library(raster)
 library(sf)
 library(janitor)
+library(knitr)
 
 # pour avoir les noms de dates en français
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
@@ -49,8 +50,6 @@ On souhaite tout d'abord visualiser les données DRIAS. On peut passer par les d
 
 ```{r}
 #| label: get-drias-raster
-
-aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/resultats")
 
 drias_raster <- s3read_using(
   function(f) readAll(brick(f)),
@@ -79,7 +78,7 @@ colnames(drias_df) <- c(
   "ALTI"
 )
 
-head(drias_df)
+kable(drias_df)
 ```
 
 Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) :
@@ -149,13 +148,70 @@ SELECT B.point, code_cultu, Sum(surf_parc) AS surface, B.arra
 FROM rpg.parcelles AS A
 JOIN drias.previsions AS B
 ON ST_Intersects(A.geom , B.geometry)
-GROUP BY B.point, code_cultu
+GROUP BY B.point, B.arra, code_cultu
 "
 res <- dbSendQuery(cnx, query)
-results_df <- dbFetch(res)
+arra_df <- dbFetch(res)
 
-head(results_df)
+arra_df %>% kable()
 ```
+On a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.
 
 ## Calcul d'indicateurs par type de culture
 
+On peut maintenant calculer un écart moyen de cumul de précipitation (d'avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche. 
+
+```{r}
+#| label: aggregation-culture
+
+# Récupération des libellés des codes culture
+culture_mapping <- s3read_using(
+  FUN = read.csv,
+  sep = ";",
+  object = "2023/sujet2/ign/rpg/CULTURE.csv",
+  bucket = "projet-funathon",
+  opts = list("region" = "")
+)
+
+# On aggrège au niveau national par code culture et on calcule un écart
+# moyen du cumul par m2
+agg_arra_df <- arra_df %>%
+  group_by(code_cultu) %>%
+  summarise(ecart_volume_precip = sum(surface * arra), surface = sum(surface)) %>%
+  mutate(ecart_cumul_moyen = ecart_volume_precip / surface)
+
+# Récupération des 10 cultures avec une forte perte de précipitation
+agg_arra_df %>%
+  dplyr::left_join(culture_mapping, by = c("code_cultu" = "Code")) %>%
+  arrange(ecart_cumul_moyen) %>%
+  kable()
+```
+
+Le maïs doux est une culture qui sera touchée par les baisses de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ?
+
+```{r}
+#| label: localisation-mais
+
+# Frontières régionales de métropole
+region_sf <- st_read(
+  cnx, query = "SELECT * FROM adminexpress.region"
+)
+region_sf <- region_sf %>% st_transform(
+  "EPSG:2154"
+)
+region_sf <- region_sf %>%
+  dplyr::filter(!(insee_reg %in% c("03", "04", "06", "01", "02", "01_SBSM")))
+
+# Parcelles de maïs doux
+query_mid <- "
+SELECT id_parcel, geom
+FROM rpg.parcelles
+WHERE code_cultu = 'MID'
+"
+cultures_mid <- st_read(cnx, query = query_mid)
+ggplot() + 
+  geom_sf(data = region_sf) +
+  geom_sf(data = st_buffer(cultures_mid, 5000), fill = "#fca8ab", color = NA)
+```
+
+On observe en effet beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.
