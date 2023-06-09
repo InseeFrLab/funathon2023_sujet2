@@ -15,8 +15,9 @@ output-file: Sujet2-Etape1.html
 ---
 
 ```{r setup, include=FALSE}
+#| label: setup
 #| echo: false
-#| # chargement des packages
+
 library(tidyverse) 
 library(aws.s3)
 library(sf)
@@ -30,15 +31,19 @@ aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/ign/rp
 
 ```
 
+test commit
+
 ## Etape 1 : Première manipulation du RPG
 
-### Je choisis un point sur la carte (<https://www.google.fr/maps>)
+### Je choisis un point sur la carte : <https://www.google.fr/maps>
 
-clic droit sur la carte + clic gauche sur les coordonnées (copiées dans le presse-papier)
+=\> clic droit sur la carte + clic gauche sur les coordonnées (copiées dans le presse-papier)
 
 J'indique un rayon en mètres pour sélectionner les parcelles autour du point
 
 ```{r}
+#| label: choix coordonnées + rayon
+#| echo: false
 # coord_gmaps<- rstudioapi::showPrompt(title = "Collez les coordonnées", message = "coordonnées Gmaps", default = "")
 coord_gmaps<-"46.46946179131805, -1.4932577154775046"
 lat<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,1])
@@ -65,6 +70,9 @@ La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL/PostGI
 ### Je me connecte au serveur PostgreSQL avec le mot de passe disponible sur Onyxia/Mes services/PostgreSQL/Read me
 
 ```{r}
+#| echo: false
+#| label: connection PostGis
+
 # le mot de passe est stocké dans un secret Vault
 
 # postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
@@ -84,6 +92,9 @@ cnx <- dbConnect(PostgreSQL(),
 ### je lance une requête SQL pour sélectionner les parcelles situées autour de mon point dans le rayon choisi.
 
 ```{r}
+#| echo: false
+#| label: requete SQL selection parcelles
+
 # suppression de la table «point» si elle existe
 dbSendQuery(cnx,"DROP TABLE IF EXISTS rpg.point CASCADE;")
 
@@ -124,12 +135,19 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 ### J'affiche les parcelles autour de mon point (prévoir un leaflet ?)
 
 ```{r}
+#| echo: false
+#| label: affichage parcelles
+
 plot(st_geometry(parc_prox))
+plot(st_geometry(point),add = T,col = "red")
 ```
 
 ### Quelle est la structure des parcelles agricoles autour de mon point ?
 
-```{r lecture des libelles des groupes de culture}
+```{r }
+#| echo: false
+#| label: lecture libellés groupes cultures
+
 lib_group_cult<-s3read_using(FUN = read_csv2, 
                          object = "2023/sujet2/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
                          col_types = cols(.default = col_character()),
@@ -142,7 +160,10 @@ lib_group_cult<-s3read_using(FUN = read_csv2,
 ```
 
 ```{r}
-#comptage des parcelles
+#| echo: false
+#| label: stats sur les groupes de cultures 
+#| tbl-cap: Structure des cultures 
+
 t1 <- parc_prox %>% st_drop_geometry() %>% count(code_group) %>% 
   add_tally(n) %>% 
   mutate(n_pct=round(100*n/nn,1)) %>% 
@@ -172,6 +193,93 @@ format="html"
   row_spec(nrow(t1), bold = T, color = "white", background = "grey")
 
 rm(t1)
+```
+
+### Comparaison avec la structure départementale et et nationale
+
+```{r}
+#| label: comparaison structure départementale et nationale 
+#| echo: false
+#| tbl-cap: Structure des cultures 
+
+# jointure spatiale avec la couche commune pour récupérer le département où tombe le point
+
+# ouvrir la couche des communes
+# com <- s3read_using(
+#   FUN = sf::read_sf,
+#   layer = "COMMUNE_2021",
+#   object = "2023/sujet2/ign/COMMUNE_2021.gpkg",
+#   bucket = "projet-funathon",
+#   opts = list("region" = "")) %>% clean_names()
+
+# jointure
+# df<-point %>% st_join(com) %>% st_drop_geometry() %>% select(insee_dep) 
+# dep_pt<-df[1,1]
+# rm(df)
+
+# sinon sélection du département regroupant la plus grande surface agricole
+# cas où le cercle recouvre plusieurs départements
+df<-parc_prox %>% st_drop_geometry() %>% 
+  count(insee_dep,wt=surf_parc) %>% 
+  arrange(desc(n))
+dep_pt<-df[1,1]
+rm(df)
+
+# calcul des % surfaces autour du point
+stat_pt <- parc_prox %>% st_drop_geometry() %>% 
+  count(code_group,wt=surf_parc) %>% add_tally(n) %>% 
+  mutate(pct_surf_local=round(100*n/nn,1)) %>%
+  select(code_group, pct_surf_local) 
+
+# récup des % surfaces départementales
+stat_dep_pt<-s3read_using(
+  FUN=readr::read_rds,
+  object = "2023/sujet2/resultats/stat_group_cult_by_dep.rds",
+  bucket = "projet-funathon",
+  opts = list("region" = "")) %>% 
+  filter(insee_dep %in% dep_pt) %>% 
+  select(insee_dep,code_group,libelle_groupe_culture,pct_surf) %>% 
+  rename(pct_surf_dep = pct_surf)
+
+# récup des % surfaces nationales
+stat_fm<-s3read_using(
+  FUN=readr::read_csv,
+  object = "2023/sujet2/resultats/stat_group_cult_fm.csv",
+  col_types = cols(code_group = col_character()),
+  bucket = "projet-funathon",
+  opts = list("region" = "")) %>% 
+ select(code_group,libelle_groupe_culture,pct_surf) %>% 
+  rename(pct_surf_fm = pct_surf)
+
+stat_comp<-stat_fm %>% 
+  left_join(stat_dep_pt %>% select(code_group, pct_surf_dep),by="code_group") %>% 
+  left_join(stat_pt,by="code_group") %>% 
+  select(libelle_groupe_culture,pct_surf_local,pct_surf_dep,pct_surf_fm) %>% 
+  arrange(desc(pct_surf_local)) %>% adorn_totals() 
+
+kable(stat_comp)
+```
+
+### Graphique
+
+```{r}
+#| label: faire un graphique comparant les structures
+#| echo: false
+#| fig-cap: différences de structure locale, departementale, nationale  
+
+tab<-stat_comp %>% filter(libelle_groupe_culture!="Total") %>% 
+  rename(local=pct_surf_local, departement=pct_surf_dep, france=pct_surf_fm)
+tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) 
+#tab_piv<-tab_piv %>% coalesce(value,0L)  
+tab_piv[is.na(tab_piv)] <- 0
+
+
+p<-ggplot(tab_piv, 
+          aes(x = reorder(libelle_groupe_culture,+value), y = value, fill=name)) + geom_col(position = "dodge") +
+  labs(title="Surface par culture", x="Culture", y = "%")+
+  theme_classic()
+
+p+coord_flip()
 ```
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
