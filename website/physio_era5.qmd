@@ -61,10 +61,10 @@ Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur
 
 - Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agricuteurs : données graphiques et leur culture principale.
 
-  Les données sont disponibles dans une base PostGIS.
+  Les données (environ 10 millions de parcelles) sont disponibles dans une base PostgreSQL/PostGIS.
 
 - [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
-Il fournit des paramètres agro-météorologiques de surface quotidiens pour la période allant de 1979 à aujourd'hui à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France). 
+Il fournit des paramètres agro-météorologiques de surface quotidiens sur les quarante dernières années à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France). 
 
   Les données de température moyenne journalière 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
 
@@ -73,7 +73,7 @@ Les données peuvent aussi être traitées avec les packages de manipulation de 
 
 # Proposition
 
-Estimer l'évolution des dates potentielles de récolte du maïs grain (code culture : `MIS`) dans les différents bassins de productions français depuis 1980.
+Estimer l'évolution des dates potentielles de récolte du maïs grain dans les différents bassins de productions français depuis 1980.
 
 # Préparation
 
@@ -119,7 +119,7 @@ cnx <- dbConnect(Postgres(),
 
 # Définition des bassins de production du maïs grain
 
-On peut, par exemple, extraire les 10 principales zones où la densité de culture est la plus forte. Cela peut se faire par commune ou avec un lissage.
+On peut, par exemple, extraire les principales zones où la densité de culture du maïs grain (code culture : `MIS`) est la plus forte. Cela peut se faire par commune ou avec un lissage.
 
 ```{r}
 #| label: lissage-fonctions
@@ -303,7 +303,6 @@ mais <- read_sf(cnx, query = "
   WHERE code_cultu = 'MIS'")
 ```
 
-
 ```{r}
 #| label: lissage-traitement
 
@@ -311,27 +310,41 @@ mais <- read_sf(cnx, query = "
 mais_liss <- mais %>% 
   lissage(surf_parc, 10000, 1000, zone = fr) %>% 
   rast()
-
-plot(mais_liss, main = "Densité de culture de maïs grain 2022 (ha/km²)")
-
-seuil_lissage <- 8 # seuil de densité à prendre en compte (ha/km²)
 ```
 
-On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/km².
+```{r}
+#| label: fig-lissage-carte
+#| fig-cap: Lissage
+
+plot(mais_liss, main = "Densité de culture de maïs grain 2022 (ha/km²)")
+```
+
+```{r}
+#| label: bassins-params
+seuil_lissage <- 8  # seuil de densité à prendre en compte (ha/km²)
+nb_bassins    <- 10 # combien de bassins on conserve
+```
+
+On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/km² et on conservera les `r nb_bassins` plus grandes zones.
+
+```{r}
+#| label: fig-lissage-carte-filtree
+#| fig-cap: Lissage filtré
+
+plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2022 (> {seuil_lissage} ha/km²)"))
+```
 
 ```{r}
 #| label: clusters
 
-plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2022 (> {seuil_lissage} ha/km²)"))
-
-# vectorisation et conservation des 10 + grandes zones
+# vectorisation et conservation des nb_bassins + grandes zones
 cluster_liss <- (mais_liss > seuil_lissage) %>% 
   as.polygons() %>% 
   st_as_sf() %>% 
   filter(layer == 1) %>% 
   st_cast("POLYGON") %>% 
   mutate(surf = st_area(geometry)) %>% 
-  slice_max(surf, n = 10) %>% 
+  slice_max(surf, n = nb_bassins) %>% 
   mutate(id = row_number())
 
 # nommage des clusters avec le nom de la plus grosse ville de la zone
@@ -350,13 +363,14 @@ points <- cluster_liss %>%
 ```
 
 ```{r}
-#| label: clusters-carto
+#| label: fig-clusters-carto
+#| fig-cap: !expr 'glue("Les {nb_bassins} bassins de production retenus")'
 
 cluster_liss %>% 
   inner_join(noms) %>% 
   st_transform("EPSG:4326") %>% 
   leaflet() %>% 
-  addPolygons(popup = ~ nom) %>% 
+  addPolygons(popup = ~ glue("{id}. {nom}")) %>% 
   addTiles()
 ```
 
@@ -416,7 +430,7 @@ recolte <- temp_points %>%
   select(date, nom, temp_moy_c) %>% 
   group_by(nom, annee = year(date)) %>% 
   mutate(dj = case_when(yday(date) < 91 ~ 0,
-                        temp_moy_c > 30 ~ 0,
+                        temp_moy_c >= 30 ~ 0,
                         temp_moy_c < base ~ 0,
                         TRUE ~ temp_moy_c - base),
          sdj = cumsum(dj)) %>%
@@ -472,6 +486,7 @@ recolte  %>%
   geom_text_repel(data = etiquettes, aes(label = str_wrap(nom, 10, whitespace_only = FALSE)),
                   nudge_x = 1, size = 3, direction = "y", lineheight = 0.6) +
   scale_y_date(date_breaks = "months", date_labels = "%b") +
+  coord_cartesian(ylim = as.Date(c(NA, "2020-11-08"))) +
   labs(title = "Date de récolte potentielle",
        subtitle = "Maïs grain",
        x = "année",
@@ -488,7 +503,7 @@ recolte  %>%
 
 ```{r}
 #| label: tbl-tendance
-#| tbl-cap: Près de 1 jour de précocité par an
+#| tbl-cap: !expr "glue('Évolution de la date de récolte : environ {round(mod$coefficients[[\\'annee\\']], 1)} jour par an')"
 
 theme_gtsummary_language("fr")
 tbl_regression(mod)
