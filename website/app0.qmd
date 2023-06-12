@@ -35,6 +35,9 @@ library(RPostgres)
 library(dplyr)
 library(knitr)
 library(sf)
+library(janitor)
+library(aws.s3)
+
 
 conn <- dbConnect(Postgres(),
                  user = Sys.getenv("USER_POSTGRESQL"),
@@ -67,27 +70,30 @@ res %>% kable()
 
 PostGIS est une extension de PostgreSQL, qui active la manipulation d'informations géographiques sous forme de géométries (points, lignes, polygones). Il permet à PostgreSQL d'être un système de gestion de base de données spatial pouvant être utilisé par les systèmes d'informations géographiques.
 
-On utilise la librairie `sf` pour gérer les données spatiales avec `R`. La fonction `write_sf` de cette librairie permet d'écrire des données dans une base de données PostGIS. Dans la suite on va illustrer comment créer une table contenant les données de prévisions climatiques du DRIAS, disponibles [ici](http://www.drias-climat.fr/commande). Ces données 
+On utilise la librairie `sf` pour gérer les données spatiales avec `R`. La fonction `write_sf` de cette librairie permet d'écrire des données dans une base de données PostGIS. Dans la suite on va illustrer comment créer une table contenant les données du RPG (décrites en détail plus tard, la documentation figure [ici](https://geoservices.ign.fr/documentation/donnees/vecteur/rpg)). Ces données sont disponibles sur MinIO au format `.gpkg`.
 
 ```{r}
-#| label: write-query-postgis
+#| label: write-postgis
 #| code-fold: false
 
-library(aws.s3)
+parcelles <- s3read_using(
+  FUN = sf::read_sf,
+  query = 'SELECT * FROM parcelles_graphiques LIMIT 10',
+  object = "2023/sujet2/diffusion/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
+  bucket = "projet-funathon",
+  opts = list("region" = "")
+  )
+write_sf(parcelles, conn, Id(schema = "test_schema", table = "test_parcelles"), overwrite = TRUE)
+```
 
-# Indicateurs horizon proche  calculés sur la période 2021-2050
-# RCP8.5 : Scénario sans politique climatique
-# Modèle ALADIN63_CNRM-CM5
-drias <- s3read_using(
-    FUN = readr::read_delim,
-    skip = 33,
-    col_names = c("Point", "Latitude", "Longitude", "Contexte", "Période",
-                  "NORRRA", "NORSTM6", "NORSTM0", "NORSDA", "NORDATEVEG",
-                  "NORDATEDG", "NORDATEPG", "ARRA", "ASTM6", "ASTM0",
-                  "ASDA", "ADATEVEG", "ADATEDG", "ADATEPG"),
-    object = "2023/sujet2/diffusion/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
-    bucket = "projet-funathon",
-    opts = list("region" = "")) %>%
-  clean_names() %>%
-  dplyr::select(-x20)
+On n'a écrit que 10 observations du fichier des parcelles pour cette démontration. On peut les requêter pour vérifier que l'information géographique figure bien dans la base de données.
+
+```{r}
+#| label: query-postgis
+#| code-fold: false
+
+sf <- st_read(
+  conn, query = "SELECT * FROM test_schema.test_parcelles"
+)
+plot(st_geometry(sf))
 ```
