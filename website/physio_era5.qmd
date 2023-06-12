@@ -63,7 +63,7 @@ Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur
 
 - Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC (Politique agricole commune) par les agricuteurs : données graphiques et leur culture principale.
 
-  Les données (environ 10 millions de parcelles) sont disponibles dans une base PostgreSQL/PostGIS.
+  Les données 2021 (environ 10 millions de parcelles) sont disponibles dans une base PostgreSQL/PostGIS.
 
 - [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques (ERA5).
 Il fournit des paramètres agro-météorologiques de surface quotidiens sur les quarante dernières années à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France). 
@@ -123,7 +123,7 @@ cnx <- dbConnect(Postgres(),
 
 # Définition des bassins de production du maïs grain
 
-Le maïs grain (code culture : `MIS`) représente environ 6 % des surfaces déclarées à la PAC en France en 2022.
+Le maïs grain (code culture : `MIS`) représente environ 6 % des surfaces déclarées à la PAC en France en 2021.
 
 On peut, par exemple, extraire les principales zones où la densité de culture du maïs grain est la plus forte. Cela peut se faire par commune, par clustering ou avec un lissage.
 
@@ -327,7 +327,7 @@ mais_liss <- mais %>%
 #| label: fig-lissage-carte
 #| fig-cap: Lissage
 
-plot(mais_liss, main = "Densité de culture de maïs grain 2022 (ha/km²)")
+plot(mais_liss, main = "Densité de culture de maïs grain 2021 (ha/km²)")
 ```
 
 ```{r}
@@ -342,7 +342,7 @@ On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/k
 #| label: fig-lissage-carte-filtree
 #| fig-cap: Lissage filtré
 
-plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2022 (> {seuil_lissage} ha/km²)"))
+plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2021 (> {seuil_lissage} ha/km²)"))
 ```
 
 ```{r}
