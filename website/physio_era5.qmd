@@ -77,11 +77,13 @@ Estimer l'évolution des dates potentielles de récolte du maïs grain dans les 
 
 # Préparation
 
+Restaurer les packages à utiliser : `renv::restore()`
+
 Il faut avoir préalablement copié les données depuis le stockage S3 Minio :
 
 `$ mc cp -r s3/projet-funathon/2023/sujet2/era5/ funathon2023_sujet2/donnees/era5/`
 
-Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme  variable d'environnement en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *~/.Renviron*.
+Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme  variable d'environnement par exemple en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *~/.Renviron* : `file.edit("~/.Renviron")` et relancer la session (ctrl + maj + F10).
 
 ```{r}
 #| label: setup
