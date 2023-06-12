@@ -9,4 +9,209 @@ knitr:
     out.width: 100%
 ---
 
-A compléter.
+Le changement climatique aura des changements importants sur les cultures en France, en particulier à cause de la diminution des précipitations dans certaines régions au cours des années à venir. Dans cette application, on souhaite identifier les cultures avec le niveau de risque le plus élevé.
+
+## Données
+
+- Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC par les agriculteurs, leurs informations graphiques et leur culture principale. Ces données sont mises à disposition dans une base de données PostgreSQL.
+
+- Le projet [Drias](https://www.drias-climat.fr/) a pour vocation de mettre à disposition des projections climatiques réalisées dans les laboratoires français de modélisation du climat (IPSL, CERFACS, CNRM). En particulier, nous disposons de projections locales du modèle CNRM-CM5 / ALADIN63 / correction ADAMONT. Ces données sont aussi mises à disposition sur PostgreSQL. 
+
+## Visualisations
+
+```{r}
+#| label: setup
+#| echo: true
+
+library(RPostgres)
+library(dplyr)
+library(aws.s3)
+library(ggplot2)
+library(raster)
+library(sf)
+library(janitor)
+library(knitr)
+
+# pour avoir les noms de dates en français
+invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
+
+options(knitr.kable.NA = "")
+
+cnx <- dbConnect(Postgres(),
+                 user = "projet-funathon",
+                 password = Sys.getenv("PASS_POSTGRESQL"),
+                 host = "postgresql-438832",
+                 dbname = "defaultdb",
+                 port = 5432,
+                 check_interrupts = TRUE)
+```
+
+On souhaite tout d'abord visualiser les données DRIAS. On peut passer par les données sauvegardées au format raster qui sont stockées dans l'espace de stockage du SSP Cloud. Ces données correspondent à des prévisions à horizon proche (2021-2050) dans un scénario sans réduction des gaz à effet de serre, la période de référence étant 1976-2005.
+
+```{r}
+#| label: get-drias-raster
+
+drias_raster <- s3read_using(
+  function(f) readAll(brick(f)),
+  object = "2023/sujet2/resultats/drias.tif",
+  bucket = "projet-funathon",
+  opts = list("region" = ""))
+
+drias_df <- as.data.frame(drias_raster, xy = TRUE) %>% tidyr::drop_na()
+colnames(drias_df) <- c(
+  "x",
+  "y",
+  "NORRRA",
+  "NORSTM6",
+  "NORSTM0",
+  "NORSDA",
+  "NORDATEVEG",
+  "NORDATEDG",
+  "NORDATEPG",
+  "ARRA",
+  "ASTM6",
+  "ASTM0",
+  "ASDA",
+  "ADATEVEG",
+  "ADATEDG",
+  "ADATEPG",
+  "ALTI"
+)
+
+kable(drias_df)
+```
+
+Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) :
+- RRA : cumul de précipitations d'avril à octobre (mm)
+- STM6 : somme de température base 6°C d'avril à octobre (°C)
+- STM0 : somme de température base 0°C d'octobre (année-1) à juillet (année) (°C)
+- SDA : nombre de jours d'été d'avril à juin (jour(s))
+- DATEVEG : date de reprise de végétation en jour julien (date)
+- DATEDG : Date de dernière gelée avec 1er juillet comme référence (date)
+- DATEPG : Date de première gelée avec 1er juillet comme référence (date)
+
+On visualise la variable ARRA, qui correspond à l'écart de cumul de précipitations d'avril à octobre en mm.
+
+```{r}
+#| label: drias_vis_raster
+
+# Bande ARRA
+drias_raster_arra <- s3read_using(
+  function(f) readAll(raster(f, band = 8)),
+  object = "2023/sujet2/resultats/drias.tif",
+  bucket = "projet-funathon",
+  opts = list("region" = ""))
+
+# Avec palette custom
+palette <- c("#1457ff", "#3c9aff", "#6dc4ff", "#a8e1ff", "#dff1fb", "#f8e9eb", "#fca8ab", "#f9575d", "#f2060b", "#a20102")
+breaks <- c(-200, -160, -120, -80, -40, -0, 40, 80, 120, 160, 200)
+
+raster::plot(x = drias_raster_arra,
+             col = rev(palette),
+             breaks = breaks,
+             main = "Ecart de cumul de précipitations d'avril à octobre (mm) entre 2021-2050 et 1976-2005")
+```
+
+Sur la période 2021-2050, les précipitations vont augmenter presque partout, sauf Sud-Ouest de la France (détails...).
+
+## Requêtes PostgreSQL 
+
+Les données sont également stockées dans une base PostgreSQL qu'il est possible de requêter. La table `drias.previsions` contient une grille équivalente aux données raster précédemment utilisées.
+
+```{r}
+#| label: drias_vis_postgresql
+
+query <- "
+SELECT *
+FROM drias.previsions
+"
+drias_sf <- st_read(cnx, query = query)
+
+ggplot() + 
+  geom_sf(data = drias_sf, aes(fill = arra), color = NA) +
+  binned_scale(aesthetics = "fill", scale_name = "custom", 
+               palette = ggplot2:::binned_pal(scales::manual_pal(values = rev(palette)[-1])),
+               guide = "bins",
+               breaks = breaks)
+```
+
+## Appariement spatial entre données DRIAS et RPG
+
+On souhaite effectuer cet appariement pour obtenir par carreau de la grille DRIAS la surface de parcelles pour chaque type de culture.
+
+```{r}
+#| label: spatial-join
+
+# On récupère par carreau de la grille DRIAS la surface pour chaque type de culture
+query <- "
+SELECT B.point, code_cultu, Sum(surf_parc) AS surface, B.arra
+FROM rpg.parcelles AS A
+JOIN drias.previsions AS B
+ON ST_Intersects(A.geom , B.geometry)
+GROUP BY B.point, B.arra, code_cultu
+"
+res <- dbSendQuery(cnx, query)
+arra_df <- dbFetch(res)
+
+arra_df %>% kable()
+```
+On a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.
+
+## Calcul d'indicateurs par type de culture
+
+On peut maintenant calculer un écart moyen de cumul de précipitation (d'avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche. 
+
+```{r}
+#| label: aggregation-culture
+
+# Récupération des libellés des codes culture
+culture_mapping <- s3read_using(
+  FUN = read.csv,
+  sep = ";",
+  object = "2023/sujet2/ign/rpg/CULTURE.csv",
+  bucket = "projet-funathon",
+  opts = list("region" = "")
+)
+
+# On aggrège au niveau national par code culture et on calcule un écart
+# moyen du cumul par m2
+agg_arra_df <- arra_df %>%
+  group_by(code_cultu) %>%
+  summarise(ecart_volume_precip = sum(surface * arra), surface = sum(surface)) %>%
+  mutate(ecart_cumul_moyen = ecart_volume_precip / surface)
+
+# Récupération des 10 cultures avec une forte perte de précipitation
+agg_arra_df %>%
+  dplyr::left_join(culture_mapping, by = c("code_cultu" = "Code")) %>%
+  arrange(ecart_cumul_moyen) %>%
+  kable()
+```
+
+Le maïs doux est une culture qui sera touchée par les baisses de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ?
+
+```{r}
+#| label: localisation-mais
+
+# Frontières régionales de métropole
+region_sf <- st_read(
+  cnx, query = "SELECT * FROM adminexpress.region"
+)
+region_sf <- region_sf %>% st_transform(
+  "EPSG:2154"
+)
+region_sf <- region_sf %>%
+  dplyr::filter(!(insee_reg %in% c("03", "04", "06", "01", "02", "01_SBSM")))
+
+# Parcelles de maïs doux
+query_mid <- "
+SELECT id_parcel, geom
+FROM rpg.parcelles
+WHERE code_cultu = 'MID'
+"
+cultures_mid <- st_read(cnx, query = query_mid)
+ggplot() + 
+  geom_sf(data = region_sf) +
+  geom_sf(data = st_buffer(cultures_mid, 5000), fill = "#fca8ab", color = NA)
+```
+
+On observe en effet beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.
