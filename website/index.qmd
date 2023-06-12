@@ -1,3 +1,7 @@
 # Contexte et description du sujet {.unnumbered}
 
-A compléter.
+Avec ce sujet, vous allez pouvoir :
+
+- Utiliser une base de données PostgreSQL
+- Travailler avec des données géographiques
+- A compléter
