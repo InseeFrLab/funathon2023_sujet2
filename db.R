@@ -18,12 +18,12 @@ cnx <- dbConnect(Postgres(),
                                                    error = function(e) ''),
                                           sep = " - "))
 
-aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2")
+aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion")
 
 # couches dispo dans le gpkg
 s3read_using(
   FUN = sf::st_layers,
-  object = "2023/sujet2/ign/adminexpress_cog_simpl_000_2023.gpkg",
+  object = "2023/sujet2/diffusion/ign/adminexpress_cog_simpl_000_2023.gpkg",
   bucket = "projet-funathon",
   opts = list("region" = "")
 )
@@ -32,7 +32,7 @@ s3read_using(
 reg <- s3read_using(
     FUN = sf::read_sf,
     layer = "region",
-    object = "2023/sujet2/ign/adminexpress_cog_simpl_000_2023.gpkg",
+    object = "2023/sujet2/diffusion/ign/adminexpress_cog_simpl_000_2023.gpkg",
     bucket = "projet-funathon",
     opts = list("region" = ""))
 
@@ -50,7 +50,7 @@ EPSG:WGS84$$")
 com <- s3read_using(
   FUN = sf::read_sf,
   layer = "commune",
-  object = "2023/sujet2/ign/adminexpress_cog_simpl_000_2023.gpkg",
+  object = "2023/sujet2/diffusion/ign/adminexpress_cog_simpl_000_2023.gpkg",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 

@@ -27,7 +27,7 @@ if (!"kableExtra" %in% installed.packages()) { install.packages("kableExtra") }
 library(kableExtra)
 
 # données -----------------------------------------------------------------
-aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/ign/rpg")
+aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion/ign/rpg")
 
 ```
 
@@ -149,7 +149,7 @@ plot(st_geometry(point),add = T,col = "red")
 #| label: lecture libellés groupes cultures
 
 lib_group_cult<-s3read_using(FUN = read_csv2, 
-                         object = "2023/sujet2/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
+                         object = "2023/sujet2/diffusion/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
                          col_types = cols(.default = col_character()),
                          bucket = "projet-funathon",
                          opts = list("region" = "")) %>% 
@@ -208,7 +208,7 @@ rm(t1)
 # com <- s3read_using(
 #   FUN = sf::read_sf,
 #   layer = "COMMUNE_2021",
-#   object = "2023/sujet2/ign/COMMUNE_2021.gpkg",
+#   object = "2023/sujet2/diffusion/ign/COMMUNE_2021.gpkg",
 #   bucket = "projet-funathon",
 #   opts = list("region" = "")) %>% clean_names()
 
@@ -234,7 +234,7 @@ stat_pt <- parc_prox %>% st_drop_geometry() %>%
 # récup des % surfaces départementales
 stat_dep_pt<-s3read_using(
   FUN=readr::read_rds,
-  object = "2023/sujet2/resultats/stat_group_cult_by_dep.rds",
+  object = "2023/sujet2/diffusion/resultats/stat_group_cult_by_dep.rds",
   bucket = "projet-funathon",
   opts = list("region" = "")) %>% 
   filter(insee_dep %in% dep_pt) %>% 
@@ -244,7 +244,7 @@ stat_dep_pt<-s3read_using(
 # récup des % surfaces nationales
 stat_fm<-s3read_using(
   FUN=readr::read_csv,
-  object = "2023/sujet2/resultats/stat_group_cult_fm.csv",
+  object = "2023/sujet2/diffusion/resultats/stat_group_cult_fm.csv",
   col_types = cols(code_group = col_character()),
   bucket = "projet-funathon",
   opts = list("region" = "")) %>% 

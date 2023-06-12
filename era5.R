@@ -91,17 +91,17 @@ periode %>%
 # Mon compte > Connexion au stockage > Pour accéder au stockage > MC client
 # $ export MC_HOST_s3=...
 # puis par ex. :
-# $ mc cp -r funathon2023_sujet2/donnees/era5/2022/ s3/projet-funathon/2023/sujet2/era5/2022
+# $ mc cp -r funathon2023_sujet2/data/era5/2022/ s3/projet-funathon/2023/sujet2/diffusion/era5/2022
 
 # ne marche pas (?) :
 # periode %>%
-#   walk(~ system(glue("export MC_HOST_s3=\"{Sys.getenv('MC_HOST_s3')}\" && mc cp -r {rep_era5_full}{.x}/ s3/projet-funathon/2023/sujet2/era5/{.x}")))
+#   walk(~ system(glue("export MC_HOST_s3=\"{Sys.getenv('MC_HOST_s3')}\" && mc cp -r {rep_era5_full}{.x}/ s3/projet-funathon/2023/sujet2/diffusion/era5/{.x}")))
 
 
 # ex. utilisation ---------------------------------------------------------
 
 # copier les données depuis le stockage persistant S3
-system(glue("mc cp -r  s3/projet-funathon/2023/sujet2/era5/ {rep_era5_full}"))
+system(glue("mc cp -r  s3/projet-funathon/2023/sujet2/diffusion/era5/ {rep_era5_full}"))
 
 # un exemple de localisations avec date début-fin
 points <- tribble(~ville,       ~lon,   ~lat,

@@ -28,7 +28,7 @@ renv::restore()
 
 # données -----------------------------------------------------------------
 
-aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/ign/rpg")
+aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/diffusion/sujet2/ign/rpg")
 
 # 1 - Créer une table avec un point en récupérant les coordonnées GPS --------
 
@@ -112,7 +112,7 @@ plot(st_geometry(parc_prox))
 # 5 - Lecture et appariement des cultures agrégées ---------------------------------------
 
 cult_agreg<-s3read_using(FUN = read_csv, 
-                         object = "2023/sujet2/ign/rpg/n-cultures-2021.csv", 
+                         object = "2023/sujet2/diffusion/ign/rpg/n-cultures-2021.csv", 
                          col_types = cols(.default = col_character()),
                          bucket = "projet-funathon",
                          opts = list("region" = "")) %>% select(-nom_sous_chapitre,-categorie_surf_agricole)
@@ -124,7 +124,7 @@ parc_prox <- parc_prox %>% left_join(cult_agreg,by=c("code_cultu"="code_culture"
 # 5 - lecture des libelles des groupes de culture --------------------------------------
 
 lib_group_cult<-s3read_using(FUN = read_csv2, 
-                         object = "2023/sujet2/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
+                         object = "2023/sujet2/diffusion/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
                          col_types = cols(.default = col_character()),
                          bucket = "projet-funathon",
                          opts = list("region" = "")) %>% 
@@ -147,12 +147,12 @@ stat_group_cult_fm<-stat_sql_group_cult_fm %>%
 
 s3saveRDS(stat_group_cult_fm, 
           bucket = "projet-funathon", 
-          object = "/2023/sujet2/resultats/stat_group_cult_fm.rds", 
+          object = "/2023/sujet2/diffusion/resultats/stat_group_cult_fm.rds", 
           opts = list("region" = ""))
 
 s3write_using(stat_group_cult_fm,
               FUN = write_csv, 
-             object = "/2023/sujet2/resultats/stat_group_cult_fm.csv",
+             object = "/2023/sujet2/diffusion/resultats/stat_group_cult_fm.csv",
              bucket = "projet-funathon",
              opts = list("region" = "")) 
   
@@ -207,7 +207,7 @@ stat_group_cult_dep<-stat_sql_group_cult_dep %>%
 
 s3write_using(stat_group_cult_dep,
               FUN = write_csv, 
-              object = "/2023/sujet2/resultats/stat_group_cult_dep.csv",
+              object = "/2023/sujet2/diffusion/resultats/stat_group_cult_dep.csv",
               bucket = "projet-funathon",
               opts = list("region" = "")) 
 
@@ -271,13 +271,13 @@ stat_group_cult_by_dep<-stats_group_cult_by_dep %>%
 
 s3write_using(stat_group_cult_by_dep,
               FUN = write_csv, 
-              object = "/2023/sujet2/resultats/stat_group_cult_by_dep.csv",
+              object = "/2023/sujet2/diffusion/resultats/stat_group_cult_by_dep.csv",
               bucket = "projet-funathon",
               opts = list("region" = "")) 
 s3write_using(
   stat_group_cult_by_dep,
   readr::write_rds,
-  object = "2023/sujet2/resultats/stat_group_cult_by_dep.rds",
+  object = "2023/sujet2/diffusion/resultats/stat_group_cult_by_dep.rds",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 

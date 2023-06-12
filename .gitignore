@@ -2,6 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-donnees/era5/*
+data/era5/*
 get-pip.py
-

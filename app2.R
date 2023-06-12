@@ -47,7 +47,7 @@ drias <- s3read_using(
                 "NORRRA", "NORSTM6", "NORSTM0", "NORSDA", "NORDATEVEG",
                 "NORDATEDG", "NORDATEPG", "ARRA", "ASTM6", "ASTM0",
                 "ASDA", "ADATEVEG", "ADATEDG", "ADATEPG"),
-  object = "2023/sujet2/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
+  object = "2023/sujet2/diffusion/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
   bucket = "projet-funathon",
   opts = list("region" = "")) %>%
   janitor::clean_names() %>%
@@ -88,7 +88,7 @@ precip_df <- precip_df %>%
 culture_mapping <- s3read_using(
   FUN = read.csv,
   sep = ";",
-  object = "2023/sujet2/ign/rpg/CULTURE.csv",
+  object = "2023/sujet2/diffusion/ign/rpg/CULTURE.csv",
   bucket = "projet-funathon",
   opts = list("region" = "")
 )
@@ -102,11 +102,11 @@ precip_df %>%
   arrange(ecart_cumul_moyen)
 
 # Illustration, on passe par du raster pour plot ?
-aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/resultats")
+aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/diffusion/resultats")
 
 drias_raster <- s3read_using(
   function(f) readAll(brick(f)),
-  object = "2023/sujet2/resultats/drias.tif",
+  object = "2023/sujet2/diffusion/resultats/drias.tif",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 drias_df <- as.data.frame(drias_raster, xy = TRUE) %>% tidyr::drop_na()
@@ -137,7 +137,7 @@ bandnr(drias_raster)
 # Bande ARRA
 drias_raster_arra <- s3read_using(
   function(f) readAll(raster(f, band = 8)),
-  object = "2023/sujet2/resultats/drias.tif",
+  object = "2023/sujet2/diffusion/resultats/drias.tif",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 as.data.frame(drias_raster_arra, xy = TRUE)
@@ -161,7 +161,7 @@ raster::plot(x = drias_raster_arra,
 # Bande ASDA
 drias_raster_asda <- s3read_using(
   function(f) readAll(raster(f, band = 11)),
-  object = "2023/sujet2/resultats/drias.tif",
+  object = "2023/sujet2/diffusion/resultats/drias.tif",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 

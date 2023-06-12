@@ -4,7 +4,7 @@ library(sf)
 library(aws.s3)
 library(RPostgres)
 
-aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/ign/rpg")
+aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/diffusion/ign/rpg")
 
 # Ilots
 # Un îlot de culture correspond à un groupe de parcelles contiguës,
@@ -13,7 +13,7 @@ aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/ign/rpg
 # Couches dispo dans le .gpkg
 s3read_using(
   FUN = sf::st_layers,
-  object = "2023/sujet2/ign/rpg/ILOTS_ANONYMES.gpkg",
+  object = "2023/sujet2/diffusion/ign/rpg/ILOTS_ANONYMES.gpkg",
   bucket = "projet-funathon",
   opts = list("region" = "")
 )
@@ -22,7 +22,7 @@ s3read_using(
 ilots <- s3read_using(
   FUN = sf::read_sf,
   query = 'SELECT * FROM ilots_anonymes LIMIT 10',
-  object = "2023/sujet2/ign/rpg/ILOTS_ANONYMES.gpkg",
+  object = "2023/sujet2/diffusion/ign/rpg/ILOTS_ANONYMES.gpkg",
   bucket = "projet-funathon",
   opts = list("region" = "")
 )
@@ -33,7 +33,7 @@ ilots <- s3read_using(
 # Couches dispo dans le .gpkg
 s3read_using(
   FUN = sf::st_layers,
-  object = "2023/sujet2/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
+  object = "2023/sujet2/diffusion/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
   bucket = "projet-funathon",
   opts = list("region" = "")
 )
@@ -42,7 +42,7 @@ s3read_using(
 parcelles <- s3read_using(
   FUN = sf::read_sf,
   query = 'SELECT * FROM parcelles_graphiques LIMIT 10',
-  object = "2023/sujet2/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
+  object = "2023/sujet2/diffusion/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
   bucket = "projet-funathon",
   opts = list("region" = "")
   )
@@ -89,7 +89,7 @@ for (offset in offsets) {
   parcelles_part <- s3read_using(
     FUN = sf::read_sf,
     query = query,
-    object = "2023/sujet2/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
+    object = "2023/sujet2/diffusion/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
     bucket = "projet-funathon",
     opts = list("region" = "")
   )

@@ -85,7 +85,7 @@ drias <- s3read_using(
                   "NORRRA", "NORSTM6", "NORSTM0", "NORSDA", "NORDATEVEG",
                   "NORDATEDG", "NORDATEPG", "ARRA", "ASTM6", "ASTM0",
                   "ASDA", "ADATEVEG", "ADATEDG", "ADATEPG"),
-    object = "2023/sujet2/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
+    object = "2023/sujet2/diffusion/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
   clean_names() %>%

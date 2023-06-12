@@ -14,7 +14,7 @@ library(RPostgres)
 
 # données -----------------------------------------------------------------
 
-aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2")
+aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion")
 
 
 # http://www.drias-climat.fr/commande
@@ -29,7 +29,7 @@ drias <- s3read_using(
                   "NORRRA", "NORSTM6", "NORSTM0", "NORSDA", "NORDATEVEG",
                   "NORDATEDG", "NORDATEPG", "ARRA", "ASTM6", "ASTM0",
                   "ASDA", "ADATEVEG", "ADATEDG", "ADATEPG"),
-    object = "2023/sujet2/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
+    object = "2023/sujet2/diffusion/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
   clean_names() %>%
@@ -48,7 +48,7 @@ grille <- s3read_using(
     col_names = c("id", "x_n", "y_n", "x_l2e", "y_l2e",
                  "x_l93", "y_l93", "lon", "lat",
                  "alti", "unused"),
-    object = "2023/sujet2/drias/grilleSafran_complete_drias2021.xls",
+    object = "2023/sujet2/diffusion/drias/grilleSafran_complete_drias2021.xls",
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
   dplyr::select(-unused)
@@ -57,7 +57,7 @@ grille <- s3read_using(
 fr <- s3read_using(
     FUN = sf::read_sf,
     layer = "region",
-    object = "2023/sujet2/ign/adminexpress_cog_simpl_000_2023.gpkg",
+    object = "2023/sujet2/diffusion/ign/adminexpress_cog_simpl_000_2023.gpkg",
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
   filter(insee_reg > "06") %>%
@@ -78,7 +78,7 @@ drias_sf <- drias %>%
 drias_sf %>% 
   aws.s3::s3write_using(
   sf::write_sf,
-  object = "2023/sujet2/resultats/drias.gpkg",
+  object = "2023/sujet2/diffusion/resultats/drias.gpkg",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 
@@ -97,14 +97,14 @@ drias_raster %>%
   aws.s3::s3write_using(
     raster::writeRaster,
     overwrite = TRUE,
-    object = "2023/sujet2/resultats/drias.tif",
+    object = "2023/sujet2/diffusion/resultats/drias.tif",
     bucket = "projet-funathon",
     opts = list("region" = ""))
 
 drias_raster %>% 
   aws.s3::s3write_using(
     readr::write_rds,
-    object = "2023/sujet2/resultats/drias.rds",
+    object = "2023/sujet2/diffusion/resultats/drias.rds",
     bucket = "projet-funathon",
     opts = list("region" = ""))
 

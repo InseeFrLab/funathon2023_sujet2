@@ -53,7 +53,7 @@ On souhaite tout d'abord visualiser les données DRIAS. On peut passer par les d
 
 drias_raster <- s3read_using(
   function(f) readAll(brick(f)),
-  object = "2023/sujet2/resultats/drias.tif",
+  object = "2023/sujet2/diffusion/resultats/drias.tif",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 
@@ -98,7 +98,7 @@ On visualise la variable ARRA, qui correspond à l'écart de cumul de précipita
 # Bande ARRA
 drias_raster_arra <- s3read_using(
   function(f) readAll(raster(f, band = 8)),
-  object = "2023/sujet2/resultats/drias.tif",
+  object = "2023/sujet2/diffusion/resultats/drias.tif",
   bucket = "projet-funathon",
   opts = list("region" = ""))
 
@@ -168,7 +168,7 @@ On peut maintenant calculer un écart moyen de cumul de précipitation (d'avril 
 culture_mapping <- s3read_using(
   FUN = read.csv,
   sep = ";",
-  object = "2023/sujet2/ign/rpg/CULTURE.csv",
+  object = "2023/sujet2/diffusion/ign/rpg/CULTURE.csv",
   bucket = "projet-funathon",
   opts = list("region" = "")
 )
