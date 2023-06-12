@@ -78,7 +78,7 @@ colnames(drias_df) <- c(
   "ALTI"
 )
 
-kable(drias_df)
+drias_df %>% head(10) %>% kable()
 ```
 
 Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) :
@@ -153,7 +153,7 @@ GROUP BY B.point, B.arra, code_cultu
 res <- dbSendQuery(cnx, query)
 arra_df <- dbFetch(res)
 
-arra_df %>% kable()
+arra_df %>% head(10) %>% kable()
 ```
 On a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.
 
@@ -184,6 +184,7 @@ agg_arra_df <- arra_df %>%
 agg_arra_df %>%
   dplyr::left_join(culture_mapping, by = c("code_cultu" = "Code")) %>%
   arrange(ecart_cumul_moyen) %>%
+  head(10) %>%
   kable()
 ```
 

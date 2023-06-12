@@ -9,4 +9,85 @@ knitr:
     out.width: 100%
 ---
 
-A compléter.
+Dans cette première application, nous allons voir comment créer une base PostgreSQL sur le SSP Cloud, y importer des données, et enfin la requêter. Cette application est optionnelle, étant donné qu'une base de données PostgreSQL pré-configurée avec les tables nécessaires pour traiter ce sujet est accessible depuis n'importe quel service du SSP Cloud (nous verrons plus tard comment accéder à cette base de données).
+
+## Création d'un service PostgreSQL
+
+Pour créer un service `PostgreSQL` sur le SSP Cloud, aller dans le catalogue de services et choisir l'onglet *Databases* avant de sélectionner `PostgreSQL`. Il est possible de modifier la configuration du service. La configuration par défaut conviendra dans la plupart des cas, mais on souhaitera parfois (et c'est le cas pour ce sujet) installer l'extension `PostGIS` (onglet *Extensions* de la configuration). A noter que lorsqu'on travaille en collaboration dans le cadre d'un projet, on préfèrera cliquer sur le bouton `Partager le service` pour rendre ce dernier plus facilement accessible à ses collaborateurs.
+
+![Partage d'un service PostgreSQL.](img/launch_postgresql.png)
+
+## pgAdmin
+
+`pgAdmin` est une plateforme d'administration et de développement pour `PostgreSQL` C'est une interface graphique pour `PostgreSQL`. `pgAdmin` est disponible dans le catalogue de service du SSP Cloud (toujours dans l'onglet *Databases*). Une fois le service lancé, se connecter en suivant les instructions données dans le README du service. Le serveur `PostgreSQL` lancé au préalable devrait être automatiquement détecté par la fonction d'`Autodiscovery` (panneau de gauche). Il est alors possible d'accéder aux différentes bases de données disponibles sur le serveur, de les requêter (en utilisant la fonctionnalité `Query Tool`), etc.
+
+## Connexion au service PostgreSQL
+
+Le serveur `PostgreSQL` est facilement accessible depuis n'importe quel service interactif (par exemple `RStudio`). Tous les langages de programmation disposent de librairies qui implémentent une interface avec `PostgreSQL`. En `R`, on peut par exemple utiliser la librairie `RPostgres`, basée sur la librairie `DBI`. 
+
+Ci-dessous, on crée l'objet `conn` qui va nous permettre de communiquer avec `PostgreSQL`. Les paramètres `user`, `password` et `host` sont disponibles dans le README du service `PostgreSQL` (le paramètre `host` figure dans l'URL du README et a pour valeur `postgresql-xxxxxx`). Ici, on choisit de stocker ces différentes valeurs dans des variables d'environnement, `USER_POSTGRES`, `PASS_POSTGRES` et `HOST_POSTGRES`, ce qui est spécifié dans le fichier `~/.Renviron`. Pour éditer ce fichier, `file.edit("~/.Renviron")` puis relancer la session (ctrl + maj + F10).
+
+```{r}
+#| label: connect-db
+#| code-fold: false
+
+library(RPostgres)
+library(dplyr)
+library(knitr)
+library(sf)
+
+conn <- dbConnect(Postgres(),
+                 user = Sys.getenv("USER_POSTGRESQL"),
+                 password = Sys.getenv("PASS_POSTGRESQL"),
+                 host = Sys.getenv("HOST_POSTGRESQL"),
+                 dbname = "defaultdb",
+                 port = 5432,
+                 check_interrupts = TRUE)
+```
+
+A partir de l'objet `conn`, il est possible d'executer des requêtes et de récupérer les résultats petit à petit en utilisant les fonctions `dbSendQuery`, `dbFetch` et `dbClearResult`. Alternativement, pour récupérer tous les résultats de la requête directement lorsqu'ils tiennent en mémoire, on peut utiliser la fonction `dbGetQuery` qui rassemble les trois fonctions précédentes. Des fonctions utilitaires pour l'écriture de tables sont fournies par la librairie qu'on utilise, comme `dbWriteTable` pour écrire une table. Ainsi, si on a des données tabulaires stockées dans un `data.frame`, 
+
+```{r}
+#| label: write-query
+#| code-fold: false
+
+df <- data.frame(
+  a = c("a", "b", "c"),
+  b = c(1, 2, 3)
+)
+
+res <- dbSendQuery(conn, "CREATE SCHEMA IF NOT EXISTS test_schema")
+dbWriteTable(conn, Id(schema = "test_schema", table = "test_table"), df, overwrite = TRUE)
+res <- dbGetQuery(conn, "SELECT * FROM test_schema.test_table")
+
+res %>% kable()
+```
+
+## Utilisation de l'extension PostGIS
+
+PostGIS est une extension de PostgreSQL, qui active la manipulation d'informations géographiques sous forme de géométries (points, lignes, polygones). Il permet à PostgreSQL d'être un système de gestion de base de données spatial pouvant être utilisé par les systèmes d'informations géographiques.
+
+On utilise la librairie `sf` pour gérer les données spatiales avec `R`. La fonction `write_sf` de cette librairie permet d'écrire des données dans une base de données PostGIS. Dans la suite on va illustrer comment créer une table contenant les données de prévisions climatiques du DRIAS, disponibles [ici](http://www.drias-climat.fr/commande). Ces données 
+
+```{r}
+#| label: write-query-postgis
+#| code-fold: false
+
+library(aws.s3)
+
+# Indicateurs horizon proche  calculés sur la période 2021-2050
+# RCP8.5 : Scénario sans politique climatique
+# Modèle ALADIN63_CNRM-CM5
+drias <- s3read_using(
+    FUN = readr::read_delim,
+    skip = 33,
+    col_names = c("Point", "Latitude", "Longitude", "Contexte", "Période",
+                  "NORRRA", "NORSTM6", "NORSTM0", "NORSDA", "NORDATEVEG",
+                  "NORDATEDG", "NORDATEPG", "ARRA", "ASTM6", "ASTM0",
+                  "ASDA", "ADATEVEG", "ADATEDG", "ADATEPG"),
+    object = "2023/sujet2/drias/indicesALADIN63_CNRM-CM5_23050511192547042.KEYuUdx3UA39Av7f1U7u7O.txt",
+    bucket = "projet-funathon",
+    opts = list("region" = "")) %>%
+  clean_names() %>%
+  dplyr::select(-x20)
+```
