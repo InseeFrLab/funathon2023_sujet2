@@ -7,6 +7,7 @@ library(janitor)
 library(sf)
 library(readxl)
 library(aws.s3)
+library(RPostgres)
 
 # paramètres --------------------------------------------------------------
 
@@ -32,7 +33,7 @@ drias <- s3read_using(
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
   clean_names() %>%
-  select(-x20)
+  dplyr::select(-x20)
 
 # Les points lon/lat ne sont pas précisément sur une grille régulière qui
 # était à l'origine en Lambert2 étendu (grille Safran). On ne peut donc pas
@@ -50,7 +51,7 @@ grille <- s3read_using(
     object = "2023/sujet2/drias/grilleSafran_complete_drias2021.xls",
     bucket = "projet-funathon",
     opts = list("region" = "")) %>%
-  select(-unused)
+  dplyr::select(-unused)
 
 # contours admin simplifiés d'après adminexpress
 fr <- s3read_using(
@@ -107,3 +108,43 @@ drias_raster %>%
     bucket = "projet-funathon",
     opts = list("region" = ""))
 
+# Voronoï à partir des points
+g <- st_combine(st_geometry(drias_sf))
+v <- st_voronoi(g)
+v <- st_collection_extract(v)
+v <- v[unlist(st_intersects(drias_sf, v))]
+drias_sf <- st_set_geometry(drias_sf, v)
+
+# On récupère les régions françaises pour réduire la taille des cellules aux frontières
+query <- "
+SELECT * FROM adminexpress.region
+"
+region_sf <- st_read(cnx, query = query)
+region_sf <- region_sf %>% st_transform(
+  "EPSG:2154"
+)
+metropole_sf <- region_sf %>%
+  dplyr::filter(!(insee_reg %in% c("03", "04", "06", "01", "02", "01_SBSM")))
+
+# Intersection
+drias_sf_intersected <- st_intersection(drias_sf, st_combine(metropole_sf))
+
+# Export PostgreSQL  ----------------------------------------------------------
+
+cnx <- dbConnect(Postgres(),
+                 user = "projet-funathon",
+                 password = postgresql_password,
+                 host = "postgresql-438832",
+                 dbname = "defaultdb",
+                 port = 5432,
+                 check_interrupts = TRUE,
+                 application_name = paste(paste0(version[["language"]], " ",
+                                                 version[["major"]], ".",
+                                                 version[["minor"]]),
+                                          tryCatch(basename(rstudioapi::getActiveDocumentContext()[["path"]]),
+                                                   error = function(e) ''),
+                                          sep = " - "))
+
+# On peuple la table PostgreSQL
+dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS drias")
+write_sf(drias_sf_intersected, cnx, Id(schema = "drias", table = "previsions"))
