@@ -25,13 +25,31 @@ library(RPostgreSQL)
 library(janitor)
 if (!"kableExtra" %in% installed.packages()) { install.packages("kableExtra") }
 library(kableExtra)
+library(leaflet)
+library(htmlwidgets)
+library(RColorBrewer)
 
 # données -----------------------------------------------------------------
 aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion/ign/rpg")
 
 ```
 
-test commit
+```{r }
+#| echo: false
+#| label: lecture libellés groupes cultures
+
+lib_cult<-s3read_using(FUN = read_csv2, 
+                         object = "2023/sujet2/diffusion/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
+                         col_types = cols(.default = col_character()),
+                         bucket = "projet-funathon",
+                         opts = list("region" = "")) %>% clean_names() 
+
+lib_group_cult<-lib_cult %>% 
+  select(code_groupe_culture,libelle_groupe_culture) %>% 
+  distinct(code_groupe_culture,.keep_all=T)
+
+
+```
 
 ## Etape 1 : Première manipulation du RPG
 
@@ -140,24 +158,60 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 
 plot(st_geometry(parc_prox))
 plot(st_geometry(point),add = T,col = "red")
+
+# Transformation de la projection car leaflet ne connait que le WGS 84
+carte_parc_prox<- parc_prox %>% st_transform(4326)
+
+# ajout du libellé des cultures
+carte_parc_prox_lib<-carte_parc_prox %>% 
+  left_join(lib_cult %>% select(-code_groupe_culture),by=c("code_cultu"="code_culture")) 
+#création d'un label ad hoc à afficher en surbrillance au passage de la souris sur la carte.
+labels<-sprintf("<strong>id_parcel : </strong>%s<br/>
+                <strong>Groupe culture : </strong>%s<br/>
+                <strong>Culture : </strong>%s<br/>
+                <strong>Surface (ha) : </strong>%s<br/>
+                <strong>Département : </strong>%s<br/>
+                <strong>Commune : </strong>%s<br/>",
+                parc_prox$id_parcel,carte_parc_prox_lib$libelle_groupe_culture,
+                carte_parc_prox_lib$libelle_culture,parc_prox$surf_parc,
+                parc_prox$insee_dep,parc_prox$nom_com) %>% 
+  lapply(htmltools::HTML)
+
+# labels
+
+# création d'une palette de couleurs associée au groupe de culture
+factpal <- colorFactor("Paired", parc_prox$code_group)
+
+carte_parc_prox_html <- leaflet(carte_parc_prox_lib) %>% 
+   # addProviderTiles("Esri.WorldImagery") %>%
+   # addTiles() %>% 
+  addTiles("http://wxs.ign.fr/essentiels/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}") %>%
+  addPolygons( #fillColor="white",
+               fillColor=~factpal(code_group),
+               weight = 2,
+               opacity = 1,
+               color = "#ffd966",
+               dashArray = "3",
+               fillOpacity = 0.5,
+               highlight = highlightOptions(
+                 weight = 5,
+                 color = "#A40000",
+                 dashArray = "",
+                 fillOpacity = 0.0,
+                 bringToFront = TRUE),
+               label = labels,
+               labelOptions = labelOptions(
+                 style = list("font-weight" = "normal", padding = "3px 8px"),
+                 textsize = "15px",
+                 direction = "auto",
+                 encoding="UTF-8"))
+
+carte_parc_prox_html
+saveWidget(widget = carte_parc_prox_html, file = "carte_parc_prox_html.html")
+
 ```
 
 ### Quelle est la structure des parcelles agricoles autour de mon point ?
-
-```{r }
-#| echo: false
-#| label: lecture libellés groupes cultures
-
-lib_group_cult<-s3read_using(FUN = read_csv2, 
-                         object = "2023/sujet2/diffusion/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
-                         col_types = cols(.default = col_character()),
-                         bucket = "projet-funathon",
-                         opts = list("region" = "")) %>% 
-  select(CODE_GROUPE_CULTURE,LIBELLE_GROUPE_CULTURE) %>% 
-  distinct(CODE_GROUPE_CULTURE,.keep_all=T) %>% 
-  rename (code_group_culture=CODE_GROUPE_CULTURE,libelle_groupe_culture=LIBELLE_GROUPE_CULTURE)
-
-```
 
 ```{r}
 #| echo: false
@@ -177,7 +231,7 @@ parc_prox %>% st_drop_geometry() %>% count(code_group,wt=surf_parc) %>%
       select(-nn) %>%  
       rename(surf_parc_ha=n) %>% select(surf_parc_ha, surf_pct) # %>% 
        # adorn_totals()
-) %>% left_join(lib_group_cult,by=c("code_group"="code_group_culture")) %>% 
+) %>% left_join(lib_group_cult,by=c("code_group"="code_groupe_culture")) %>% 
   select(code_group,libelle_groupe_culture,everything()) %>% 
   arrange(as.numeric(code_group)) %>% adorn_totals() %>% 
   mutate(taille_moy_parc=round(surf_parc_ha/n_parcelles,1))
