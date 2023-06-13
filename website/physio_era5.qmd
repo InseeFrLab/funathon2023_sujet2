@@ -53,13 +53,24 @@ knitr:
     out.width: 100%
 ---
 
-Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur pour se développer. La notion de *degrés jours* a été introduite par les biologistes pour quantifier ce besoin physiologique. Il s'exprime par la somme des différences entre la température moyenne journalière et une température de base[^1].
+Les organismes vivants, dont les plantes, ont besoin d'une certaine quantité de chaleur pour se développer. La notion de *degrés jours* a été introduite par les biologistes pour quantifier ce besoin physiologique. Il s'exprime par la somme des différences entre la température moyenne journalière et une température de base[^1].
 
-[^1]: [Degré jour de croissance. *Wikipedia*](https://fr.wikipedia.org/wiki/Degr%C3%A9_jour_de_croissance)
+[^1]: [Degré jour de croissance](https://fr.wikipedia.org/wiki/Degr%C3%A9_jour_de_croissance) sur *Wikipedia*
 
-**Peut-on voir comment a évolué la date de récolte théorique du maïs au cours des 40 dernières années ?**
+Peut-on voir comment a évolué la date de récolte théorique d'une culture au cours des 40 dernières années ?
 
-# Données
+# Proposition
+
+**Estimer les tendances de la date potentielle de récolte du maïs grain dans les différents bassins de productions français depuis 1980.**
+
+## Compétences mises en oeuvre
+
+- Manipulation de données SIG : vecteurs et rasters avec les packages {sf}, {terra}, {stars}.
+- Requêtes SQL simples sur PostGIS avec {RPostgres} et {sf}.
+- Utiliser le lissage spatial pour synthétiser les données géographiques avec {btb}.
+- Estimer et visualiser des tendances : modèle linéaire simple et {ggplot2}.
+
+## Données utilisées
 
 -   Le [RPG](https://geoservices.ign.fr/rpg) recense les parcelles déclarées à la PAC (Politique agricole commune) par les agricuteurs : données graphiques et leur culture principale.
 
@@ -71,9 +82,7 @@ Les organismes, dont les plantes, ont besoin d'une certaine quantité de chaleur
 
     Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools). Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/).
 
-# Proposition
 
-Estimer les tendances de la date potentielle de récolte du maïs grain dans les différents bassins de productions français depuis 1980.
 
 # Préparation
 
@@ -96,7 +105,7 @@ library(tidyverse) # manipulation des données
 library(glue)      # interpolation de chaine de caractères
 library(fs)        # gestion du système de fichier
 library(gtsummary) # tableaux de modèles stat
-library(RPostgres) # connxion PostgreSQL
+library(RPostgres) # connexion PostgreSQL
 library(sf)        # manipulation de données spatiales vecteur
 library(leaflet)   # carto web
 library(knitr)     # génération du document
@@ -121,16 +130,19 @@ cnx <- dbConnect(Postgres(),
 
 # Définition des bassins de production du maïs grain
 
-Le maïs grain (code culture : `MIS`) représente environ 6 % des surfaces déclarées à la PAC en France en 2021.
+Le maïs grain (code culture : `MIS`) représente avec 1,5·10^6^ ha la moitié du maïs cultivé[^4] en France en 2021 soit environ 6 % des surfaces déclarées à la PAC. Il est utilisé pour l'alimentation animale (essentiellement) et humaine, la transformation en amidon, les agrocarburants...
 
-On peut, par exemple, extraire les principales zones où la densité de culture du maïs grain est la plus forte. Cela peut se faire par commune, par clustering ou avec un lissage[voir chapitre 8 @loonisManuelAnalyseSpatiale2018].
+[^4]: Les autres cultures étant le maïs ensilage (1,3·10^6^ ha, broyé et fermenté) destiné aussi à nourrir le bétail et le maïs doux (23 000 ha) pour l'alimentation humaine.
+
+Pour déterminer les aires principales de culture on peut, par exemple, extraire les principales zones où la densité de culture du maïs grain est la plus forte. Cela peut se faire par commune, par clustering ou avec un lissage[voir chapitre 8 @loonisManuelAnalyseSpatiale2018].
 
 On présente ici un exemple avec un lissage filtré.
 
 ```{r}
 #| label: lissage-fonctions
 
-# Lissage
+# Lissage : fonctions simplifiant la création de rasters lissés à partir de 
+# points avec {btb}
 #
 # michael.delorme - 2021-08-26
 
@@ -293,10 +305,11 @@ fr <- read_sf(cnx, query = "
   FROM adminexpress.region
   WHERE insee_reg > '06'")
 
-# communes (pour donner un nom à nos bassins de production)
+# communes (pour donner ultérieurement un nom à nos bassins de production)
 com <- read_sf(cnx, query = "
   SELECT 
     nom,
+    insee_dep,
     population,
     st_transform(geom, 3035) as geom
   FROM adminexpress.commune
@@ -315,9 +328,10 @@ mais <- read_sf(cnx, query = "
 #| label: lissage-traitement
 
 # lissage à 10 km de "bande passante" avec un pixel de 1 km
-# NB : le lissage ne peut pas être mis en cache car les objets {terra} ne sont pas cachables.
+# NB : le lissage ne peut pas être mis en cache car les objets {terra} ne sont 
+# pas cachables.
 mais_liss <- mais %>% 
-  lissage(surf_parc, 10000, 1000, zone = fr) %>% 
+  lissage(surf_parc, bandwidth = 10000, resolution = 1000, zone = fr) %>% 
   rast()
 ```
 
@@ -358,17 +372,11 @@ cluster_liss <- (mais_liss > seuil_lissage) %>%
 
 # nommage des clusters avec le nom de la plus grosse ville de la zone
 noms <- cluster_liss %>% 
-  st_join(com, left = TRUE) %>% 
+  st_join(st_point_on_surface(com), left = TRUE) %>% 
   st_drop_geometry() %>% 
   group_by(id) %>% 
   slice_max(population, n = 1, with_ties = FALSE) %>% 
-  select(id, nom)
-
-# préparations de points pour l'extraction des températures
-points <- cluster_liss %>% 
-  inner_join(noms) %>% 
-  st_point_on_surface() %>% 
-  st_transform("EPSG:4326")
+  select(id, nom, insee_dep)
 ```
 
 ```{r}
@@ -376,23 +384,31 @@ points <- cluster_liss %>%
 #| fig-cap: !expr 'glue("Les {nb_bassins} bassins de production retenus")'
 
 cluster_liss %>% 
-  inner_join(noms) %>% 
+  inner_join(noms, by = "id") %>% 
   st_transform("EPSG:4326") %>% 
   leaflet() %>% 
-  addPolygons(popup = ~ glue("{id}. {nom}")) %>% 
+  addPolygons(popup = ~ glue("{id}. bassin de {nom}")) %>% 
   addTiles()
 ```
 
 # Extraction des températures à chaque point
 
-Pour chaque bassin de production, on peut prendre un "centroïde" et récupérer les données de température journalières pour ces points.
+Pour chaque bassin de production, on peut rechercher un point représentatif et récupérer les données de température journalières pour tous ces points.
+
+NB : Le centroïde d'un polygone peut se trouver en dehors du polygone ; on utilise `st_point_on_surface()` plutôt que `st_centroid()` pour garantir qu'il est bien dans le polygone.
 
 ```{r}
 #| label: donnees-climat
 #| cache: true
 #| results: hide
 
-# données climato
+# préparations de points pour l'extraction des températures. 
+points <- cluster_liss %>% 
+  inner_join(noms, by = "id") %>% 
+  st_point_on_surface() %>% 
+  st_transform("EPSG:4326")
+
+# données de température sous forme de pile de rasters
 era5 <- dir_ls(here::here(rep_era5), recurse = TRUE, glob = "*.nc") %>% 
   read_stars() %>% 
   rename(temp_moy_k = 1)
@@ -410,7 +426,7 @@ temp_points <- era5 %>%
 
 $$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{max, j} - T_{min, j}}{2} - T_{base}}$$
 
-Le maïs a une température de base de 6 °C et il lui faut 1500 DJ (variable selon la précocité de la variété) pour être récolté pour l'ensilage[^2] destiné à nourrir le bétail, ou 1700 DJ pour le maïs grain. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^3].
+Le maïs a une température de base de 6 °C et il lui faut 1700 DJ (variable selon la précocité de la variété) pour être récolté pour le grain[^2]. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^3].
 
 [^2]: [*Spotifarm*](https://blog.spotifarm.fr/tour-de-plaine-spotifarm/somme-de-temperature-pourquoi-suivre-levolution-des-degres-jours)
 
@@ -422,10 +438,10 @@ On considère que la température moyenne journalière ERA5 correspond à $\frac
 #| label: calcul-degres-jours
 
 # la date n'est pas un bon indicateur pour suivre précisémment une évolution 
-# journalière à cause des années bissextiles 
-#   -> on utilisara le day of year (doy)
+# journalière à cause des années bissextiles. Ex :
 # yday(ymd("2020-04-01"))
 # yday(ymd("2023-04-01"))
+#   -> on utilisera le day of year (doy)
 
 # base de calcul pour maïs : 6 °C
 base <- 6 # °C
@@ -469,7 +485,8 @@ mod <- recolte %>%
   mutate(doy = yday(date)) %>% 
   glm(doy ~ annee + nom, data = .)
 
-# préparation des étiquettes pour la visualisation
+# préparation des étiquettes pour la visualisation avec affichage direct (sans 
+# légende)
 etiquettes <- tibble(nom = unique(recolte$nom),
                      annee = max(recolte$annee) + 1) %>% 
   bind_cols(doy = predict(mod, newdata = .)) %>% 
@@ -515,11 +532,6 @@ theme_gtsummary_language("fr")
 tbl_regression(mod)
 ```
 
-```{css}
-#| echo: false
-code {font-size: .8em}
-.toc-section-number:after, .header-section-number:after {content: ". "}
-q {quotes:'« ' ' »' '“' '”' '‘' '’'}
-```
 
-# Références
+
+
