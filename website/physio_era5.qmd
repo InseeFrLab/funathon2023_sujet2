@@ -458,7 +458,8 @@ recolte <- temp_points %>%
                         temp_moy_c >= 30 ~ 0,
                         temp_moy_c < base ~ 0,
                         TRUE ~ temp_moy_c - base),
-         sdj = cumsum(dj)) %>%
+         sdj = cumsum(dj),
+         doy = yday(date)) %>%
   filter(sdj > besoin) %>% 
   slice_min(date) %>% 
   ungroup() %>% 
@@ -487,7 +488,6 @@ recolte %>%
 #| label: tendance-avec-interaction
 
 mod_interactions <- recolte %>% 
-  mutate(doy = yday(date)) %>% 
   glm(doy ~ annee * nom, data = .)
 
 # préparation des étiquettes pour la visualisation avec affichage direct (sans 
@@ -505,8 +505,7 @@ etiquettes <- tibble(nom = unique(recolte$nom),
 #| fig-height: 7
 
 recolte %>% 
-  mutate(doy = yday(date),
-         date_virtuelle = as_date(parse_date_time(glue("2020-{str_pad(doy, 3, 'left', '0')}"), 
+  mutate(date_virtuelle = as_date(parse_date_time(glue("2020-{str_pad(doy, 3, 'left', '0')}"), 
                                                   orders = "yj"))) %>% 
   ggplot(aes(annee, date_virtuelle, color = nom)) +
   geom_point() +
@@ -535,14 +534,13 @@ recolte %>%
 #| label: tendance-simple
 
 mod_simple <- recolte %>% 
-  mutate(doy = yday(date)) %>% 
   glm(doy ~ annee + nom, data = .)
 
 evol <- round(mod_simple$coefficients[["annee"]], 1)
 ic95 <- round(confint(mod_simple)[2, ], 1)
 ```
 
-Au cours des quatre dernières décennies, la date de récolte potentielle moyenne du maïs grain dans les principaux bassins de production français à évolué d'environ `r evol` jour par an (IC~95%~ [`r ic95[1]`, `r ic95[2]`]).
+Au cours des quatre dernières décennies, la date de récolte potentielle moyenne du maïs grain dans les principaux bassins de production français à évolué d'environ `r evol` jour par an (IC~95 %~ [`r ic95[1]` ; `r ic95[2]`]).
 
 ```{r}
 #| label: tbl-tendance
