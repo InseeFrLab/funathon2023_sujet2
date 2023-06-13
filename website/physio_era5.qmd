@@ -117,7 +117,9 @@ rep_era5 <- "data/era5"
 # pour avoir les noms de dates en français
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 
-options(knitr.kable.NA = "")
+options(knitr.kable.NA = "",
+        OutDec = ",",
+        scipen = 999)
 
 cnx <- dbConnect(Postgres(),
                  user = "projet-funathon",
@@ -130,9 +132,9 @@ cnx <- dbConnect(Postgres(),
 
 # Définition des bassins de production du maïs grain
 
-Le maïs grain (code culture : `MIS`) représente avec 1,5·10^6^ ha la moitié du maïs cultivé[^4] en France en 2021 soit environ 6 % des surfaces déclarées à la PAC. Il est utilisé pour l'alimentation animale (essentiellement) et humaine, la transformation en amidon, les agrocarburants...
+Le maïs grain (code culture : `MIS`) représente, avec une surface de 1,5·10^6^ ha, la moitié du maïs cultivé[^4] en France en 2021, soit environ 6 % des surfaces déclarées à la PAC. Il est utilisé pour l'alimentation animale (essentiellement) et humaine, la transformation en amidon, les agrocarburants...
 
-[^4]: Les autres cultures étant le maïs ensilage (1,3·10^6^ ha, broyé et fermenté) destiné aussi à nourrir le bétail et le maïs doux (23 000 ha) pour l'alimentation humaine.
+[^4]: Les autres cultures étant le maïs ensilage (1,3·10^6^ ha, broyé et fermenté) destiné à nourrir le bétail et le maïs doux (23 000 ha) pour l'alimentation humaine.
 
 Pour déterminer les aires principales de culture on peut, par exemple, extraire les principales zones où la densité de culture du maïs grain est la plus forte. Cela peut se faire par commune, par clustering ou avec un lissage[voir chapitre 8 @loonisManuelAnalyseSpatiale2018].
 
@@ -395,7 +397,7 @@ cluster_liss %>%
 
 Pour chaque bassin de production, on peut rechercher un point représentatif et récupérer les données de température journalières pour tous ces points.
 
-NB : Le centroïde d'un polygone peut se trouver en dehors du polygone ; on utilise `st_point_on_surface()` plutôt que `st_centroid()` pour garantir qu'il est bien dans le polygone.
+NB : Le centroïde d'un polygone tarabiscoté peut se trouver en dehors du polygone ; on utilise `st_point_on_surface()` plutôt que `st_centroid()` pour garantir qu'il est bien dans le polygone.
 
 ```{r}
 #| label: donnees-climat
@@ -483,7 +485,10 @@ recolte %>%
 
 mod <- recolte %>% 
   mutate(doy = yday(date)) %>% 
-  glm(doy ~ annee + nom, data = .)
+  glm(doy ~ annee * nom, data = .)
+
+evol <- round(mod$coefficients[["annee"]], 1)
+ic95 <- round(confint(mod)[2, ], 1)
 
 # préparation des étiquettes pour la visualisation avec affichage direct (sans 
 # légende)
@@ -494,23 +499,27 @@ etiquettes <- tibble(nom = unique(recolte$nom),
                                                   orders = "yj")))
 ```
 
-# Visualisation
+# Visualisation des tendances
 
 ```{r}
 #| label: fig-date-recolte
 #| fig-cap: Évolution de la date de récolte potentielle du maïs grain
+#| fig-height: 7
 
-recolte  %>% 
+recolte %>% 
   mutate(doy = yday(date),
          date_virtuelle = as_date(parse_date_time(glue("2020-{str_pad(doy, 3, 'left', '0')}"), 
                                                   orders = "yj"))) %>% 
   ggplot(aes(annee, date_virtuelle, color = nom)) +
   geom_point() +
   geom_smooth(method = glm) +
-  geom_text_repel(data = etiquettes, aes(label = str_wrap(nom, 10, whitespace_only = FALSE)),
+  geom_text_repel(data = etiquettes, 
+                  aes(label = str_wrap(nom, 10, whitespace_only = FALSE)),
                   nudge_x = 1, size = 3, direction = "y", lineheight = 0.6) +
   scale_y_date(date_breaks = "months", date_labels = "%b") +
-  coord_cartesian(ylim = as.Date(c(NA, "2020-11-08"))) +
+  coord_cartesian(xlim = c(min(recolte$annee) - .5, max(recolte$annee) + 5),
+                  ylim = as.Date(c(NA, "2020-11-08")),
+                  expand = FALSE) +
   labs(title = "Date de récolte potentielle",
        subtitle = "Maïs grain",
        x = "année",
@@ -522,14 +531,20 @@ recolte  %>%
         plot.caption = element_text(size = 6))
 ```
 
-# Tendance
+# Tendance 
+
+Au cours des quatre dernières décennies, la date de récolte potentielle moyenne du maïs grain dans les principaux bassins de production français à évolué d'environ `r evol` jour par an (IC~95%~ [`r ic95[1]`, `r ic95[2]`]).
 
 ```{r}
 #| label: tbl-tendance
-#| tbl-cap: !expr "glue('Évolution de la date de récolte : environ {round(mod$coefficients[[\\'annee\\']], 1)} jour par an')"
+#| tbl-cap: !expr "glue('Évolution de la date de récolte : environ {evol} jour par an')"
 
 theme_gtsummary_language("fr")
-tbl_regression(mod)
+
+ recolte %>% 
+  mutate(doy = yday(date)) %>% 
+  glm(doy ~ annee + nom, data = .) %>% 
+  tbl_regression()
 ```
 
 
