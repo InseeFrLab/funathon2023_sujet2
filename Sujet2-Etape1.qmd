@@ -162,6 +162,9 @@ plot(st_geometry(point),add = T,col = "red")
 # Transformation de la projection car leaflet ne connait que le WGS 84
 carte_parc_prox<- parc_prox %>% st_transform(4326)
 
+# Marqueur du point
+pt_mark<- point %>% st_transform(4326)
+
 # ajout du libellé des cultures
 carte_parc_prox_lib<-carte_parc_prox %>% 
   left_join(lib_cult %>% select(-code_groupe_culture),by=c("code_cultu"="code_culture")) 
@@ -204,7 +207,10 @@ carte_parc_prox_html <- leaflet(carte_parc_prox_lib) %>%
                  style = list("font-weight" = "normal", padding = "3px 8px"),
                  textsize = "15px",
                  direction = "auto",
-                 encoding="UTF-8"))
+                 encoding="UTF-8")) %>% 
+  addMarkers(data=pt_mark,~lon,~lat, popup = ~coord_pt_gps, label = ~coord_pt_gps)
+
+# leaflet(pt_mark) %>% addTiles() %>% addMarkers(~lon,~lat)
 
 carte_parc_prox_html
 # saveWidget(widget = carte_parc_prox_html, file = "carte_parc_prox_html.html")
