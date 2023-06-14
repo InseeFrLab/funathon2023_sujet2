@@ -57,7 +57,7 @@ lib_group_cult<-lib_cult %>%
 
 =\> clic droit sur la carte + clic gauche sur les coordonnées (copiées dans le presse-papier)
 
-J'indique un rayon en mètres pour sélectionner les parcelles autour du point
+J'indique un rayon en mètres (\< 15000) pour sélectionner les parcelles autour du point
 
 ```{r}
 #| label: choix coordonnées + rayon
@@ -150,7 +150,7 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 
 ```
 
-### J'affiche les parcelles autour de mon point (prévoir un leaflet ?)
+### J'affiche les parcelles autour de mon point avec une carte interactive leaflet
 
 ```{r}
 #| echo: false
@@ -207,7 +207,7 @@ carte_parc_prox_html <- leaflet(carte_parc_prox_lib) %>%
                  encoding="UTF-8"))
 
 carte_parc_prox_html
-saveWidget(widget = carte_parc_prox_html, file = "carte_parc_prox_html.html")
+# saveWidget(widget = carte_parc_prox_html, file = "carte_parc_prox_html.html")
 
 ```
 
@@ -216,7 +216,7 @@ saveWidget(widget = carte_parc_prox_html, file = "carte_parc_prox_html.html")
 ```{r}
 #| echo: false
 #| label: stats sur les groupes de cultures 
-#| tbl-cap: Structure des cultures 
+#| tbl-cap: Structure des cultures au niveau local 
 
 t1 <- parc_prox %>% st_drop_geometry() %>% count(code_group) %>% 
   add_tally(n) %>% 
@@ -233,51 +233,57 @@ parc_prox %>% st_drop_geometry() %>% count(code_group,wt=surf_parc) %>%
        # adorn_totals()
 ) %>% left_join(lib_group_cult,by=c("code_group"="code_groupe_culture")) %>% 
   select(code_group,libelle_groupe_culture,everything()) %>% 
-  arrange(as.numeric(code_group)) %>% adorn_totals() %>% 
+  # arrange(as.numeric(code_group)) %>% 
+  arrange(desc(surf_parc_ha)) %>% 
+  adorn_totals() %>% 
   mutate(taille_moy_parc=round(surf_parc_ha/n_parcelles,1))
 
-kable(t1,
-format="html"
-,format.args = list(decimal.mark = ",", big.mark = " ")
-,booktabs = TRUE) %>%
+t1  %>% 
+  setNames(c("code","groupe de cultures","nombre de parcelles","(%)","surface (ha)","surface (%)","taille moyenne (ha)")) %>% 
+  kable(
+    format="html",
+    caption="<span style='font-size:medium'>Groupes de cultures <strong>locales</strong> par surfaces décroissantes</span>",
+    format.args = list(decimal.mark = ",", big.mark = " "),
+    booktabs = TRUE) %>%
   kable_styling(font_size = 15) %>% 
   gsub("font-size: initial !important;",
        "font-size: 20pt !important;",.)%>%
   kable_styling(bootstrap_options = c("striped", "hover")) %>% 
   row_spec(nrow(t1), bold = T, color = "white", background = "grey")
 
-rm(t1)
+# rm(t1)
 ```
 
-### Comparaison avec la structure départementale et et nationale
+### Comparaison avec la répartition des cultures au niveau départemental et national
 
 ```{r}
 #| label: comparaison structure départementale et nationale 
 #| echo: false
 #| tbl-cap: Structure des cultures 
 
-# jointure spatiale avec la couche commune pour récupérer le département où tombe le point
+# jointure spatiale avec la couche département pour récupérer le département où tombe le point
 
-# ouvrir la couche des communes
-# com <- s3read_using(
-#   FUN = sf::read_sf,
-#   layer = "COMMUNE_2021",
-#   object = "2023/sujet2/diffusion/ign/COMMUNE_2021.gpkg",
-#   bucket = "projet-funathon",
-#   opts = list("region" = "")) %>% clean_names()
+# ouvrir la couche des communes (à convertir en Lambert II epsg 2154)
+dep <- s3read_using(
+    FUN = sf::read_sf,
+    layer = "departement",
+    object = "2023/sujet2/diffusion/ign/adminexpress_cog_simpl_000_2023.gpkg",
+    bucket = "projet-funathon",
+    opts = list("region" = "")) %>% 
+  st_transform(2154)
 
 # jointure
-# df<-point %>% st_join(com) %>% st_drop_geometry() %>% select(insee_dep) 
-# dep_pt<-df[1,1]
-# rm(df)
+df<-point %>% st_join(dep) %>% st_drop_geometry() %>% select(insee_dep)
+dep_pt<-df[1,1]
+rm(df)
 
 # sinon sélection du département regroupant la plus grande surface agricole
 # cas où le cercle recouvre plusieurs départements
-df<-parc_prox %>% st_drop_geometry() %>% 
-  count(insee_dep,wt=surf_parc) %>% 
-  arrange(desc(n))
-dep_pt<-df[1,1]
-rm(df)
+# df<-parc_prox %>% st_drop_geometry() %>% 
+#   count(insee_dep,wt=surf_parc) %>% 
+#   arrange(desc(n))
+# dep_pt<-df[1,1]
+# rm(df)
 
 # calcul des % surfaces autour du point
 stat_pt <- parc_prox %>% st_drop_geometry() %>% 
@@ -305,36 +311,90 @@ stat_fm<-s3read_using(
  select(code_group,libelle_groupe_culture,pct_surf) %>% 
   rename(pct_surf_fm = pct_surf)
 
-stat_comp<-stat_fm %>% 
+# appariement des stas locales, départementales, nationales
+stat_compar<-stat_fm %>% 
   left_join(stat_dep_pt %>% select(code_group, pct_surf_dep),by="code_group") %>% 
   left_join(stat_pt,by="code_group") %>% 
   select(libelle_groupe_culture,pct_surf_local,pct_surf_dep,pct_surf_fm) %>% 
   arrange(desc(pct_surf_local)) %>% adorn_totals() 
 
-kable(stat_comp)
+stat_compar %>% 
+  setNames(c("Groupe de cultures","surf. locales (%)","surf. départ. (%)","surf. France m. (%)")) %>% kable(
+    format="html",
+    caption="<span style='font-size:medium'>Comparaison des surfaces locales, départemenales et nationales</span>",
+    format.args = list(decimal.mark = ",", big.mark = " "),
+    booktabs = TRUE) %>%
+  kable_styling(font_size = 15) %>% 
+  gsub("font-size: initial !important;",
+       "font-size: 20pt !important;",.)%>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  row_spec(nrow(stat_comp), bold = T, color = "white", background = "grey")
+
 ```
 
-### Graphique
+### Graphique de comparaison des cultures au niveau local, départemental et national
 
 ```{r}
 #| label: faire un graphique comparant les structures
 #| echo: false
 #| fig-cap: différences de structure locale, departementale, nationale  
 
-tab<-stat_comp %>% filter(libelle_groupe_culture!="Total") %>% 
+# je sélectionne les 10 groupes de cultures les plus répandus au niveau local 
+tab<-stat_compar %>% filter(libelle_groupe_culture!="Total") %>% slice_head(n=10) %>% 
   rename(local=pct_surf_local, departement=pct_surf_dep, france=pct_surf_fm)
-tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) 
+
+# je transpose la table pour rassembler toutes les valeurs dans une seule variable value (ggplot oblige)
+tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur=name) 
+
+# je mets à 0 les valeurs manquantes
 #tab_piv<-tab_piv %>% coalesce(value,0L)  
 tab_piv[is.na(tab_piv)] <- 0
 
+# levels(as.factor(tab_piv$secteur))
+# tab_piv$secteur<-factor(tab_piv$secteur, levels=c("france","departement","local"))
+# tab_piv<-tab_piv %>% arrange(desc(secteur), desc(value))
 
-p<-ggplot(tab_piv, 
-          aes(x = reorder(libelle_groupe_culture,+value), y = value, fill=name)) + geom_col(position = "dodge") +
-  labs(title="Surface par culture", x="Culture", y = "%")+
+# ggplot => problème de tri : affichage des prairies avant le maïs ?    
+p<-ggplot(tab_piv, aes(x = reorder(libelle_groupe_culture,+value), 
+                       y = value, 
+                       fill=factor(secteur, levels=c("france","departement","local")))) + 
+  geom_col(position = "dodge") +
+  labs(title="Surface par culture", x="Culture", y = "%", fill = "Secteur") +
   theme_classic()
 
+# je flippe le graphique pour avoir des barres horizontales  
 p+coord_flip()
 ```
+
+### Je teste un graphique par secteur avec facet_wrap
+
+```{r}
+#| label: faire un graphique facet_wrap 
+#| echo: false
+#| fig-cap: différences de structure locale, departementale, nationale  
+
+# je sélectionne les 10 groupes de cultures les plus répandus au niveau local 
+tab<-stat_compar %>% filter(libelle_groupe_culture!="Total") %>% slice_head(n=10) %>% 
+  rename(local=pct_surf_local, departement=pct_surf_dep, france=pct_surf_fm)
+
+# je transpose la table pour rassembler toutes les valeurs dans une seule variable value (ggplot oblige)
+tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur=name) 
+
+# je mets à 0 les valeurs manquantes
+#tab_piv<-tab_piv %>% coalesce(value,0L)  
+tab_piv[is.na(tab_piv)] <- 0
+
+# ggplot => problème de tri : affichage des prairies avant le maïs ?    
+ggplot(tab_piv, aes(x = reorder(libelle_groupe_culture,+value), 
+                       y = value)) + 
+  geom_col(fill = "lightblue", colour = "black",position = "dodge") +
+  labs(title="Surface par culture", x="Culture", y = "%", fill = "Secteur") +
+  geom_text(aes(label = value), hjust = -0.3, size = 8/.pt, colour = "black") +
+  theme_classic() + coord_flip() + 
+  facet_wrap(~secteur,nrow=3,scales='free')
+```
+
+### Pour aller plus loin, comparer la taille moyenne des parcelles selon les secteurs 
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
