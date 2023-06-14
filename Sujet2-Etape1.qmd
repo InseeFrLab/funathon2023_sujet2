@@ -1,6 +1,9 @@
 ---
 title: "Sujet2-Etape1"
 format: html
+code-fold: true
+code-tools: true
+code-summary: "voir le code"
 # embed-resources: true
 # standalone: true
 self-contained: true
@@ -13,6 +16,16 @@ theme: united
 editor: visual
 output-file: Sujet2-Etape1.html
 ---
+```{r sys.setenv, include=FALSE}
+#| echo: false
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "J22M2WX5LUZVCH4VURED",
+           "AWS_SECRET_ACCESS_KEY" = "evIq8KQpeShehOH3uV3Y8sbGo6TPlRCIBJw1LXqQ",
+           "AWS_DEFAULT_REGION" = "us-east-1",
+           "AWS_SESSION_TOKEN" = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJKMjJNMldYNUxVWlZDSDRWVVJFRCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNjg2NzI2NTUyLCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImJlcnRyYW5kLmJhbGxldEBhZ3JpY3VsdHVyZS5nb3V2LmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTY4NjgyOTA0MSwiZmFtaWx5X25hbWUiOiJCQUxMRVQiLCJnaXZlbl9uYW1lIjoiQmVydHJhbmQiLCJncm91cHMiOlsiZnVuYXRob24iXSwiaWF0IjoxNjg2NzI2NTUzLCJpc3MiOiJodHRwczovL2F1dGgubGFiLnNzcGNsb3VkLmZyL2F1dGgvcmVhbG1zL3NzcGNsb3VkIiwianRpIjoiYjliMmY0MzMtODU3NS00YTY4LTk2MzktOGYyMTE4MTQ3ZjZjIiwibmFtZSI6IkJlcnRyYW5kIEJBTExFVCIsIm5vbmNlIjoiYjQyMTc0YWUtN2I5MS00YTM2LTgyZDAtNzM4MTYzMmVmNjlmIiwicG9saWN5Ijoic3Rzb25seSIsInByZWZlcnJlZF91c2VybmFtZSI6ImJiYWxsZXQiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2Vzc2lvblBvbGljeSI6ImV5SldaWEp6YVc5dUlqb2lNakF4TWkweE1DMHhOeUlzSWxOMFlYUmxiV1Z1ZENJNlczc2lSV1ptWldOMElqb2lRV3hzYjNjaUxDSkJZM1JwYjI0aU9sc2ljek02S2lKZExDSlNaWE52ZFhKalpTSTZXeUpoY200NllYZHpPbk16T2pvNmNISnZhbVYwTFdaMWJtRjBhRzl1SWl3aVlYSnVPbUYzY3pwek16bzZPbkJ5YjJwbGRDMW1kVzVoZEdodmJpOHFJbDE5TEhzaVJXWm1aV04wSWpvaVFXeHNiM2NpTENKQlkzUnBiMjRpT2xzaWN6TTZUR2x6ZEVKMVkydGxkQ0pkTENKU1pYTnZkWEpqWlNJNld5SmhjbTQ2WVhkek9uTXpPam82S2lKZExDSkRiMjVrYVhScGIyNGlPbnNpVTNSeWFXNW5UR2xyWlNJNmV5SnpNenB3Y21WbWFYZ2lPaUprYVdabWRYTnBiMjR2S2lKOWZYMHNleUpGWm1abFkzUWlPaUpCYkd4dmR5SXNJa0ZqZEdsdmJpSTZXeUp6TXpwSFpYUlBZbXBsWTNRaVhTd2lVbVZ6YjNWeVkyVWlPbHNpWVhKdU9tRjNjenB6TXpvNk9pb3ZaR2xtWm5WemFXOXVMeW9pWFgxZGZRPT0iLCJzZXNzaW9uX3N0YXRlIjoiZmFhZjNlMDQtZDAxMS00OWEwLWE1ZmQtMzIyNjFjYzY3ZThkIiwic2lkIjoiZmFhZjNlMDQtZDAxMS00OWEwLWE1ZmQtMzIyNjFjYzY3ZThkIiwic3ViIjoiNGQ1N2NlN2QtOWNhYS00MDk4LWFjNDktNzY0MjAyYzJhN2I5IiwidHlwIjoiQmVhcmVyIn0.-3cSSboFOX2oXpaN73POdZj8uLHIvkYjPBttgnIhnNOFQDJc1aDfRusPBWCO_toMS5eMPM3J8DiKMOuLht8ddg",
+           "AWS_S3_ENDPOINT"= "minio.lab.sspcloud.fr")
+
+```
 
 ```{r setup, include=FALSE}
 #| label: setup
@@ -29,6 +42,13 @@ library(leaflet)
 library(htmlwidgets)
 library(RColorBrewer)
 
+# install.packages("aws.s3", repos = "https://cloud.R-project.org")
+
+bucketlist(region="")
+```
+
+```{r acces donnees, include=FALSE}
+#| echo: false
 # données -----------------------------------------------------------------
 aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion/ign/rpg")
 
@@ -61,7 +81,6 @@ J'indique un rayon en mètres (\< 15000) pour sélectionner les parcelles autour
 
 ```{r}
 #| label: choix coordonnées + rayon
-#| echo: false
 # coord_gmaps<- rstudioapi::showPrompt(title = "Collez les coordonnées", message = "coordonnées Gmaps", default = "")
 coord_gmaps<-"46.46946179131805, -1.4932577154775046"
 lat<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,1])
@@ -88,7 +107,6 @@ La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL/PostGI
 ### Je me connecte au serveur PostgreSQL avec le mot de passe disponible sur Onyxia/Mes services/PostgreSQL/Read me
 
 ```{r}
-#| echo: false
 #| label: connection PostGis
 
 # le mot de passe est stocké dans un secret Vault
@@ -110,7 +128,6 @@ cnx <- dbConnect(PostgreSQL(),
 ### je lance une requête SQL pour sélectionner les parcelles situées autour de mon point dans le rayon choisi.
 
 ```{r}
-#| echo: false
 #| label: requete SQL selection parcelles
 
 # suppression de la table «point» si elle existe
@@ -153,11 +170,10 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 ### J'affiche les parcelles autour de mon point avec une carte interactive leaflet
 
 ```{r}
-#| echo: false
 #| label: affichage parcelles
 
-plot(st_geometry(parc_prox))
-plot(st_geometry(point),add = T,col = "red")
+#plot(st_geometry(parc_prox))
+#plot(st_geometry(point),add = T,col = "red")
 
 # Transformation de la projection car leaflet ne connait que le WGS 84
 carte_parc_prox<- parc_prox %>% st_transform(4326)
@@ -220,7 +236,6 @@ carte_parc_prox_html
 ### Quelle est la structure des parcelles agricoles autour de mon point ?
 
 ```{r}
-#| echo: false
 #| label: stats sur les groupes de cultures 
 #| tbl-cap: Structure des cultures au niveau local 
 
@@ -264,7 +279,6 @@ t1  %>%
 
 ```{r}
 #| label: comparaison structure départementale et nationale 
-#| echo: false
 #| tbl-cap: Structure des cultures 
 
 # jointure spatiale avec la couche département pour récupérer le département où tombe le point
@@ -334,7 +348,7 @@ stat_compar %>%
   gsub("font-size: initial !important;",
        "font-size: 20pt !important;",.)%>%
   kable_styling(bootstrap_options = c("striped", "hover")) %>% 
-  row_spec(nrow(stat_comp), bold = T, color = "white", background = "grey")
+  row_spec(nrow(stat_compar), bold = T, color = "white", background = "grey")
 
 ```
 
@@ -342,7 +356,6 @@ stat_compar %>%
 
 ```{r}
 #| label: faire un graphique comparant les structures
-#| echo: false
 #| fig-cap: différences de structure locale, departementale, nationale  
 
 # je sélectionne les 10 groupes de cultures les plus répandus au niveau local 
@@ -365,7 +378,7 @@ p<-ggplot(tab_piv, aes(x = reorder(libelle_groupe_culture,+value),
                        y = value, 
                        fill=factor(secteur, levels=c("france","departement","local")))) + 
   geom_col(position = "dodge") +
-  labs(title="Surface par culture", x="Culture", y = "%", fill = "Secteur") +
+  labs(title="Surfaces comparées des 10 principales cultures locales, en %", x="Culture", y = "%", fill = "Secteur") +
   theme_classic()
 
 # je flippe le graphique pour avoir des barres horizontales  
@@ -376,7 +389,6 @@ p+coord_flip()
 
 ```{r}
 #| label: faire un graphique facet_wrap 
-#| echo: false
 #| fig-cap: différences de structure locale, departementale, nationale  
 
 # je sélectionne les 10 groupes de cultures les plus répandus au niveau local 
@@ -402,21 +414,3 @@ ggplot(tab_piv, aes(x = reorder(libelle_groupe_culture,+value),
 
 ### Pour aller plus loin, comparer la taille moyenne des parcelles selon les secteurs 
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
