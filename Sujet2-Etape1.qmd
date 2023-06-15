@@ -19,11 +19,14 @@ output-file: Sujet2-Etape1.html
 ```{r sys.setenv, include=FALSE}
 #| echo: false
 
-Sys.setenv("AWS_ACCESS_KEY_ID" = "J22M2WX5LUZVCH4VURED",
-           "AWS_SECRET_ACCESS_KEY" = "evIq8KQpeShehOH3uV3Y8sbGo6TPlRCIBJw1LXqQ",
+#install.packages("aws.s3", repos = "https://cloud.R-project.org")
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "Y7E0FP1FZ22FQ3YP44UM",
+           "AWS_SECRET_ACCESS_KEY" = "J4+4P5HnlFbvTCgR+dIhyYQWfeymzaAhM2KRyVhj",
            "AWS_DEFAULT_REGION" = "us-east-1",
-           "AWS_SESSION_TOKEN" = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJKMjJNMldYNUxVWlZDSDRWVVJFRCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNjg2NzI2NTUyLCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImJlcnRyYW5kLmJhbGxldEBhZ3JpY3VsdHVyZS5nb3V2LmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTY4NjgyOTA0MSwiZmFtaWx5X25hbWUiOiJCQUxMRVQiLCJnaXZlbl9uYW1lIjoiQmVydHJhbmQiLCJncm91cHMiOlsiZnVuYXRob24iXSwiaWF0IjoxNjg2NzI2NTUzLCJpc3MiOiJodHRwczovL2F1dGgubGFiLnNzcGNsb3VkLmZyL2F1dGgvcmVhbG1zL3NzcGNsb3VkIiwianRpIjoiYjliMmY0MzMtODU3NS00YTY4LTk2MzktOGYyMTE4MTQ3ZjZjIiwibmFtZSI6IkJlcnRyYW5kIEJBTExFVCIsIm5vbmNlIjoiYjQyMTc0YWUtN2I5MS00YTM2LTgyZDAtNzM4MTYzMmVmNjlmIiwicG9saWN5Ijoic3Rzb25seSIsInByZWZlcnJlZF91c2VybmFtZSI6ImJiYWxsZXQiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2Vzc2lvblBvbGljeSI6ImV5SldaWEp6YVc5dUlqb2lNakF4TWkweE1DMHhOeUlzSWxOMFlYUmxiV1Z1ZENJNlczc2lSV1ptWldOMElqb2lRV3hzYjNjaUxDSkJZM1JwYjI0aU9sc2ljek02S2lKZExDSlNaWE52ZFhKalpTSTZXeUpoY200NllYZHpPbk16T2pvNmNISnZhbVYwTFdaMWJtRjBhRzl1SWl3aVlYSnVPbUYzY3pwek16bzZPbkJ5YjJwbGRDMW1kVzVoZEdodmJpOHFJbDE5TEhzaVJXWm1aV04wSWpvaVFXeHNiM2NpTENKQlkzUnBiMjRpT2xzaWN6TTZUR2x6ZEVKMVkydGxkQ0pkTENKU1pYTnZkWEpqWlNJNld5SmhjbTQ2WVhkek9uTXpPam82S2lKZExDSkRiMjVrYVhScGIyNGlPbnNpVTNSeWFXNW5UR2xyWlNJNmV5SnpNenB3Y21WbWFYZ2lPaUprYVdabWRYTnBiMjR2S2lKOWZYMHNleUpGWm1abFkzUWlPaUpCYkd4dmR5SXNJa0ZqZEdsdmJpSTZXeUp6TXpwSFpYUlBZbXBsWTNRaVhTd2lVbVZ6YjNWeVkyVWlPbHNpWVhKdU9tRjNjenB6TXpvNk9pb3ZaR2xtWm5WemFXOXVMeW9pWFgxZGZRPT0iLCJzZXNzaW9uX3N0YXRlIjoiZmFhZjNlMDQtZDAxMS00OWEwLWE1ZmQtMzIyNjFjYzY3ZThkIiwic2lkIjoiZmFhZjNlMDQtZDAxMS00OWEwLWE1ZmQtMzIyNjFjYzY3ZThkIiwic3ViIjoiNGQ1N2NlN2QtOWNhYS00MDk4LWFjNDktNzY0MjAyYzJhN2I5IiwidHlwIjoiQmVhcmVyIn0.-3cSSboFOX2oXpaN73POdZj8uLHIvkYjPBttgnIhnNOFQDJc1aDfRusPBWCO_toMS5eMPM3J8DiKMOuLht8ddg",
+           "AWS_SESSION_TOKEN" = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJZN0UwRlAxRloyMkZRM1lQNDRVTSIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNjg2ODM3OTgxLCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImJlcnRyYW5kLmJhbGxldEBhZ3JpY3VsdHVyZS5nb3V2LmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTY4NjkyNDM5NiwiZmFtaWx5X25hbWUiOiJCQUxMRVQiLCJnaXZlbl9uYW1lIjoiQmVydHJhbmQiLCJncm91cHMiOlsiZnVuYXRob24iXSwiaWF0IjoxNjg2ODM3OTgyLCJpc3MiOiJodHRwczovL2F1dGgubGFiLnNzcGNsb3VkLmZyL2F1dGgvcmVhbG1zL3NzcGNsb3VkIiwianRpIjoiNjJhYjQ5ZWEtYmU0Yi00MzE4LTljYjktMWY1NGZkNmRmYTkwIiwibmFtZSI6IkJlcnRyYW5kIEJBTExFVCIsIm5vbmNlIjoiODllYmM1YzYtNWZiYy00ODRkLTk3MDEtOTJkMTY0NzJjNjFjIiwicG9saWN5Ijoic3Rzb25seSIsInByZWZlcnJlZF91c2VybmFtZSI6ImJiYWxsZXQiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2Vzc2lvblBvbGljeSI6ImV5SldaWEp6YVc5dUlqb2lNakF4TWkweE1DMHhOeUlzSWxOMFlYUmxiV1Z1ZENJNlczc2lSV1ptWldOMElqb2lRV3hzYjNjaUxDSkJZM1JwYjI0aU9sc2ljek02S2lKZExDSlNaWE52ZFhKalpTSTZXeUpoY200NllYZHpPbk16T2pvNmNISnZhbVYwTFdaMWJtRjBhRzl1SWl3aVlYSnVPbUYzY3pwek16bzZPbkJ5YjJwbGRDMW1kVzVoZEdodmJpOHFJbDE5TEhzaVJXWm1aV04wSWpvaVFXeHNiM2NpTENKQlkzUnBiMjRpT2xzaWN6TTZUR2x6ZEVKMVkydGxkQ0pkTENKU1pYTnZkWEpqWlNJNld5SmhjbTQ2WVhkek9uTXpPam82S2lKZExDSkRiMjVrYVhScGIyNGlPbnNpVTNSeWFXNW5UR2xyWlNJNmV5SnpNenB3Y21WbWFYZ2lPaUprYVdabWRYTnBiMjR2S2lKOWZYMHNleUpGWm1abFkzUWlPaUpCYkd4dmR5SXNJa0ZqZEdsdmJpSTZXeUp6TXpwSFpYUlBZbXBsWTNRaVhTd2lVbVZ6YjNWeVkyVWlPbHNpWVhKdU9tRjNjenB6TXpvNk9pb3ZaR2xtWm5WemFXOXVMeW9pWFgxZGZRPT0iLCJzZXNzaW9uX3N0YXRlIjoiMzAwYzgzNDktZWQ5MS00MGVhLThhZGQtYTkxYzlhMTE5YzlkIiwic2lkIjoiMzAwYzgzNDktZWQ5MS00MGVhLThhZGQtYTkxYzlhMTE5YzlkIiwic3ViIjoiNGQ1N2NlN2QtOWNhYS00MDk4LWFjNDktNzY0MjAyYzJhN2I5IiwidHlwIjoiQmVhcmVyIn0.rrSRJ9eWjRyk-SPG-1-UIyLK4EsS40ViBwstKwrSim20xEZQb9f9-jEPNBeajvGc4k3N-zGLQeyHWu7IvfkKKQ",
            "AWS_S3_ENDPOINT"= "minio.lab.sspcloud.fr")
+
 
 ```
 
@@ -54,7 +57,7 @@ aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffus
 
 ```
 
-```{r }
+```{r, include=FALSE }
 #| echo: false
 #| label: lecture libellés groupes cultures
 
@@ -82,11 +85,11 @@ J'indique un rayon en mètres (\< 15000) pour sélectionner les parcelles autour
 ```{r}
 #| label: choix coordonnées + rayon
 # coord_gmaps<- rstudioapi::showPrompt(title = "Collez les coordonnées", message = "coordonnées Gmaps", default = "")
-coord_gmaps<-"46.46946179131805, -1.4932577154775046"
+coord_gmaps<-"43.447894436406216, 1.2886163291688764"
 lat<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,1])
 lon<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,2])
 # rayon<-as.numeric(rstudioapi::showPrompt(title = "Rayon", message = "Rayon (en m)", default = ""))
-rayon<-5000
+rayon<-10000
 
 # création d'une table sf «point» avec les coordonnées saisies
 # transformation des coordonnées en syst de proj 2154 (Lambert II - Français) 
@@ -112,14 +115,15 @@ La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL/PostGI
 # le mot de passe est stocké dans un secret Vault
 
 # postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
-postgresql_password <- "1tfawt3nj7fgzo3w7cma"
+# postgresql_password <- "1tfawt3nj7fgzo3w7cma"
+# Sys.setenv("PASS_POSTGRESQL"="1tfawt3nj7fgzo3w7cma")
   
 # Connection à PostgreSQL
-cnx <- dbConnect(PostgreSQL(),
+ cnx <- dbConnect(PostgreSQL(),
                 user = "projet-funathon",
-                password = postgresql_password,
-                host = "postgresql-438832",
-                dbname = "defaultdb",
+                password = Sys.getenv("PASS_POSTGRESQL"),
+               host = "postgresql-758156",
+               dbname = "defaultdb",
                 port = 5432,
                 options="-c search_path=rpg,public") # specify what schema to connect to
                  
@@ -369,12 +373,20 @@ tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur=name)
 #tab_piv<-tab_piv %>% coalesce(value,0L)  
 tab_piv[is.na(tab_piv)] <- 0
 
+
 # levels(as.factor(tab_piv$secteur))
-# tab_piv$secteur<-factor(tab_piv$secteur, levels=c("france","departement","local"))
-# tab_piv<-tab_piv %>% arrange(desc(secteur), desc(value))
+# je réordonne les secteurs dans le "bon" ordre, avec factor  
+tab_piv$secteur<-factor(tab_piv$secteur,levels=c("france","departement","local"))
+tab_piv<-tab_piv %>% arrange(desc(secteur), desc(value))
+
+# je réordonne les cultures par surface décroissante au niveau local, avec factor
+x <- tab_piv %>% filter(secteur == "local") %>% arrange(value) %>% select(libelle_groupe_culture)
+y <- pull(x, libelle_groupe_culture)
+
+tab_piv$libelle_groupe_culture <- factor(tab_piv$libelle_groupe_culture, levels = y)
 
 # ggplot => problème de tri : affichage des prairies avant le maïs ?    
-p<-ggplot(tab_piv, aes(x = reorder(libelle_groupe_culture,+value), 
+p<-ggplot(tab_piv, aes(x =libelle_groupe_culture,
                        y = value, 
                        fill=factor(secteur, levels=c("france","departement","local")))) + 
   geom_col(position = "dodge") +
@@ -402,8 +414,17 @@ tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur=name)
 #tab_piv<-tab_piv %>% coalesce(value,0L)  
 tab_piv[is.na(tab_piv)] <- 0
 
+# je réordonne les secteurs dans le "bon" ordre, avec factor  
+tab_piv$secteur<-factor(tab_piv$secteur,levels=c("local","departement","france"))
+
+# je réordonne les cultures par surface décroissante au niveau local, avec factor
+x <- tab_piv %>% filter(secteur == "local") %>% arrange(value) %>% select(libelle_groupe_culture)
+y <- pull(x, libelle_groupe_culture)
+
+tab_piv$libelle_groupe_culture <- factor(tab_piv$libelle_groupe_culture, levels = y)
+
 # ggplot => problème de tri : affichage des prairies avant le maïs ?    
-ggplot(tab_piv, aes(x = reorder(libelle_groupe_culture,+value), 
+ggplot(tab_piv, aes(x = libelle_groupe_culture, 
                        y = value)) + 
   geom_col(fill = "lightblue", colour = "black",position = "dodge") +
   labs(title="Surface par culture", x="Culture", y = "%", fill = "Secteur") +
