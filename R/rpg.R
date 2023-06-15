@@ -4,6 +4,7 @@ library(sf)
 library(aws.s3)
 library(RPostgres)
 
+# Données sur MinIO
 aws.s3::get_bucket("projet-funathon", region = "", prefix = "2023/sujet2/diffusion/ign/rpg")
 
 # Ilots
@@ -59,17 +60,12 @@ parcelles %>% st_crs()
 # Lambert 93
 
 # Le fichier est trop gros pour être chargé en mémoire, on veut créer un table 
-# dans un BDD PostgreSQL
-
-# La base PostgreSQL est créée sur le SSP Cloud, et le mot de passe est stocké
-# dans un secret Vault
-postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
-
+# dans une BDD PostgreSQL
 # Connection à PostgreSQL
 cnx <- dbConnect(Postgres(),
                  user = "projet-funathon",
-                 password = postgresql_password,
-                 host = "postgresql-438832",
+                 password = Sys.getenv("PASS_POSTGRESQL"),
+                 host = "postgresql-758156",
                  dbname = "defaultdb",
                  port = 5432,
                  check_interrupts = TRUE,
@@ -81,11 +77,20 @@ cnx <- dbConnect(Postgres(),
                                           sep = " - "))
 
 # On peuple la table PostgreSQL
-dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS rpg")
+dbExecute(cnx, "CREATE SCHEMA IF NOT EXISTS rpg")
+query <- paste0("SELECT * FROM parcelles_graphiques LIMIT 1")
+parcelles_part <- s3read_using(
+  FUN = sf::read_sf,
+  query = query,
+  object = "2023/sujet2/diffusion/ign/rpg/PARCELLES_GRAPHIQUES.gpkg",
+  bucket = "projet-funathon",
+  opts = list("region" = "")
+)
+write_sf(parcelles_part, cnx, Id(schema = "rpg", table = "parcelles"))
 
 offsets <- c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9) * 1000000
 for (offset in offsets) {
-  query <- paste0("SELECT * FROM parcelles_graphiques LIMIT 1000000 OFFSET ", format(offset, scientific = FALSE))
+  query <- paste0("SELECT * FROM parcelles_graphiques LIMIT 1000000 OFFSET ", format(offset + 1, scientific = FALSE))
   parcelles_part <- s3read_using(
     FUN = sf::read_sf,
     query = query,
@@ -96,7 +101,7 @@ for (offset in offsets) {
   write_sf(parcelles_part, cnx, Id(schema = "rpg", table = "parcelles"), append = T)
 }
 
-# renommages pour homogénéiser (on aurait pu faire un janitor::clean_names sur parcelles_part)
+# Renommages pour homogénéiser (on aurait pu faire un janitor::clean_names sur parcelles_part)
 dbExecute(cnx,
           "ALTER TABLE rpg.parcelles RENAME \"ID_PARCEL\" TO id_parcel")
 dbExecute(cnx,
@@ -123,4 +128,3 @@ dbExecute(cnx,
           "CREATE INDEX ON rpg.parcelles USING btree (culture_d1)")
 dbExecute(cnx,
           "CREATE INDEX ON rpg.parcelles USING btree (culture_d2)")
-

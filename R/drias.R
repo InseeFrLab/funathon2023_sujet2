@@ -1,6 +1,7 @@
-# prétraitement des données Drias pour avoir un format simple à utiliser :
+###
+# Prétraitement des données Drias pour avoir un format simple à utiliser :
 # formats SIG et projections homogènes
-
+###
 library(raster)
 library(tidyverse)
 library(janitor)
@@ -9,13 +10,9 @@ library(readxl)
 library(aws.s3)
 library(RPostgres)
 
-# paramètres --------------------------------------------------------------
 
-
-# données -----------------------------------------------------------------
-
+# Données sur MinIO
 aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion")
-
 
 # http://www.drias-climat.fr/commande
 # Indicateurs 'DRIAS-2020' par horizon - secteur Agriculture
@@ -53,7 +50,7 @@ grille <- s3read_using(
     opts = list("region" = "")) %>%
   dplyr::select(-unused)
 
-# contours admin simplifiés d'après adminexpress
+# Contours admin simplifiés d'après adminexpress
 fr <- s3read_using(
     FUN = sf::read_sf,
     layer = "region",
@@ -64,10 +61,9 @@ fr <- s3read_using(
   summarise() %>%
   st_transform("EPSG:2154")
 
+# Prétraitement  ----------------------------------------------------------
 
-# prétraitement  ----------------------------------------------------------
-
-# points
+# Points
 drias_sf <- drias %>%
   inner_join(grille, by = c("point" = "id")) %>%
   st_as_sf(coords = c("x_l2e", "y_l2e"),
@@ -82,10 +78,10 @@ drias_sf %>%
   bucket = "projet-funathon",
   opts = list("region" = ""))
 
-# raster
+# Raster
 drias_raster <- drias_sf %>%
   st_drop_geometry() %>%
-  select(-c(point, contexte, periode, x_n, y_n, latitude, longitude,
+  dplyr::select(-c(point, contexte, periode, x_n, y_n, latitude, longitude,
             x_l93, y_l93, lon, lat)) %>%
   `coordinates<-`(~ x_l2e + y_l2e) %>%
   `projection<-`("EPSG:27572") %>%
@@ -116,9 +112,7 @@ v <- v[unlist(st_intersects(drias_sf, v))]
 drias_sf <- st_set_geometry(drias_sf, v)
 
 # On récupère les régions françaises pour réduire la taille des cellules aux frontières
-query <- "
-SELECT * FROM adminexpress.region
-"
+query <- "SELECT * FROM adminexpress.region"
 region_sf <- st_read(cnx, query = query)
 region_sf <- region_sf %>% st_transform(
   "EPSG:2154"
@@ -130,11 +124,10 @@ metropole_sf <- region_sf %>%
 drias_sf_intersected <- st_intersection(drias_sf, st_combine(metropole_sf))
 
 # Export PostgreSQL  ----------------------------------------------------------
-
 cnx <- dbConnect(Postgres(),
                  user = "projet-funathon",
-                 password = postgresql_password,
-                 host = "postgresql-438832",
+                 password = Sys.getenv("PASS_POSTGRESQL"),
+                 host = "postgresql-758156",
                  dbname = "defaultdb",
                  port = 5432,
                  check_interrupts = TRUE,
@@ -146,5 +139,5 @@ cnx <- dbConnect(Postgres(),
                                           sep = " - "))
 
 # On peuple la table PostgreSQL
-dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS drias")
+dbExecute(cnx, "CREATE SCHEMA IF NOT EXISTS drias")
 write_sf(drias_sf_intersected, cnx, Id(schema = "drias", table = "previsions"))

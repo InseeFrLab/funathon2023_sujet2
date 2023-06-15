@@ -1,13 +1,16 @@
+###
 # Import données SIG dans PostgreSQL
-
+###
 library(RPostgres)
 library(aws.s3)
 library(sf)
 
+
+# Database connection
 cnx <- dbConnect(Postgres(),
                  user = "projet-funathon",
-                 password = rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL"),
-                 host = "postgresql-438832",
+                 password = Sys.getenv("PASS_POSTGRESQL"),
+                 host = "postgresql-758156",
                  dbname = "defaultdb",
                  port = 5432,
                  check_interrupts = TRUE,
@@ -18,9 +21,11 @@ cnx <- dbConnect(Postgres(),
                                                    error = function(e) ''),
                                           sep = " - "))
 
+
+# MinIO
 aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion")
 
-# couches dispo dans le gpkg
+# Couches dispo dans le .gpkg de test
 s3read_using(
   FUN = sf::st_layers,
   object = "2023/sujet2/diffusion/ign/adminexpress_cog_simpl_000_2023.gpkg",
@@ -28,7 +33,7 @@ s3read_using(
   opts = list("region" = "")
 )
 
-# ouvrir la couche des régions
+# Ouvrir la couche des régions
 reg <- s3read_using(
     FUN = sf::read_sf,
     layer = "region",
@@ -36,17 +41,16 @@ reg <- s3read_using(
     bucket = "projet-funathon",
     opts = list("region" = ""))
 
-
-# importer 
-dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS adminexpress")
-
+# Export des données sur PostgreSQL
+dbExecute(cnx, "CREATE SCHEMA IF NOT EXISTS adminexpress")
 write_sf(reg, cnx, Id(schema = "adminexpress", table = "region"))
-dbExecute(cnx, "COMMENT ON TABLE adminexpress.region IS
-$$polygones des régions françaises Adminexpress COG 2023
-géométrie simplifiée pour carto nationale
-EPSG:WGS84$$")
+dbExecute(
+  cnx,
+  "COMMENT ON TABLE adminexpress.region IS $$polygones des régions françaises 
+  Adminexpress COG 2023 géométrie simplifiée pour carto nationale EPSG:WGS84$$"
+)
 
-# ouvrir la couche des communes
+# Couche des communes
 com <- s3read_using(
   FUN = sf::read_sf,
   layer = "commune",
@@ -54,19 +58,16 @@ com <- s3read_using(
   bucket = "projet-funathon",
   opts = list("region" = ""))
 
-
-# importer 
-dbSendQuery(cnx, "CREATE SCHEMA IF NOT EXISTS adminexpress")
-
+# Export des données sur PostgreSQL
 write_sf(com, cnx, Id(schema = "adminexpress", table = "commune"))
-dbExecute(cnx, "COMMENT ON TABLE adminexpress.commune IS
-$$polygones des communes françaises Adminexpress COG 2023
-géométrie simplifiée pour carto nationale
-EPSG:WGS84$$")
+dbExecute(
+  cnx,
+  "COMMENT ON TABLE adminexpress.commune IS $$polygones des communes françaises 
+  Adminexpress COG 2023 géométrie simplifiée pour carto nationale EPSG:WGS84$$"
+)
 
-# Ajout des index, celui sur geom est important
+# Indexation, important sur geom
 dbExecute(cnx,
           "ALTER TABLE adminexpress.commune ADD CONSTRAINT commune_pk PRIMARY KEY (id)")
 dbExecute(cnx, 
           "CREATE INDEX ON adminexpress.commune USING gist (geom)")
-
