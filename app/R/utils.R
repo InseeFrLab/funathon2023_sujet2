@@ -111,7 +111,7 @@ plot_surroundings <- function(leaflet_proxy, sf) {
                     sf$insee_dep,
                     sf$nom_com) %>%
     lapply(htmltools::HTML)
-  
+
   return(
     leaflet_proxy %>%
     addPolygons(

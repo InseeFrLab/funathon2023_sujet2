@@ -282,21 +282,129 @@ p<-ggplot(tab_piv,
 p+coord_flip()
 ```
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+## Création d'un dashboard de visualisation
 
-## Running Code
+On souhaiterait intégrer les analyses faites ci-dessus à un tableau de bord qui offrirait des visualisations interactives. Une solution est d'utiliser `Shiny`, une librairie qui permet la création de telles applications avec `R` notamment.
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+Une application `Shiny` simple a deux composants principaux :
+
+- Un objet d'interface utilisateur (UI) qui contrôle la disposition et l'apparence du tableau de bord ;
+- Une fonction serveur qui contient les instructions nécessaires au fonctionnement de l'application.
+
+Lorsque ces deux composants sont définis, l'application est lancée à l'aide d'une simple instruction `runApp`. Ici, on aimerait bien aller vers une première version de tableau de bord, qui afficherait au départ une carte interactive et laisserait aussi à l'utilisateur de choisir un rayon. Une fois ce rayon choisi et un point sélectionné grâce à un clic sur la carte, on souhaiterait (comme affiché ci-dessous) :
+
+- Afficher sur la carte les parcelles se situant à une distance inférieure au rayon choisi du point spécifié ;
+- Afficher des statistiques sur les parcelles en questions. 
+
+![Shiny screenshot](img/shiny_screenshot.png)
+Ainsi notre UI sera un objet [`fluidPage`](https://shiny.posit.co/r/reference/shiny/1.3.1/fluidpage) composé de trois éléments, et dans la fonction de serveur il y aura deux évènements distincts à [observer](https://shiny.posit.co/r/reference/shiny/1.0.1/observeevent). Pour développer l'application, créez un répertoire `my_app` et à l'intérieur 3 fichiers, un fichier `ui.R`, un fichier `server.R` et un fichier `utils.R` (dans lequel se trouveront les fonctions utilitaires).
+
+## UI
+
+Le fichier UI aura la forme suivante :
 
 ```{r}
-1 + 1
+library(shiny)
+
+# Define UI
+ui <- fluidPage(
+  ...
+)
 ```
 
-You can add options to executable code like this
+A l'intérieur de la fonction `fluidPage` et grâce à la documentation de `Shiny`, ajoutez les 3 éléments qui constitueront le tableau de bord : un output de type "carte `leaflet`", un champ d'input numérique, et un output de type "table".
 
 ```{r}
-#| echo: false
-2 * 2
+library(shiny)
+
+# Define UI
+ui <- fluidPage(
+  leafletOutput("map", height = 800),
+  numericInput("buffer_radius", "Rayon (en km) :", value = 5),
+  tableOutput("table")
+)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Serveur
+
+Le code de la fonction serveur figure ci-dessous dans son intégralité, et l'objectif de cette partie va être d'implémenter dans `utils.R` les différentes fonctions appelées dans le code :
+
+- `connect_to_db` : une fonction qui renvoie une connexion à la base de données ;
+- `query_db` : une fonction qui interroge la base de données pour récupérer les parcelles se situant à l'intérieur d'un cercle de rayon `radius` d'un point défini par une latitude et une longitude ;
+- `plot_surroundings` : une fonction qui prend en entrée la sortie de la fonction `query_db` et une carte `leaflet` et qui ajoute une couche comportant les polygones des parcelles concernées ;
+- `compute_stats` : une fonction qui prend en entrée la sortie de la fonction `query_db` et renvoie des statistiques sur les parcelles concernées.
+
+```{r}
+library(shiny)
+library(leaflet)
+
+
+# Define server
+server <- function(input, output) {
+  
+  # Render the map
+  output$map <- renderLeaflet({
+    leaflet() %>%
+      addTiles("http://wxs.ign.fr/essentiels/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}") %>%
+      setView(lng = -1.4932577154775046, lat = 46.46946179131805, zoom = 12)
+  })
+  
+  # Connect to database
+  cnx <- connect_to_db()
+  
+  # Initialize a reactive value for storing the selected point
+  selectedPoint <- reactiveValues(lat = NULL, lng = NULL)
+  
+  # Handle click event on the map
+  observeEvent(input$map_click, {
+    
+    clickData <- input$map_click
+    if (!is.null(clickData)) {
+      # Store selected point
+      selectedPoint$lat <- clickData$lat
+      selectedPoint$lng <- clickData$lng
+      
+      buffer_radius <- input$buffer_radius
+      sf <- query_db(cnx, selectedPoint$lat, selectedPoint$lng, buffer_radius)
+
+      # Update the map with the marker at the selected point
+      leafletProxy("map") %>%
+        clearMarkers() %>%
+        clearShapes() %>%
+        addMarkers(lng = selectedPoint$lng, lat = selectedPoint$lat) %>%
+        plot_surroundings(sf)
+      
+      # Computations on queried data
+      df <- compute_stats(sf)
+      
+      # Update rendered table
+      output$table <- renderTable({
+        df
+      })
+    }
+  })
+  
+  observeEvent(input$buffer_radius, {
+    # Check if a point has been selected
+    if (!is.null(selectedPoint$lat) && !is.null(selectedPoint$lng)) {
+      # Perform computations based on the selected point and new radius
+      buffer_radius <- input$buffer_radius
+      sf <- query_db(cnx, selectedPoint$lat, selectedPoint$lng, buffer_radius)
+      
+      # Update the map with the new polygons
+      leafletProxy("map") %>%
+        clearShapes() %>%
+        plot_surroundings(sf)
+      
+      # Computations on queried data
+      df <- compute_stats(sf)
+      
+      # Update rendered table
+      output$table <- renderTable({
+        df
+      })
+    }
+  })
+}
+```
+
