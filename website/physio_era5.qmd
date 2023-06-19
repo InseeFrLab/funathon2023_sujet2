@@ -63,8 +63,9 @@ Peut-on voir comment a évolué la date de récolte théorique d'une culture au 
 
 **Estimer les tendances de la date potentielle de récolte du maïs grain dans les différents bassins de productions français depuis 1980.**
 
-## Compétences mises en oeuvre
+## Compétences mises en œuvre
 
+- Langage R.
 - Manipulation de données SIG : vecteurs et rasters avec les packages {sf}, {terra}, {stars}.
 - Requêtes SQL simples sur PostGIS avec {RPostgres} et {sf}.
 - Utiliser le lissage spatial pour synthétiser les données géographiques avec {btb}.
