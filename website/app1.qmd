@@ -1,20 +1,12 @@
 ---
-title: "Sujet2-Etape1"
-format: html
-code-fold: true
-code-tools: true
-code-summary: "voir le code"
-# embed-resources: true
-# standalone: true
-self-contained: true
-toc: true
-toc-depth: 3
+title: "Première manipulation du RPG"
+pagetitle: "Première manipulation du RPG"
+keywords: ["RPG", "PostgreSQL", "PostGIS", "manipulation"]
 number-sections: true
-toc-location: left
-css: styles.css
-theme: united
-editor: visual
-output-file: Sujet2-Etape1.html
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+    out.width: 100%
 ---
 
 ```{r sys.setenv, include=FALSE}
@@ -76,9 +68,7 @@ lib_group_cult<-lib_cult %>%
 
 ```
 
-## Etape 1 : Première manipulation du RPG
-
-### Je choisis un point sur la carte : <https://www.google.fr/maps>
+## Je choisis un point sur la carte : <https://www.google.fr/maps>
 
 =\> clic droit sur la carte + clic gauche sur les coordonnées (copiées dans le presse-papier)
 
@@ -112,23 +102,16 @@ La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL/PostGI
 ### Je me connecte au serveur PostgreSQL avec le mot de passe disponible sur Onyxia/Mes services/PostgreSQL/Read me
 
 ```{r}
-#| label: connection PostGis
+#| label: connection PostgreSQL
 
-# le mot de passe est stocké dans un secret Vault
-
-# postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
-# postgresql_password <- "1tfawt3nj7fgzo3w7cma"
-# Sys.setenv("PASS_POSTGRESQL"="1tfawt3nj7fgzo3w7cma")
-  
 # Connection à PostgreSQL
- cnx <- dbConnect(PostgreSQL(),
-                user = "projet-funathon",
-                password = Sys.getenv("PASS_POSTGRESQL"),
-               host = "postgresql-758156",
-               dbname = "defaultdb",
-                port = 5432,
-                options="-c search_path=rpg,public") # specify what schema to connect to
-                 
+cnx <- dbConnect(PostgreSQL(),
+                 user = Sys.getenv("USER_POSTGRESQL"),
+                 password = Sys.getenv("PASS_POSTGRESQL"),
+                 host = Sys.getenv("HOST_POSTGRESQL"),
+                 dbname = "defaultdb",
+                 port = 5432,
+                 options="-c search_path=rpg,public") # specify what schema to connect to
 ```
 
 ### je lance une requête SQL pour sélectionner les parcelles situées autour de mon point dans le rayon choisi.
@@ -437,7 +420,6 @@ ggplot(tab_piv, aes(x = libelle_groupe_culture,
 
 ### Pour aller plus loin, comparer la taille moyenne des parcelles selon les secteurs
 
-
 ## Création d'un dashboard de visualisation
 
 On souhaiterait intégrer les analyses faites ci-dessus à un tableau de bord qui offrirait des visualisations interactives. Une solution est d'utiliser `Shiny`, une librairie qui permet la création de telles applications avec `R` notamment.
@@ -459,6 +441,10 @@ Lorsque ces deux composants sont définis, l'application est lancée à l'aide d
 Le fichier UI aura la forme suivante :
 
 ```{r}
+#| label: ui-q
+#| eval: false
+#| code-fold: false
+
 library(shiny)
 
 # Define UI
@@ -469,7 +455,13 @@ ui <- fluidPage(
 
 A l'intérieur de la fonction `fluidPage` et grâce à la documentation de `Shiny`, ajoutez les 3 éléments qui constitueront le tableau de bord : un output de type "carte `leaflet`", un champ d'input numérique, et un output de type "table".
 
+::: {.callout-note icon=false}
+## Solution
+
 ```{r}
+#| label: ui-a
+#| eval: false
+
 library(shiny)
 
 # Define UI
@@ -479,6 +471,9 @@ ui <- fluidPage(
   tableOutput("table")
 )
 ```
+:::
+
+
 
 ## Serveur
 
@@ -490,6 +485,10 @@ Le code de la fonction serveur figure ci-dessous dans son intégralité, et l'ob
 -   `compute_stats` : une fonction qui prend en entrée la sortie de la fonction `query_db` et renvoie des statistiques sur les parcelles concernées.
 
 ```{r}
+#| label: server-q
+#| eval: false
+#| code-fold: false
+
 library(shiny)
 library(leaflet)
 
@@ -565,9 +564,17 @@ server <- function(input, output) {
 
 Proposer une implémentation des fonctions `connect_to_db`, `query_db` et `compute_stats` décrites ci-dessus et utilisées dans la fonction "serveur".
 
-**`connect_to_db`**
+### `connect_to_db`
+
+La fonction `connect_to_db` renvoie une connexion à la base de données PostgreSQL, comme vu précédemment. Les identifiants (`user` et `password` sont respectivement stockés dans les variables d'environnement `USER_POSTGRESQL` et `PASS_POSTGRESQL`.)
+
+::: {.callout-note icon=false}
+## Solution
 
 ```{r}
+#| label: connect-fun
+#| eval: false
+
 #' Connection au serveur PostgreSQL. Le mot de passe doit être stocké dans la
 #' variable d'environnement PASS_POSTGRESQL.
 #' 
@@ -585,12 +592,17 @@ connect_to_db <- function() {
   return(cnx)
 }
 ```
+:::
 
-**`query_db`**
+### `query_db`
 
 On souhaite implémenter la fonction suivante :
 
 ```{r}
+#| label: query-fun-q
+#| eval: false
+#| code-fold: false
+
 #' Requête la table `parcelles` pour récupérer les parcelles qui se situent
 #' dans un certain rayon autour d'un point repéré par une latitude et 
 #' une longitude.
@@ -614,7 +626,13 @@ On pourra notamment utiliser plusieurs fonctions PostGIS :
 
 ainsi que des fonction de la librairie `sf`.
 
+::: {.callout-note icon=false}
+## Solution
+
 ```{r}
+#| label: query-fun-a
+#| eval: false
+
 #' Requête la table `parcelles` pour récupérer les parcelles qui se situent
 #' dans un certain rayon autour d'un point repéré par une latitude et 
 #' une longitude.
@@ -649,12 +667,17 @@ query_db <- function(cnx, lat, lng, radius) {
   return(sf)
 }
 ```
+:::
 
-**`compute_stats`**
+### `compute_stats`
 
 On souhaite implémenter la fonction suivante :
 
 ```{r}
+#| label: stats-fun-q
+#| eval: false
+#| code-fold: false
+#| 
 #' Crée la table à afficher sur l'application grâce à des calculs sur les
 #' données requêtées depuis PostgreSQL.
 #' 
@@ -665,9 +688,24 @@ compute_stats <- function(sf) {
 }
 ```
 
-qui calcule sur une table spatiale renvoyéer par la fonction `query_db` ...
+qui calcule sur une table spatiale renvoyée par la fonction `query_db` (ensemble des parcelles se situant autour d'un point donné) les statistiques suivantes par groupe de culture agregé :
+
+-   Nombre de parcelles;
+
+-   Pourcentage des parcelles parmi toutes les parcelles;
+
+-   Surface des parcelles;
+
+-   Surface des parcelles rapportée à la surface de toutes les parcelles;
+
+-   Surface moyenne d'une parcelle.
+
+On récupère les groupes de cultures agrégés sur l'espace de stockage du SSP Cloud et avec un léger prétraitement, comme ceci :
 
 ```{r}
+#| label: lib-cult
+#| code-fold: false
+
 # Récupération des libellés des différentes cultures
 lib_cult <- s3read_using(FUN = read_csv2,
                          object = "2023/sujet2/diffusion/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
@@ -683,7 +721,13 @@ lib_group_cult <- lib_cult %>%
 lib_group_cult %>% kable()
 ```
 
+::: {.callout-note icon=false}
+## Solution
+
 ```{r}
+#| label: stats-fun-a
+#| eval: false
+
 #' Crée la table à afficher sur l'application grâce à des calculs sur les
 #' données requêtées depuis PostgreSQL.
 #' 
@@ -726,10 +770,21 @@ compute_stats <- function(sf) {
   )
 }
 ```
+:::
 
-**`plot_surroundings`**
+### `plot_surroundings`
+
+La fonction `plot_surroundings` prend en entrée une carte `leaflet` ainsi qu'un objet `sf` récupéré grâce à `query_db` et renvoie une carte où on a rajouté une couche avec les polygones correspondant aux parcelles. Elle est donné ci-dessous. Essayez de comprendre à quoi correspondent les différents arguments de la fonction `addPolygons`.
 
 ```{r}
+#| label: plot-fun-a
+#| eval: false
+
+# Création d'une palette de couleurs associée au groupe de culture
+pal <- brewer.pal(12, "Paired")
+pal <- colorRampPalette(pal)(24)
+factpal <- colorFactor(pal, lib_group_cult$code_groupe_culture)
+
 #' Rajoute les données d'un objet `sf` sous forme de polygones à une
 #' carte `leaflet`.
 #' 
@@ -785,9 +840,6 @@ plot_surroundings <- function(leaflet_proxy, sf) {
 }
 ```
 
-```{r}
-# Création d'une palette de couleurs associée au groupe de culture
-pal <- brewer.pal(12, "Paired")
-pal <- colorRampPalette(pal)(24)
-factpal <- colorFactor(pal, lib_group_cult$code_groupe_culture)
-```
+## Lancement de l'application
+
+L'application RShiny se lance localement grâce à la commande `shiny::runApp("my-app")`. Vérifiez que tout fonctionne bien ! Une application fonctionnelle se trouve dans le répertoire `app` si besoin.

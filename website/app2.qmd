@@ -1,7 +1,7 @@
 ---
 title: "Cultures et prévisions climatiques"
 pagetitle: "Prévisions"
-keywords: ["RPG", "prévisions, cultures"]
+keywords: ["RPG", "prévisions", "cultures"]
 number-sections: true
 knitr:
   opts_chunk: 
@@ -19,9 +19,11 @@ Le changement climatique aura des changements importants sur les cultures en Fra
 
 ## Visualisations
 
+On initialise une nouvelle fois la connexion à PostgreSQL comme expliqué à la fin de l'application 0.
+
 ```{r}
 #| label: setup
-#| echo: true
+#| code-fold: false
 
 library(RPostgres)
 library(dplyr)
@@ -32,24 +34,25 @@ library(sf)
 library(janitor)
 library(knitr)
 
-# pour avoir les noms de dates en français
+# Pour avoir les noms de dates en français
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 
 options(knitr.kable.NA = "")
 
 cnx <- dbConnect(Postgres(),
-                 user = "projet-funathon",
+                 user = Sys.getenv("USER_POSTGRESQL"),
                  password = Sys.getenv("PASS_POSTGRESQL"),
-                 host = "postgresql-438832",
+                 host = Sys.getenv("HOST_POSTGRESQL"),
                  dbname = "defaultdb",
                  port = 5432,
                  check_interrupts = TRUE)
 ```
 
-On souhaite tout d'abord visualiser les données DRIAS. On peut passer par les données sauvegardées au format raster qui sont stockées dans l'espace de stockage du SSP Cloud. Ces données correspondent à des prévisions à horizon proche (2021-2050) dans un scénario sans réduction des gaz à effet de serre, la période de référence étant 1976-2005.
+On souhaite tout d'abord visualiser les données DRIAS. On peut passer par les données sauvegardées au format raster qui sont stockées dans l'espace de stockage du SSP Cloud. Ces données correspondent à des prévisions à horizon proche (2021-2050) dans un scénario sans réduction des gaz à effet de serre, la période de référence étant 1976-2005. Le code ci-dessous permet de récupérer les données.
 
 ```{r}
 #| label: get-drias-raster
+#| code-fold: false
 
 drias_raster <- s3read_using(
   function(f) readAll(brick(f)),
@@ -82,6 +85,7 @@ drias_df %>% head(10) %>% kable()
 ```
 
 Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) :
+
 - RRA : cumul de précipitations d'avril à octobre (mm)
 - STM6 : somme de température base 6°C d'avril à octobre (°C)
 - STM0 : somme de température base 0°C d'octobre (année-1) à juillet (année) (°C)
@@ -90,7 +94,10 @@ Les variables disponibles dans les données DRIAS sont systématiquement calcul�
 - DATEDG : Date de dernière gelée avec 1er juillet comme référence (date)
 - DATEPG : Date de première gelée avec 1er juillet comme référence (date)
 
-On visualise la variable ARRA, qui correspond à l'écart de cumul de précipitations d'avril à octobre en mm.
+On souhaite visualiser la variable ARRA, qui correspond à la huitième couche du raster et correspond à l'écart de cumul de précipitations d'avril à octobre en mm. Pour faire cela, on pourra récupérer spécifiquement la couche désirée lors de l'utilisation de la fonction [`raster::raster`](https://www.rdocumentation.org/packages/raster/versions/3.6-20/topics/raster). Pour la visualisation, on pourra utiliser [`raster::plot`](https://www.rdocumentation.org/packages/raster/versions/3.6-20/topics/plot).
+
+::: {.callout-note icon=false}
+## Solution
 
 ```{r}
 #| label: drias_vis_raster
@@ -109,14 +116,18 @@ breaks <- c(-200, -160, -120, -80, -40, -0, 40, 80, 120, 160, 200)
 raster::plot(x = drias_raster_arra,
              col = rev(palette),
              breaks = breaks,
-             main = "Ecart de cumul de précipitations d'avril à octobre (mm) entre 2021-2050 et 1976-2005")
+             main = "Ecart de cumul de précipitations d'avril à octobre (mm)\nentre 2021-2050 et 1976-2005")
 ```
+:::
 
-Sur la période 2021-2050, les précipitations vont augmenter presque partout, sauf Sud-Ouest de la France (détails...).
+Sur la période 2021-2050, les précipitations vont augmenter presque partout, sauf dans le Sud-Ouest de la France.
 
 ## Requêtes PostgreSQL 
 
-Les données sont également stockées dans une base PostgreSQL qu'il est possible de requêter. La table `drias.previsions` contient une grille équivalente aux données raster précédemment utilisées.
+Les données DRIAS sont également stockées dans une base PostgreSQL qu'il est possible de requêter. La table `drias.previsions` contient une grille équivalente aux données raster précédemment utilisées. On souhaite obtenir la même visualisation que celle obtenue précédemment en requêtant la base de données. Pour ce faire, utiliser la fonction `sf::st_read` avec une requête sur la table `drias.previsions`. Pour la création de la carte, on peut utiliser le package `ggplot2` et sa fonction [`geom_sf`](https://ggplot2.tidyverse.org/reference/ggsf.html).
+
+::: {.callout-note icon=false}
+## Solution
 
 ```{r}
 #| label: drias_vis_postgresql
@@ -134,10 +145,14 @@ ggplot() +
                guide = "bins",
                breaks = breaks)
 ```
+:::
 
 ## Appariement spatial entre données DRIAS et RPG
 
-On souhaite effectuer cet appariement pour obtenir par carreau de la grille DRIAS la surface de parcelles pour chaque type de culture.
+On aimerait associer chaque culture à une évolution en terme de cumul de précipitation. Pour ceci il faut tout d'abord récupérer pour chaque culture la surface des parcelles existantes dans chaque carreau de la grille DRIAS. Pour ceci on peut procéder à un appariement spatial des tables `drias.previsions` et `rpg.parcelles` de la base de données. On pourra s'aider de [cette page](https://postgis.net/workshops/postgis-intro/joins.html) de documentation, et utiliser [`ST_Intersects`](https://postgis.net/docs/ST_Intersects.html).
+
+::: {.callout-note icon=false}
+## Solution
 
 ```{r}
 #| label: spatial-join
@@ -155,11 +170,16 @@ arra_df <- dbFetch(res)
 
 arra_df %>% head(10) %>% kable()
 ```
-On a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.
+:::
+
+A ce stade, on a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.
 
 ## Calcul d'indicateurs par type de culture
 
-On peut maintenant calculer un écart moyen de cumul de précipitation (d'avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche. 
+On peut maintenant calculer un écart moyen de cumul de précipitation (d'avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche. Un fichier `.csv` contenant les intitulés complets des différentes cultures est disponible sur MinIO (bucket `"projet-funathon"`, objet `"2023/sujet2/diffusion/ign/rpg/CULTURE.csv"`).
+
+::: {.callout-note icon=false}
+## Solution
 
 ```{r}
 #| label: aggregation-culture
@@ -187,8 +207,12 @@ agg_arra_df %>%
   head(10) %>%
   kable()
 ```
+:::
 
-Le maïs doux est une culture qui sera touchée par les baisses de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ?
+On observe que maïs doux est une culture qui va connaître une baisse de cumul de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ? On souhaite dessiner une carte indiquant l'emplacement de ces parcelles. Pour ce faire, faire une requête de la table `rpg.parcelles` et utiliser `ggplot2` et sa fonction `geom_sf` pour tracer la carte. Pour que les parcelles soient visibles, on pourra artificiellement augmenter leur surface grâce à la fonction [`st_buffer`](https://r-spatial.github.io/sf/reference/geos_unary.html).
+
+::: {.callout-note icon=false}
+## Solution
 
 ```{r}
 #| label: localisation-mais
@@ -214,5 +238,14 @@ ggplot() +
   geom_sf(data = region_sf) +
   geom_sf(data = st_buffer(cultures_mid, 5000), fill = "#fca8ab", color = NA)
 ```
+:::
 
-On observe en effet beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.
+On observe comme attendu beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.
+
+## Pour aller plus loin
+
+Pour aller plus loin, plusieurs idées :
+
+- Calculer des écarts en pourcentage par rapport au niveau sur la période de référence pour avoir une idée plus parlante de la diminution ou de l'augmentation du cumul de précipitations;
+- Regarder plutôt les prévisions climatiques à long terme, en utilisant la table `drias.previsions_hl` qui concerne la période 2071-2100;
+- S'intéresser aux autres indicateurs qui existent dans les données DRIAS;

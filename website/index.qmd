@@ -1,7 +1,37 @@
 # Contexte et description du sujet {.unnumbered}
 
+Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous et disponibles sur les pages suivantes. Ces applications sont des points de départ - n'hésitez pas à aller plus loin !
+
 Avec ce sujet, vous allez pouvoir :
 
-- Utiliser une base de données PostgreSQL
-- Travailler avec des données géographiques
-- A compléter
+- Travailler avec le langage `R`;
+- Manipuler des données spatiales : vecteurs et rasters avec les packages `sf`, `terra`, `stars`;
+- Utiliser une base de données `PostgreSQL` et son extension `PostGIS`;
+- Créer des visualisations avec `ggplot2`;
+- Développer un tableau de bord interactif avec `Shiny`;
+- Utiliser le lissage spatial pour synthétiser des données géographiques avec `btb`;
+- Estimer des tendances avec un modèle linéaire.
+
+### Les données utilisées {.unnumbered}
+
+Ce sujet propose de manipuler :
+
+- Le [Registre Parcellaire Graphique (RPG)](https://www.data.gouv.fr/fr/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/);
+- Des données du [Drias](http://www.drias-climat.fr/decouverte) de simulation de l'évolution climatique pour le siècle en cours sur la France;
+- Des données [ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) agro-météorologiques de surface **quotidiens** pour la période allant de 1979 à aujourd'hui.
+
+### Etape 0 (optionnel) : Création d'une base de données PostgreSQL {.unnumbered}
+
+Les données du RPG étant volumineuses, il faut pouvoir les requêter depuis une base de données. Les gentils organisateurs vous ont déjà préparé une base de données PostgreSQL (avec l'extension PostGIS) prête à l'emploi pour ce sujet. Néanmoins, nous vous expliquons comment procéder si vous souhaitez être en mesure de le faire vous-mêmes sur la plateforme SSP Cloud.
+
+### Etape 1 : Première manipulation du RPG {.unnumbered}
+
+L'objectif de cette première étape est d'effectuer des premières requêtes géographiques permettant d'examiner les cultures à proximité d'un point géographique donné, de comparer la composition observée avec les compositions départementale, régionale, etc. Pour aller plus loin, on développera une interface graphique de type tableau de bord permettant d'obtenir ces informations interactivement en cliquant sur une carte.
+
+### Etape 2 : Exposition des cultures au déficit de précipitations {.unnumbered}
+
+Cette deuxième étape est fortement inspirée de l'excellente [étude](https://www.insee.fr/fr/statistiques/6522912) réalisée par C. Fontès-Rousseau, R. Lardellier (DR Occitanie Insee) et JM Soubeyroux (Météo France). Son objectif est de mettre en regard cultures et prévisions climatiques localement, pour identifier des cultures particulièrement mises en danger par le changement climatique en France.
+
+### Etape 3 : Evolution des cultures, lien avec le climat passé {.unnumbered}
+
+Après avoir regardé vers l'avenir, il est temps de jeter un coup d'oeil dans le rétroviseur, et de regarder comment l'évolution des températures au cours des 40 dernières années a pu influencer certaines cultures en France. On estimera l'évolution des dates potentielles de récolte du maïs grain dans les différents bassins de production français depuis 1980.

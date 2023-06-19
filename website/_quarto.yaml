@@ -45,7 +45,6 @@ format:
     code-summary: "voir le code"
 
 mainfont: "Marianne"
-monofont: "Fira Code"
 code-fold: true
 
 crossref:

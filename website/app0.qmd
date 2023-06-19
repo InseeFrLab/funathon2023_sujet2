@@ -40,15 +40,15 @@ library(aws.s3)
 
 
 conn <- dbConnect(Postgres(),
-                 user = Sys.getenv("USER_POSTGRESQL"),
-                 password = Sys.getenv("PASS_POSTGRESQL"),
-                 host = Sys.getenv("HOST_POSTGRESQL"),
-                 dbname = "defaultdb",
-                 port = 5432,
-                 check_interrupts = TRUE)
+                  user = Sys.getenv("USER_POSTGRESQL"),
+                  password = Sys.getenv("PASS_POSTGRESQL"),
+                  host = Sys.getenv("HOST_POSTGRESQL"),
+                  dbname = "defaultdb",
+                  port = 5432,
+                  check_interrupts = TRUE)
 ```
 
-A partir de l'objet `conn`, il est possible d'executer des requêtes et de récupérer les résultats petit à petit en utilisant les fonctions `dbSendQuery`, `dbFetch` et `dbClearResult`. Alternativement, pour récupérer tous les résultats de la requête directement lorsqu'ils tiennent en mémoire, on peut utiliser la fonction `dbGetQuery` qui rassemble les trois fonctions précédentes. Des fonctions utilitaires pour l'écriture de tables sont fournies par la librairie qu'on utilise, comme `dbWriteTable` pour écrire une table. Ainsi, si on a des données tabulaires stockées dans un `data.frame`, 
+A partir de l'objet `conn`, il est possible d'exécuter des requêtes et de récupérer les résultats petit à petit en utilisant les fonctions `dbSendQuery`, `dbFetch` et `dbClearResult`. Alternativement, pour récupérer tous les résultats de la requête directement lorsqu'ils tiennent en mémoire, on peut utiliser la fonction `dbGetQuery` qui rassemble les trois fonctions précédentes. Des fonctions utilitaires pour l'écriture de tables sont fournies par la librairie qu'on utilise, comme `dbWriteTable` pour écrire une table. Ainsi, si on a des données tabulaires stockées dans un `data.frame`, 
 
 ```{r}
 #| label: write-query
@@ -83,7 +83,8 @@ parcelles <- s3read_using(
   bucket = "projet-funathon",
   opts = list("region" = "")
   )
-write_sf(parcelles, conn, Id(schema = "test_schema", table = "test_parcelles"), overwrite = TRUE)
+
+write_sf(parcelles, conn, Id(schema = "test_schema", table = "test_parcelles"), delete_layer = TRUE)
 ```
 
 On n'a écrit que 10 observations du fichier des parcelles pour cette démontration. On peut les requêter pour vérifier que l'information géographique figure bien dans la base de données.
@@ -95,5 +96,11 @@ On n'a écrit que 10 observations du fichier des parcelles pour cette démontrat
 sf <- st_read(
   conn, query = "SELECT * FROM test_schema.test_parcelles"
 )
+
 plot(st_geometry(sf))
 ```
+
+## Base de données à disposition
+
+Dans toute la suite du sujet, on propose d'utiliser une base de données déjà préconfigurée, accessible depuis n'importe où sur le SSP Cloud. Pour accéder à cette base de données de la manière décrite ci-dessus, `HOST_POSTGRES` doit avoir pour valeur `postgresql-758156.projet-funathon`. Pour récupérer le nom d'utilisateur et le mot de passe, envoyer un message à Tom Seimandi (par mail ou sur Tchap). Dans la base de données `defaultdb`, les schémas `adminexpress`, `drias` et `rpg` contiennent les données mises à disposition pour traiter le sujet. Les participants ne disposent que des droits de lecture pour ces schémas (commande `SELECT`). Toutefois, le schéma `public` est disponible pour créer des tables temporaires, n'hésitez pas !
+
