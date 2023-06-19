@@ -1,6 +1,9 @@
 ---
 title: "Sujet2-Etape1"
 format: html
+code-fold: true
+code-tools: true
+code-summary: "voir le code"
 # embed-resources: true
 # standalone: true
 self-contained: true
@@ -14,6 +17,21 @@ editor: visual
 output-file: Sujet2-Etape1.html
 ---
 
+```{r sys.setenv, include=FALSE}
+#| echo: false
+
+#install.packages("aws.s3", repos = "https://cloud.R-project.org")
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "NNHCV9H0JHH7IU48ZHU4",
+           "AWS_SECRET_ACCESS_KEY" = "gjIgTAUKWjvwk5meiauKxjAf4G0wwXEp7C8rNxpC",
+           "AWS_DEFAULT_REGION" = "us-east-1",
+           "AWS_SESSION_TOKEN" = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJOTkhDVjlIMEpISDdJVTQ4WkhVNCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNjg3MTY1MTg5LCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImJlcnRyYW5kLmJhbGxldEBhZ3JpY3VsdHVyZS5nb3V2LmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTY4NzI2MTYyNywiZmFtaWx5X25hbWUiOiJCQUxMRVQiLCJnaXZlbl9uYW1lIjoiQmVydHJhbmQiLCJncm91cHMiOlsiZnVuYXRob24iXSwiaWF0IjoxNjg3MTY1MTg5LCJpc3MiOiJodHRwczovL2F1dGgubGFiLnNzcGNsb3VkLmZyL2F1dGgvcmVhbG1zL3NzcGNsb3VkIiwianRpIjoiMWJjNGNlNWItYjVhZi00NWZjLThhNDktZDI0MjcwODI3ZDRkIiwibmFtZSI6IkJlcnRyYW5kIEJBTExFVCIsIm5vbmNlIjoiODhlY2I5ZGQtOWRkNC00MGQ5LThkZjgtOWUzNGY5MTM1MTIxIiwicG9saWN5Ijoic3Rzb25seSIsInByZWZlcnJlZF91c2VybmFtZSI6ImJiYWxsZXQiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2Vzc2lvblBvbGljeSI6ImV5SldaWEp6YVc5dUlqb2lNakF4TWkweE1DMHhOeUlzSWxOMFlYUmxiV1Z1ZENJNlczc2lSV1ptWldOMElqb2lRV3hzYjNjaUxDSkJZM1JwYjI0aU9sc2ljek02S2lKZExDSlNaWE52ZFhKalpTSTZXeUpoY200NllYZHpPbk16T2pvNmNISnZhbVYwTFdaMWJtRjBhRzl1SWl3aVlYSnVPbUYzY3pwek16bzZPbkJ5YjJwbGRDMW1kVzVoZEdodmJpOHFJbDE5TEhzaVJXWm1aV04wSWpvaVFXeHNiM2NpTENKQlkzUnBiMjRpT2xzaWN6TTZUR2x6ZEVKMVkydGxkQ0pkTENKU1pYTnZkWEpqWlNJNld5SmhjbTQ2WVhkek9uTXpPam82S2lKZExDSkRiMjVrYVhScGIyNGlPbnNpVTNSeWFXNW5UR2xyWlNJNmV5SnpNenB3Y21WbWFYZ2lPaUprYVdabWRYTnBiMjR2S2lKOWZYMHNleUpGWm1abFkzUWlPaUpCYkd4dmR5SXNJa0ZqZEdsdmJpSTZXeUp6TXpwSFpYUlBZbXBsWTNRaVhTd2lVbVZ6YjNWeVkyVWlPbHNpWVhKdU9tRjNjenB6TXpvNk9pb3ZaR2xtWm5WemFXOXVMeW9pWFgxZGZRPT0iLCJzZXNzaW9uX3N0YXRlIjoiZTdhM2UxODgtOTI0Ny00NWFkLWI4NTEtYWI1NjQ2MmY3MTVkIiwic2lkIjoiZTdhM2UxODgtOTI0Ny00NWFkLWI4NTEtYWI1NjQ2MmY3MTVkIiwic3ViIjoiNGQ1N2NlN2QtOWNhYS00MDk4LWFjNDktNzY0MjAyYzJhN2I5IiwidHlwIjoiQmVhcmVyIn0.IjHQ-aRrCB_u_SCgUkxhdZnjmBRwVYW3RA5QYE0MBmC4YdqVVuE1DEevc71RavhWgDakoov_40MgdroIcYSibQ",
+           "AWS_S3_ENDPOINT"= "minio.lab.sspcloud.fr")
+
+Sys.setenv("PASS_POSTGRESQL"="1tfawt3nj7fgzo3w7cma")
+
+```
+
 ```{r setup, include=FALSE}
 #| label: setup
 #| echo: false
@@ -25,13 +43,38 @@ library(RPostgreSQL)
 library(janitor)
 if (!"kableExtra" %in% installed.packages()) { install.packages("kableExtra") }
 library(kableExtra)
+library(leaflet)
+library(htmlwidgets)
+library(RColorBrewer)
 
+# install.packages("aws.s3", repos = "https://cloud.R-project.org")
+
+bucketlist(region="")
+```
+
+```{r acces donnees, include=FALSE}
+#| echo: false
 # données -----------------------------------------------------------------
 aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/sujet2/diffusion/ign/rpg")
 
 ```
 
-test commit
+```{r, include=FALSE }
+#| echo: false
+#| label: lecture libellés groupes cultures
+
+lib_cult<-s3read_using(FUN = read_csv2, 
+                         object = "2023/sujet2/diffusion/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
+                         col_types = cols(.default = col_character()),
+                         bucket = "projet-funathon",
+                         opts = list("region" = "")) %>% clean_names() 
+
+lib_group_cult<-lib_cult %>% 
+  select(code_groupe_culture,libelle_groupe_culture) %>% 
+  distinct(code_groupe_culture,.keep_all=T)
+
+
+```
 
 ## Etape 1 : Première manipulation du RPG
 
@@ -39,17 +82,16 @@ test commit
 
 =\> clic droit sur la carte + clic gauche sur les coordonnées (copiées dans le presse-papier)
 
-J'indique un rayon en mètres pour sélectionner les parcelles autour du point
+J'indique un rayon en mètres (\< 15000) pour sélectionner les parcelles autour du point
 
 ```{r}
 #| label: choix coordonnées + rayon
-#| echo: false
 # coord_gmaps<- rstudioapi::showPrompt(title = "Collez les coordonnées", message = "coordonnées Gmaps", default = "")
-coord_gmaps<-"46.46946179131805, -1.4932577154775046"
+coord_gmaps<-"43.447894436406216, 1.2886163291688764"
 lat<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,1])
 lon<-as.numeric(str_split(coord_gmaps,fixed(","),simplify = TRUE)[,2])
 # rayon<-as.numeric(rstudioapi::showPrompt(title = "Rayon", message = "Rayon (en m)", default = ""))
-rayon<-5000
+rayon<-10000
 
 # création d'une table sf «point» avec les coordonnées saisies
 # transformation des coordonnées en syst de proj 2154 (Lambert II - Français) 
@@ -70,20 +112,20 @@ La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL/PostGI
 ### Je me connecte au serveur PostgreSQL avec le mot de passe disponible sur Onyxia/Mes services/PostgreSQL/Read me
 
 ```{r}
-#| echo: false
 #| label: connection PostGis
 
 # le mot de passe est stocké dans un secret Vault
 
 # postgresql_password <- rstudioapi::askForPassword(prompt = "Entrez le password PostgreSQL")
-postgresql_password <- "1tfawt3nj7fgzo3w7cma"
+# postgresql_password <- "1tfawt3nj7fgzo3w7cma"
+# Sys.setenv("PASS_POSTGRESQL"="1tfawt3nj7fgzo3w7cma")
   
 # Connection à PostgreSQL
-cnx <- dbConnect(PostgreSQL(),
+ cnx <- dbConnect(PostgreSQL(),
                 user = "projet-funathon",
-                password = postgresql_password,
-                host = "postgresql-438832",
-                dbname = "defaultdb",
+                password = Sys.getenv("PASS_POSTGRESQL"),
+               host = "postgresql-758156",
+               dbname = "defaultdb",
                 port = 5432,
                 options="-c search_path=rpg,public") # specify what schema to connect to
                  
@@ -92,9 +134,8 @@ cnx <- dbConnect(PostgreSQL(),
 ### je lance une requête SQL pour sélectionner les parcelles situées autour de mon point dans le rayon choisi.
 
 ```{r}
-#| echo: false
 #| label: requete SQL selection parcelles
-
+#| warnings : false
 # suppression de la table «point» si elle existe
 dbSendQuery(cnx,"DROP TABLE IF EXISTS rpg.point CASCADE;")
 
@@ -132,37 +173,77 @@ parc_prox<-st_read(cnx, query="select * from rpg.parc_prox;")
 
 ```
 
-### J'affiche les parcelles autour de mon point (prévoir un leaflet ?)
+### J'affiche les parcelles autour de mon point avec une carte interactive leaflet
 
 ```{r}
-#| echo: false
 #| label: affichage parcelles
 
-plot(st_geometry(parc_prox))
-plot(st_geometry(point),add = T,col = "red")
+#plot(st_geometry(parc_prox))
+#plot(st_geometry(point),add = T,col = "red")
+
+# Transformation de la projection car leaflet ne connait que le WGS 84
+carte_parc_prox<- parc_prox %>% st_transform(4326)
+
+# Marqueur du point
+pt_mark<- point %>% st_transform(4326)
+
+# ajout du libellé des cultures
+carte_parc_prox_lib<-carte_parc_prox %>% 
+  left_join(lib_cult %>% select(-code_groupe_culture),by=c("code_cultu"="code_culture")) 
+#création d'un label ad hoc à afficher en surbrillance au passage de la souris sur la carte.
+labels<-sprintf("<strong>id_parcel : </strong>%s<br/>
+                <strong>Groupe culture : </strong>%s<br/>
+                <strong>Culture : </strong>%s<br/>
+                <strong>Surface (ha) : </strong>%s<br/>
+                <strong>Département : </strong>%s<br/>
+                <strong>Commune : </strong>%s<br/>",
+                parc_prox$id_parcel,carte_parc_prox_lib$libelle_groupe_culture,
+                carte_parc_prox_lib$libelle_culture,parc_prox$surf_parc,
+                parc_prox$insee_dep,parc_prox$nom_com) %>% 
+  lapply(htmltools::HTML)
+
+# labels
+
+# création d'une palette de couleurs associée au groupe de culture
+factpal <- colorFactor("Paired", parc_prox$code_group)
+
+carte_parc_prox_html <- leaflet(carte_parc_prox_lib) %>% 
+   # addProviderTiles("Esri.WorldImagery") %>%
+   # addTiles() %>% 
+  addTiles("http://wxs.ign.fr/essentiels/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}") %>%
+  addPolygons( #fillColor="white",
+               fillColor=~factpal(code_group),
+               weight = 2,
+               opacity = 1,
+               color = "#ffd966",
+               dashArray = "3",
+               fillOpacity = 0.5,
+               highlight = highlightOptions(
+                 weight = 5,
+                 color = "#A40000",
+                 dashArray = "",
+                 fillOpacity = 0.0,
+                 bringToFront = TRUE),
+               label = labels,
+               labelOptions = labelOptions(
+                 style = list("font-weight" = "normal", padding = "3px 8px"),
+                 textsize = "15px",
+                 direction = "auto",
+                 encoding="UTF-8")) %>% 
+  addMarkers(data=pt_mark,~lon,~lat, popup = ~coord_pt_gps, label = ~coord_pt_gps)
+
+# leaflet(pt_mark) %>% addTiles() %>% addMarkers(~lon,~lat)
+
+carte_parc_prox_html
+# saveWidget(widget = carte_parc_prox_html, file = "carte_parc_prox_html.html")
+
 ```
 
 ### Quelle est la structure des parcelles agricoles autour de mon point ?
 
-```{r }
-#| echo: false
-#| label: lecture libellés groupes cultures
-
-lib_group_cult<-s3read_using(FUN = read_csv2, 
-                         object = "2023/sujet2/diffusion/ign/rpg/REF_CULTURES_GROUPES_CULTURES_2020.csv",
-                         col_types = cols(.default = col_character()),
-                         bucket = "projet-funathon",
-                         opts = list("region" = "")) %>% 
-  select(CODE_GROUPE_CULTURE,LIBELLE_GROUPE_CULTURE) %>% 
-  distinct(CODE_GROUPE_CULTURE,.keep_all=T) %>% 
-  rename (code_group_culture=CODE_GROUPE_CULTURE,libelle_groupe_culture=LIBELLE_GROUPE_CULTURE)
-
-```
-
 ```{r}
-#| echo: false
 #| label: stats sur les groupes de cultures 
-#| tbl-cap: Structure des cultures 
+#| tbl-cap: Structure des cultures au niveau local 
 
 t1 <- parc_prox %>% st_drop_geometry() %>% count(code_group) %>% 
   add_tally(n) %>% 
@@ -177,53 +258,58 @@ parc_prox %>% st_drop_geometry() %>% count(code_group,wt=surf_parc) %>%
       select(-nn) %>%  
       rename(surf_parc_ha=n) %>% select(surf_parc_ha, surf_pct) # %>% 
        # adorn_totals()
-) %>% left_join(lib_group_cult,by=c("code_group"="code_group_culture")) %>% 
+) %>% left_join(lib_group_cult,by=c("code_group"="code_groupe_culture")) %>% 
   select(code_group,libelle_groupe_culture,everything()) %>% 
-  arrange(as.numeric(code_group)) %>% adorn_totals() %>% 
+  # arrange(as.numeric(code_group)) %>% 
+  arrange(desc(surf_parc_ha)) %>% 
+  adorn_totals() %>% 
   mutate(taille_moy_parc=round(surf_parc_ha/n_parcelles,1))
 
-kable(t1,
-format="html"
-,format.args = list(decimal.mark = ",", big.mark = " ")
-,booktabs = TRUE) %>%
+t1  %>% 
+  setNames(c("code","groupe de cultures","nombre de parcelles","(%)","surface (ha)","surface (%)","taille moyenne (ha)")) %>% 
+  kable(
+    format="html",
+    caption="<span style='font-size:medium'>Groupes de cultures <strong>locales</strong> par surfaces décroissantes</span>",
+    format.args = list(decimal.mark = ",", big.mark = " "),
+    booktabs = TRUE) %>%
   kable_styling(font_size = 15) %>% 
   gsub("font-size: initial !important;",
        "font-size: 20pt !important;",.)%>%
   kable_styling(bootstrap_options = c("striped", "hover")) %>% 
   row_spec(nrow(t1), bold = T, color = "white", background = "grey")
 
-rm(t1)
+# rm(t1)
 ```
 
-### Comparaison avec la structure départementale et et nationale
+### Comparaison avec la répartition des cultures au niveau départemental et national
 
 ```{r}
 #| label: comparaison structure départementale et nationale 
-#| echo: false
 #| tbl-cap: Structure des cultures 
 
-# jointure spatiale avec la couche commune pour récupérer le département où tombe le point
+# jointure spatiale avec la couche département pour récupérer le département où tombe le point
 
-# ouvrir la couche des communes
-# com <- s3read_using(
-#   FUN = sf::read_sf,
-#   layer = "COMMUNE_2021",
-#   object = "2023/sujet2/diffusion/ign/COMMUNE_2021.gpkg",
-#   bucket = "projet-funathon",
-#   opts = list("region" = "")) %>% clean_names()
+# ouvrir la couche des communes (à convertir en Lambert II epsg 2154)
+dep <- s3read_using(
+    FUN = sf::read_sf,
+    layer = "departement",
+    object = "2023/sujet2/diffusion/ign/adminexpress_cog_simpl_000_2023.gpkg",
+    bucket = "projet-funathon",
+    opts = list("region" = "")) %>% 
+  st_transform(2154)
 
 # jointure
-# df<-point %>% st_join(com) %>% st_drop_geometry() %>% select(insee_dep) 
-# dep_pt<-df[1,1]
-# rm(df)
+df<-point %>% st_join(dep) %>% st_drop_geometry() %>% select(insee_dep)
+dep_pt<-df[1,1]
+rm(df)
 
 # sinon sélection du département regroupant la plus grande surface agricole
 # cas où le cercle recouvre plusieurs départements
-df<-parc_prox %>% st_drop_geometry() %>% 
-  count(insee_dep,wt=surf_parc) %>% 
-  arrange(desc(n))
-dep_pt<-df[1,1]
-rm(df)
+# df<-parc_prox %>% st_drop_geometry() %>% 
+#   count(insee_dep,wt=surf_parc) %>% 
+#   arrange(desc(n))
+# dep_pt<-df[1,1]
+# rm(df)
 
 # calcul des % surfaces autour du point
 stat_pt <- parc_prox %>% st_drop_geometry() %>% 
@@ -251,36 +337,106 @@ stat_fm<-s3read_using(
  select(code_group,libelle_groupe_culture,pct_surf) %>% 
   rename(pct_surf_fm = pct_surf)
 
-stat_comp<-stat_fm %>% 
+# appariement des stas locales, départementales, nationales
+stat_compar<-stat_fm %>% 
   left_join(stat_dep_pt %>% select(code_group, pct_surf_dep),by="code_group") %>% 
   left_join(stat_pt,by="code_group") %>% 
   select(libelle_groupe_culture,pct_surf_local,pct_surf_dep,pct_surf_fm) %>% 
   arrange(desc(pct_surf_local)) %>% adorn_totals() 
 
-kable(stat_comp)
+stat_compar %>% 
+  setNames(c("Groupe de cultures","surf. locales (%)","surf. départ. (%)","surf. France m. (%)")) %>% kable(
+    format="html",
+    caption="<span style='font-size:medium'>Comparaison des surfaces locales, départemenales et nationales</span>",
+    format.args = list(decimal.mark = ",", big.mark = " "),
+    booktabs = TRUE) %>%
+  kable_styling(font_size = 15) %>% 
+  gsub("font-size: initial !important;",
+       "font-size: 20pt !important;",.)%>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  row_spec(nrow(stat_compar), bold = T, color = "white", background = "grey")
+
 ```
 
-### Graphique
+### Graphique de comparaison des cultures au niveau local, départemental et national
 
 ```{r}
 #| label: faire un graphique comparant les structures
-#| echo: false
 #| fig-cap: différences de structure locale, departementale, nationale  
 
-tab<-stat_comp %>% filter(libelle_groupe_culture!="Total") %>% 
+# je sélectionne les 10 groupes de cultures les plus répandus au niveau local 
+tab<-stat_compar %>% filter(libelle_groupe_culture!="Total") %>% slice_head(n=10) %>% 
   rename(local=pct_surf_local, departement=pct_surf_dep, france=pct_surf_fm)
-tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) 
+
+# je transpose la table pour rassembler toutes les valeurs dans une seule variable value (ggplot oblige)
+tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur=name) 
+
+# je mets à 0 les valeurs manquantes
 #tab_piv<-tab_piv %>% coalesce(value,0L)  
 tab_piv[is.na(tab_piv)] <- 0
 
 
-p<-ggplot(tab_piv, 
-          aes(x = reorder(libelle_groupe_culture,+value), y = value, fill=name)) + geom_col(position = "dodge") +
-  labs(title="Surface par culture", x="Culture", y = "%")+
+# levels(as.factor(tab_piv$secteur))
+# je réordonne les secteurs dans le "bon" ordre, avec factor  
+tab_piv$secteur<-factor(tab_piv$secteur,levels=c("france","departement","local"))
+tab_piv<-tab_piv %>% arrange(desc(secteur), desc(value))
+
+# je réordonne les cultures par surface décroissante au niveau local, avec factor
+x <- tab_piv %>% filter(secteur == "local") %>% arrange(value) %>% select(libelle_groupe_culture)
+y <- pull(x, libelle_groupe_culture)
+
+tab_piv$libelle_groupe_culture <- factor(tab_piv$libelle_groupe_culture, levels = y)
+
+# ggplot => problème de tri : affichage des prairies avant le maïs ?    
+p<-ggplot(tab_piv, aes(x =libelle_groupe_culture,
+                       y = value, 
+                       fill=factor(secteur, levels=c("france","departement","local")))) + 
+  geom_col(position = "dodge") +
+  labs(title="Surfaces comparées des 10 principales cultures locales, en %", x="Culture", y = "%", fill = "Secteur") +
   theme_classic()
 
+# je flippe le graphique pour avoir des barres horizontales  
 p+coord_flip()
 ```
+
+### Je teste un graphique par secteur avec facet_wrap
+
+```{r}
+#| label: faire un graphique facet_wrap 
+#| fig-cap: différences de structure locale, departementale, nationale  
+
+# je sélectionne les 10 groupes de cultures les plus répandus au niveau local 
+tab<-stat_compar %>% filter(libelle_groupe_culture!="Total") %>% slice_head(n=10) %>% 
+  rename(local=pct_surf_local, departement=pct_surf_dep, france=pct_surf_fm)
+
+# je transpose la table pour rassembler toutes les valeurs dans une seule variable value (ggplot oblige)
+tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur=name) 
+
+# je mets à 0 les valeurs manquantes
+#tab_piv<-tab_piv %>% coalesce(value,0L)  
+tab_piv[is.na(tab_piv)] <- 0
+
+# je réordonne les secteurs dans le "bon" ordre, avec factor  
+tab_piv$secteur<-factor(tab_piv$secteur,levels=c("local","departement","france"))
+
+# je réordonne les cultures par surface décroissante au niveau local, avec factor
+x <- tab_piv %>% filter(secteur == "local") %>% arrange(value) %>% select(libelle_groupe_culture)
+y <- pull(x, libelle_groupe_culture)
+
+tab_piv$libelle_groupe_culture <- factor(tab_piv$libelle_groupe_culture, levels = y)
+
+# ggplot => problème de tri : affichage des prairies avant le maïs ?    
+ggplot(tab_piv, aes(x = libelle_groupe_culture, 
+                       y = value)) + 
+  geom_col(fill = "lightblue", colour = "black",position = "dodge") +
+  labs(title="Surface par culture", x="Culture", y = "%", fill = "Secteur") +
+  geom_text(aes(label = value), hjust = -0.3, size = 8/.pt, colour = "black") +
+  theme_classic() + coord_flip() + 
+  facet_wrap(~secteur,nrow=3,scales='free')
+```
+
+### Pour aller plus loin, comparer la taille moyenne des parcelles selon les secteurs
+
 
 ## Création d'un dashboard de visualisation
 
@@ -288,16 +444,15 @@ On souhaiterait intégrer les analyses faites ci-dessus à un tableau de bord qu
 
 Une application `Shiny` simple a deux composants principaux :
 
-- Un objet d'interface utilisateur (UI) qui contrôle la disposition et l'apparence du tableau de bord ;
-- Une fonction serveur qui contient les instructions nécessaires au fonctionnement de l'application.
+-   Un objet d'interface utilisateur (UI) qui contrôle la disposition et l'apparence du tableau de bord ;
+-   Une fonction serveur qui contient les instructions nécessaires au fonctionnement de l'application.
 
 Lorsque ces deux composants sont définis, l'application est lancée à l'aide d'une simple instruction `runApp`. Ici, on aimerait bien aller vers une première version de tableau de bord, qui afficherait au départ une carte interactive et laisserait aussi à l'utilisateur de choisir un rayon. Une fois ce rayon choisi et un point sélectionné grâce à un clic sur la carte, on souhaiterait (comme affiché ci-dessous) :
 
-- Afficher sur la carte les parcelles se situant à une distance inférieure au rayon choisi du point spécifié ;
-- Afficher des statistiques sur les parcelles en questions. 
+-   Afficher sur la carte les parcelles se situant à une distance inférieure au rayon choisi du point spécifié ;
+-   Afficher des statistiques sur les parcelles en questions.
 
-![Shiny screenshot](img/shiny_screenshot.png)
-Ainsi notre UI sera un objet [`fluidPage`](https://shiny.posit.co/r/reference/shiny/1.3.1/fluidpage) composé de trois éléments, et dans la fonction de serveur il y aura deux évènements distincts à [observer](https://shiny.posit.co/r/reference/shiny/1.0.1/observeevent). Pour développer l'application, créez un répertoire `my_app` et à l'intérieur 3 fichiers, un fichier `ui.R`, un fichier `server.R` et un fichier `utils.R` (dans lequel se trouveront les fonctions utilitaires).
+![Shiny screenshot](img/shiny_screenshot.png) Ainsi notre UI sera un objet [`fluidPage`](https://shiny.posit.co/r/reference/shiny/1.3.1/fluidpage) composé de trois éléments, et dans la fonction de serveur il y aura deux évènements distincts à [observer](https://shiny.posit.co/r/reference/shiny/1.0.1/observeevent). Pour développer l'application, créez un répertoire `my_app` et à l'intérieur 3 fichiers, un fichier `ui.R`, un fichier `server.R` et un fichier `utils.R` (dans lequel se trouveront les fonctions utilitaires).
 
 ## UI
 
@@ -329,10 +484,10 @@ ui <- fluidPage(
 
 Le code de la fonction serveur figure ci-dessous dans son intégralité, et l'objectif de cette partie va être d'implémenter dans `utils.R` les différentes fonctions appelées dans le code :
 
-- `connect_to_db` : une fonction qui renvoie une connexion à la base de données ;
-- `query_db` : une fonction qui interroge la base de données pour récupérer les parcelles se situant à l'intérieur d'un cercle de rayon `radius` d'un point défini par une latitude et une longitude ;
-- `plot_surroundings` : une fonction qui prend en entrée la sortie de la fonction `query_db` et une carte `leaflet` et qui ajoute une couche comportant les polygones des parcelles concernées ;
-- `compute_stats` : une fonction qui prend en entrée la sortie de la fonction `query_db` et renvoie des statistiques sur les parcelles concernées.
+-   `connect_to_db` : une fonction qui renvoie une connexion à la base de données ;
+-   `query_db` : une fonction qui interroge la base de données pour récupérer les parcelles se situant à l'intérieur d'un cercle de rayon `radius` d'un point défini par une latitude et une longitude ;
+-   `plot_surroundings` : une fonction qui prend en entrée la sortie de la fonction `query_db` et une carte `leaflet` et qui ajoute une couche comportant les polygones des parcelles concernées ;
+-   `compute_stats` : une fonction qui prend en entrée la sortie de la fonction `query_db` et renvoie des statistiques sur les parcelles concernées.
 
 ```{r}
 library(shiny)
@@ -452,10 +607,10 @@ query_db <- function(cnx, lat, lng, radius) {
 
 On pourra notamment utiliser plusieurs fonctions PostGIS :
 
-- [`ST_MakePoint`](https://postgis.net/docs/ST_MakePoint.html) qui permet de créer une géométrie POINT;
-- [`ST_SetSRID`](https://postgis.net/docs/ST_SetSRID.html) qui permet de définir le système de coordonnées pour une géométrie;
-- [`ST_Buffer`](https://postgis.net/docs/ST_Buffer.html) qui calcule un POLYGON ou un MULTIPOLYGON qui représente tous les points dont la distance par rapport à une géométrie/géographie est inférieure ou égale à une distance donnée;
-- [`ST_Intersects`](https://postgis.net/docs/ST_Intersects.html) qui compare deux géométries et renvoie `true` si elles ont une intersection non-nulle;
+-   [`ST_MakePoint`](https://postgis.net/docs/ST_MakePoint.html) qui permet de créer une géométrie POINT;
+-   [`ST_SetSRID`](https://postgis.net/docs/ST_SetSRID.html) qui permet de définir le système de coordonnées pour une géométrie;
+-   [`ST_Buffer`](https://postgis.net/docs/ST_Buffer.html) qui calcule un POLYGON ou un MULTIPOLYGON qui représente tous les points dont la distance par rapport à une géométrie/géographie est inférieure ou égale à une distance donnée;
+-   [`ST_Intersects`](https://postgis.net/docs/ST_Intersects.html) qui compare deux géométries et renvoie `true` si elles ont une intersection non-nulle;
 
 ainsi que des fonction de la librairie `sf`.
 
