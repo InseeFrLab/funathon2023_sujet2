@@ -1,4 +1,11 @@
-# References {.unnumbered}
+---
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+    out.width: 100%
+---
+
+# Références {.unnumbered}
 
 ::: {#refs}
 :::

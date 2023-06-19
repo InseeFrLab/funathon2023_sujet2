@@ -33,6 +33,7 @@ language:
   title-block-published: ""
 
 bibliography: bibliography.bib
+csl: MD.csl
 
 format:
   html:

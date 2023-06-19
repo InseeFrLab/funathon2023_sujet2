@@ -12,6 +12,8 @@ Avec ce sujet, vous allez pouvoir :
 - Utiliser le lissage spatial pour synthétiser des données géographiques avec `btb`;
 - Estimer des tendances avec un modèle linéaire.
 
+Pour traiter le sujet, commencez par restaurer les packages à utiliser avec `renv::restore()` (~10 min). Bien sûr si vous avez besoin de packages supplémentaires à un moment donné, n'hésitez pas à les installer !
+
 ### Les données utilisées {.unnumbered}
 
 Ce sujet propose de manipuler :

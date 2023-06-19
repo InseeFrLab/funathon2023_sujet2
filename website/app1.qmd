@@ -493,45 +493,45 @@ library(shiny)
 library(leaflet)
 
 
-# Define server
+# Définition du serveur
 server <- function(input, output) {
   
-  # Render the map
+  # Rendre la carte
   output$map <- renderLeaflet({
     leaflet() %>%
       addTiles("http://wxs.ign.fr/essentiels/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}") %>%
       setView(lng = -1.4932577154775046, lat = 46.46946179131805, zoom = 12)
   })
   
-  # Connect to database
+  # Connexion à la base de données
   cnx <- connect_to_db()
   
-  # Initialize a reactive value for storing the selected point
+  # Initialisation d'une "reactive value" pour le point sélectionné
   selectedPoint <- reactiveValues(lat = NULL, lng = NULL)
   
-  # Handle click event on the map
+  # Gestion de l'évènement "clic"
   observeEvent(input$map_click, {
     
     clickData <- input$map_click
     if (!is.null(clickData)) {
-      # Store selected point
+      # Stockage des coordonnées du point
       selectedPoint$lat <- clickData$lat
       selectedPoint$lng <- clickData$lng
       
       buffer_radius <- input$buffer_radius
       sf <- query_db(cnx, selectedPoint$lat, selectedPoint$lng, buffer_radius)
 
-      # Update the map with the marker at the selected point
+      # Mise à jour de la carte
       leafletProxy("map") %>%
         clearMarkers() %>%
         clearShapes() %>%
         addMarkers(lng = selectedPoint$lng, lat = selectedPoint$lat) %>%
         plot_surroundings(sf)
       
-      # Computations on queried data
+      # Calculs sur les données de parcelles
       df <- compute_stats(sf)
       
-      # Update rendered table
+      # Update de la table affichée
       output$table <- renderTable({
         df
       })
@@ -539,21 +539,21 @@ server <- function(input, output) {
   })
   
   observeEvent(input$buffer_radius, {
-    # Check if a point has been selected
+    # Vérification qu'un point a été sélectionné
     if (!is.null(selectedPoint$lat) && !is.null(selectedPoint$lng)) {
-      # Perform computations based on the selected point and new radius
+      # Requête avec le nouveau rayon
       buffer_radius <- input$buffer_radius
       sf <- query_db(cnx, selectedPoint$lat, selectedPoint$lng, buffer_radius)
       
-      # Update the map with the new polygons
+      # Mise à jour de la carte
       leafletProxy("map") %>%
         clearShapes() %>%
         plot_surroundings(sf)
       
-      # Computations on queried data
+      # Calculs sur les données de parcelles
       df <- compute_stats(sf)
       
-      # Update rendered table
+      # Update de la table affichée
       output$table <- renderTable({
         df
       })
@@ -779,6 +779,7 @@ La fonction `plot_surroundings` prend en entrée une carte `leaflet` ainsi qu'un
 ```{r}
 #| label: plot-fun-a
 #| eval: false
+#| code-fold: false
 
 # Création d'une palette de couleurs associée au groupe de culture
 pal <- brewer.pal(12, "Paired")
