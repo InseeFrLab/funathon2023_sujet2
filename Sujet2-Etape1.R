@@ -9,13 +9,30 @@
 # description       : Sélectionner les parcelles autour d'un point puis comparer les cultures / département - métropole   
 # références         : https://github.com/InseeFrLab/funathon2023_sujet2 
 
+Sys.setenv("PASS_POSTGRESQL"="1tfawt3nj7fgzo3w7cma")
+
+shiny::runApp("app")
+
 library(tidyverse); 
 library(aws.s3)
 library(sf)
 library(RPostgreSQL)
+library(shiny)
 
 renv::restore()
 
+install.packages("aws.s3", repos = "https://cloud.R-project.org")
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "J22M2WX5LUZVCH4VURED",
+           "AWS_SECRET_ACCESS_KEY" = "evIq8KQpeShehOH3uV3Y8sbGo6TPlRCIBJw1LXqQ",
+           "AWS_DEFAULT_REGION" = "us-east-1",
+           "AWS_SESSION_TOKEN" = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJKMjJNMldYNUxVWlZDSDRWVVJFRCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNjg2NzI2NTUyLCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImJlcnRyYW5kLmJhbGxldEBhZ3JpY3VsdHVyZS5nb3V2LmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTY4NjgyOTA0MSwiZmFtaWx5X25hbWUiOiJCQUxMRVQiLCJnaXZlbl9uYW1lIjoiQmVydHJhbmQiLCJncm91cHMiOlsiZnVuYXRob24iXSwiaWF0IjoxNjg2NzI2NTUzLCJpc3MiOiJodHRwczovL2F1dGgubGFiLnNzcGNsb3VkLmZyL2F1dGgvcmVhbG1zL3NzcGNsb3VkIiwianRpIjoiYjliMmY0MzMtODU3NS00YTY4LTk2MzktOGYyMTE4MTQ3ZjZjIiwibmFtZSI6IkJlcnRyYW5kIEJBTExFVCIsIm5vbmNlIjoiYjQyMTc0YWUtN2I5MS00YTM2LTgyZDAtNzM4MTYzMmVmNjlmIiwicG9saWN5Ijoic3Rzb25seSIsInByZWZlcnJlZF91c2VybmFtZSI6ImJiYWxsZXQiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2Vzc2lvblBvbGljeSI6ImV5SldaWEp6YVc5dUlqb2lNakF4TWkweE1DMHhOeUlzSWxOMFlYUmxiV1Z1ZENJNlczc2lSV1ptWldOMElqb2lRV3hzYjNjaUxDSkJZM1JwYjI0aU9sc2ljek02S2lKZExDSlNaWE52ZFhKalpTSTZXeUpoY200NllYZHpPbk16T2pvNmNISnZhbVYwTFdaMWJtRjBhRzl1SWl3aVlYSnVPbUYzY3pwek16bzZPbkJ5YjJwbGRDMW1kVzVoZEdodmJpOHFJbDE5TEhzaVJXWm1aV04wSWpvaVFXeHNiM2NpTENKQlkzUnBiMjRpT2xzaWN6TTZUR2x6ZEVKMVkydGxkQ0pkTENKU1pYTnZkWEpqWlNJNld5SmhjbTQ2WVhkek9uTXpPam82S2lKZExDSkRiMjVrYVhScGIyNGlPbnNpVTNSeWFXNW5UR2xyWlNJNmV5SnpNenB3Y21WbWFYZ2lPaUprYVdabWRYTnBiMjR2S2lKOWZYMHNleUpGWm1abFkzUWlPaUpCYkd4dmR5SXNJa0ZqZEdsdmJpSTZXeUp6TXpwSFpYUlBZbXBsWTNRaVhTd2lVbVZ6YjNWeVkyVWlPbHNpWVhKdU9tRjNjenB6TXpvNk9pb3ZaR2xtWm5WemFXOXVMeW9pWFgxZGZRPT0iLCJzZXNzaW9uX3N0YXRlIjoiZmFhZjNlMDQtZDAxMS00OWEwLWE1ZmQtMzIyNjFjYzY3ZThkIiwic2lkIjoiZmFhZjNlMDQtZDAxMS00OWEwLWE1ZmQtMzIyNjFjYzY3ZThkIiwic3ViIjoiNGQ1N2NlN2QtOWNhYS00MDk4LWFjNDktNzY0MjAyYzJhN2I5IiwidHlwIjoiQmVhcmVyIn0.-3cSSboFOX2oXpaN73POdZj8uLHIvkYjPBttgnIhnNOFQDJc1aDfRusPBWCO_toMS5eMPM3J8DiKMOuLht8ddg",
+           "AWS_S3_ENDPOINT"= "minio.lab.sspcloud.fr")
+
+library("aws.s3")
+bucketlist(region="")
+library("aws.s3")
+bucketlist(region="")
 # library(janitor);
 # library(ggplot2)
 # library(cowplot)
@@ -28,7 +45,7 @@ renv::restore()
 
 # données -----------------------------------------------------------------
 
-aws.s3::get_bucket("projet-funathon", region = "",  prefix = "2023/diffusion/sujet2/ign/rpg")
+aws.s3::get_bucket("projet-funathon", region = "",prefix = "2023/sujet2/diffusion/ign/rpg")
 
 # 1 - Créer une table avec un point en récupérant les coordonnées GPS --------
 
@@ -119,6 +136,11 @@ cult_agreg<-s3read_using(FUN = read_csv,
   
 
 parc_prox <- parc_prox %>% left_join(cult_agreg,by=c("code_cultu"="code_culture"))
+
+s3saveRDS(parc_prox, 
+          bucket = "projet-funathon", 
+          object = "/2023/sujet2/diffusion/resultats/parc_prox.rds", 
+          opts = list("region" = ""))
 
 
 # 5 - lecture des libelles des groupes de culture --------------------------------------

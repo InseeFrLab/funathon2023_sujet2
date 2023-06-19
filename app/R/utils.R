@@ -39,7 +39,7 @@ connect_to_db <- function() {
   cnx <- dbConnect(Postgres(),
                    user = "projet-funathon",
                    password = Sys.getenv("PASS_POSTGRESQL"),
-                   host = "postgresql-438832",
+                   host = "postgresql-758156",
                    dbname = "defaultdb",
                    port = 5432,
                    check_interrupts = TRUE)
@@ -111,7 +111,7 @@ plot_surroundings <- function(leaflet_proxy, sf) {
                     sf$insee_dep,
                     sf$nom_com) %>%
     lapply(htmltools::HTML)
-  
+
   return(
     leaflet_proxy %>%
     addPolygons(
