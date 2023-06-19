@@ -86,13 +86,15 @@ Peut-on voir comment a évolué la date de récolte théorique d'une culture au 
 
 # Préparation
 
-Restaurer les packages à utiliser : `renv::restore()`.
+Ouvrir le projet RStudio *website/physio_era5.qmd*.
 
-Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO :
+Restaurer les packages à utiliser : `renv::restore()` (11 min).
+
+Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO :
 
 `$ mc cp -r s3/projet-funathon/2023/sujet2/diffusion/era5/ funathon2023_sujet2/data/era5/`
 
-Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme variable d'environnement par exemple en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et relancer la session (ctrl+maj+F10).
+Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme variable d'environnement par exemple en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et relancer la session (ctrl+maj+F10).
 
 ```{r}
 #| label: setup
@@ -124,7 +126,7 @@ options(knitr.kable.NA = "",
 cnx <- dbConnect(Postgres(),
                  user = "projet-funathon",
                  password = Sys.getenv("PASS_POSTGRESQL"),
-                 host = "postgresql-438832",
+                 host = "postgresql-758156",
                  dbname = "defaultdb",
                  port = 5432,
                  check_interrupts = TRUE)
@@ -463,7 +465,7 @@ recolte <- temp_points %>%
   filter(sdj > besoin) %>% 
   slice_min(date) %>% 
   ungroup() %>% 
-  select(date, annee, nom)
+  select(date, annee, doy, nom)
 ```
 
 ```{r}
