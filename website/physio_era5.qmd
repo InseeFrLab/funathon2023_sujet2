@@ -47,7 +47,7 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
     Les données 2021 (environ 10 millions de parcelles) sont disponibles dans une base [PostgreSQL](https://www.postgresql.org/)/[PostGIS](http://postgis.net/).
 
 -   [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques ([ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land)).
-Il fournit des paramètres agro-météorologiques de surface quotidiens sur les quarante dernières années à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France métropolitaine).
+    Il fournit des paramètres agro-météorologiques de surface quotidiens sur les quarante dernières années à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France métropolitaine).
 
     Les données de température moyenne journalière 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
 
@@ -94,8 +94,7 @@ rep_era5 <- "data/era5"
 # pour avoir les noms de dates en français
 invisible(Sys.setlocale("LC_ALL", "fr_FR.UTF-8"))
 
-options(knitr.kable.NA = "",
-        OutDec = ",",
+options(OutDec = ",",
         scipen = 999)
 
 # Connexion à la base PostgreSQL
