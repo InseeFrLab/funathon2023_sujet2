@@ -9,11 +9,23 @@ knitr:
     out.width: 100%
 ---
 
-Les organismes vivants, dont les plantes, ont besoin d'une certaine quantité de chaleur pour se développer. La notion de *degrés jours* a été introduite par les biologistes pour quantifier ce besoin physiologique. Il s'exprime par la somme des différences entre la température moyenne journalière et une température de base[^1].
+Les organismes vivants, dont les plantes, ont besoin d'une certaine quantité de chaleur pour se développer. 
+La notion de *degrés jours* a été introduite par les biologistes pour quantifier ce besoin physiologique. 
+Il s'exprime par la somme des différences entre la température moyenne journalière et une température de base[^1].
 
 [^1]: [Degré jour de croissance](https://fr.wikipedia.org/wiki/Degr%C3%A9_jour_de_croissance) sur *Wikipedia*
 
-Peut-on voir comment a évolué la date de récolte théorique d'une culture au cours des 40 dernières années ?
+*Peut-on voir comment a évolué la date de récolte théorique d'une culture au cours des 40 dernières années ?*
+
+Des données anciennes existent pour certaines cultures, par exemple pour la vigne et [les dates de vendanges](https://fr.wikipedia.org/wiki/Vendange#%C3%89chelles_d%C3%A9cennales), mais pour la plupart il n'y a pas de jeu de données rétrospectif consolidé. Nous allons essayer de combler cette lacune...
+
+::: {#fig-vendanges}
+
+![Delorme, CC BY-SA 4.0, via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:%C3%89volution_des_dates_de_vendanges_en_France_(1892-2014).svg)](img/evol_dates_vendanges.png)
+
+Évolution des dates de vendanges en France (1892-2014)
+
+:::
 
 ## Proposition
 
@@ -25,6 +37,7 @@ Peut-on voir comment a évolué la date de récolte théorique d'une culture au 
 -   Manipulation de données SIG : vecteurs et rasters avec les packages {sf}, {terra}, {stars}.
 -   Requêtes SQL simples sur PostGIS avec {RPostgres} et {sf}.
 -   Utiliser le lissage spatial pour synthétiser les données géographiques avec {btb}.
+-   Carte web interactive avec {leaflet}.
 -   Estimer et visualiser des tendances : modèle linéaire simple et {ggplot2}.
 
 ### Données utilisées
@@ -33,15 +46,18 @@ Peut-on voir comment a évolué la date de récolte théorique d'une culture au 
 
     Les données 2021 (environ 10 millions de parcelles) sont disponibles dans une base PostgreSQL/[PostGIS](http://postgis.net/).
 
--   [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques ([ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land)). Il fournit des paramètres agro-météorologiques de surface quotidiens sur les quarante dernières années à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France métropolitaine).
+-   [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques ([ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land)).
+Il fournit des paramètres agro-météorologiques de surface quotidiens sur les quarante dernières années à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France métropolitaine).
 
     Les données de température moyenne journalière 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
 
-    Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools). Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/).
+    Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). 
+    Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools). 
+    Les données peuvent aussi être traitées avec les packages de manipulation de rasters tels que [{terra}](https://rspatial.org/spatial/index.html) (ou {raster}) et [{stars}](https://r-spatial.github.io/stars/).
 
 ## Préparation
 
-Ouvrir le projet RStudio *website/physio_era5.qmd*.
+Ouvrir le projet RStudio *funathon2023_sujet2.Rproj*.
 
 Restaurer les packages à utiliser : `renv::restore()` (11 min).
 
@@ -53,7 +69,6 @@ Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de pa
 
 ```{r}
 #| label: setup
-#| echo: true
 #| code-fold: show
 
 library(stars) # manipulation de rasters
@@ -89,13 +104,60 @@ cnx <- dbConnect(Postgres(),
 
 ## Définition des bassins de production du maïs grain
 
-Le maïs grain (code culture : `MIS`) représente, avec une surface de 1,5·10^6^ ha, la moitié du maïs cultivé[^2] en France en 2021, soit environ 6 % des surfaces déclarées à la PAC. Il est utilisé pour l'alimentation animale (essentiellement) et humaine, la transformation en amidon, les agrocarburants...
+Le maïs grain (code culture : `MIS`) représente, avec une surface de 1,5·10^6^ ha, la moitié du maïs cultivé[^2] en France en 2021, soit environ 6 % des surfaces déclarées à la PAC. 
+Il est utilisé pour l'alimentation animale (essentiellement) et humaine, la transformation en amidon, les agrocarburants...
 
 [^2]: Les autres cultures étant le maïs ensilage (1,3·10^6^ ha, broyé et fermenté) destiné à nourrir le bétail et le maïs doux (23 000 ha) pour l'alimentation humaine.
 
 Pour déterminer les aires principales de culture on peut, par exemple, extraire les principales zones où la densité de culture du maïs grain est la plus forte. Cela peut se faire par commune, par clustering ou avec un lissage[voir chapitre 8 @loonisManuelAnalyseSpatiale2018].
 
-On présente ici un exemple avec un lissage filtré.
+On présente ici un exemple avec un lissage filtré mais vous êtes libre d'utiliser une autre méthode pour déterminer ces aires principales, l'objectif étant d'obtenir une dizaine de points représentatifs sur le territoire à partir desquels nous extraierons les données de température.
+
+### Récupération des données
+
+- La table `rpg.parcelles` contient les polygones des parcelles ; le lissage attend un point par parcelle. 
+  Il faut donc récupérer une table de points.
+- La table `adminexpress.region` contient les limites des régions. Le lissage nécessitera le contour de la France (métropolitaine) pour "fermer" la zone d'étude.
+  Il faudra donc fusionner les régions.
+- La table `adminexpress.commune` contient les poygones des communes et pourra nous permettre de nommer nos zones en identifiant la commune la plus peuplée de la zone.
+
+NB : pour le lissage, il est recommandé d'utiliser une projection dite "équivalente" (conservant les surfaces), par exemple en France la [LAEA](https://fr.wikipedia.org/wiki/Projection_azimutale_%C3%A9quivalente_de_Lambert) [EPSG:3035](https://epsg.io/3035).
+
+```{r}
+#| label: lissage-donnees
+#| cache: true
+
+# contour de la métropole (pour limiter le lissage à l'intérieur des frontières)
+fr <- read_sf(cnx, query = "
+  SELECT 
+    st_union(st_transform(geom, 3035)) as geom
+  FROM adminexpress.region
+  WHERE insee_reg > '06'")
+
+# communes (pour donner ultérieurement un nom à nos bassins de production)
+com <- read_sf(cnx, query = "
+  SELECT 
+    nom,
+    insee_dep,
+    population,
+    st_transform(geom, 3035) as geom
+  FROM adminexpress.commune
+  WHERE insee_reg > '06'")
+
+# un point par parcelle de maïs avec sa surface qui servira de poids au lissage
+mais <- read_sf(cnx, query = "
+  SELECT 
+    st_transform(st_pointonsurface(geom), 3035) as geom,
+    surf_parc
+  FROM rpg.parcelles
+  WHERE code_cultu = 'MIS'")
+```
+
+### Lissage
+
+la fonction [`btb::btb_smooth()`](https://cran.r-project.org/package=btb) attend une table (data.frame) de coordonnées et contenant la variable à lisser, une valeur de bande passante (dans la projection utilisée, donc en mètres dans notre cas) ; on peut optionnellement fournir une grille régulière (data.frame) pour faciliter les comparaisons de jeux de données (s'assurer qu'ils ont les mêmes emprises et résolutions) et border la zone d'étude.
+
+En retour nous obtiendrons un data.frame ; il peut être plus intéressant de rasteriser le résultat.
 
 ```{r}
 #| label: lissage-fonctions
@@ -252,38 +314,6 @@ lissage <- function(df, field, bandwidth, resolution, zone = NULL, out_crs = 303
 ```
 
 ```{r}
-#| label: lissage-donnees
-#| cache: true
-
-# Utilisation d'une projection dite "équivalente" (conservant les surfaces), la LAEA EPSG:3035.
-
-# contour de la métropole (pour limiter le lissage à l'intérieur des frontières)
-fr <- read_sf(cnx, query = "
-  SELECT 
-    st_union(st_transform(geom, 3035)) as geom
-  FROM adminexpress.region
-  WHERE insee_reg > '06'")
-
-# communes (pour donner ultérieurement un nom à nos bassins de production)
-com <- read_sf(cnx, query = "
-  SELECT 
-    nom,
-    insee_dep,
-    population,
-    st_transform(geom, 3035) as geom
-  FROM adminexpress.commune
-  WHERE insee_reg > '06'")
-
-# un point par parcelle de maïs avec sa surface qui servira de poids au lissage
-mais <- read_sf(cnx, query = "
-  SELECT 
-    st_transform(st_pointonsurface(geom), 3035) as geom,
-    surf_parc
-  FROM rpg.parcelles
-  WHERE code_cultu = 'MIS'")
-```
-
-```{r}
 #| label: lissage-traitement
 
 # lissage à 10 km de "bande passante" avec un pixel de 1 km
@@ -307,7 +337,7 @@ seuil_lissage <- 8  # seuil de densité à prendre en compte (ha/km²)
 nb_bassins    <- 10 # combien de bassins on conserve
 ```
 
-On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/km² et on conservera les `r nb_bassins` plus grandes zones.
+On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/km² et on conservera les `r nb_bassins` plus grandes zones, que nous nommerons avec le nom de la plus grande ville de la zone.
 
 ```{r}
 #| label: fig-lissage-carte-filtree
@@ -315,6 +345,15 @@ On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/k
 
 plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2021 (> {seuil_lissage} ha/km²)"))
 ```
+
+- Filtrer le raster
+- Le vectoriser en polygones
+- Calculer les surfaces
+- Conserver les plus grands polygones
+- Faire une jointure spatiales avec les points des communes
+- Déterminer la plus grande commune de chaque polygone et le nommer
+
+NB : Le centroïde d'un polygone tarabiscoté peut se trouver en dehors du polygone ; on utilise `st_point_on_surface()` plutôt que `st_centroid()` pour garantir qu'il est bien dans le polygone.
 
 ```{r}
 #| label: clusters
@@ -338,6 +377,8 @@ noms <- cluster_liss %>%
   select(id, nom, insee_dep)
 ```
 
+La couche résultante peut-être affichée sur une carte interactive avec [{leaflet}](https://rstudio.github.io/leaflet/).
+
 ```{r}
 #| label: fig-clusters-carto
 #| fig-cap: !expr 'glue("Les {nb_bassins} bassins de production retenus")'
@@ -352,9 +393,9 @@ cluster_liss %>%
 
 ## Extraction des températures à chaque point
 
-Pour chaque bassin de production, on peut rechercher un point représentatif et récupérer les données de température journalières pour tous ces points.
+Pour chaque bassin de production, on va rechercher un point représentatif et récupérer les données de température journalières pour tous ces points.
 
-NB : Le centroïde d'un polygone tarabiscoté peut se trouver en dehors du polygone ; on utilise `st_point_on_surface()` plutôt que `st_centroid()` pour garantir qu'il est bien dans le polygone.
+Le package [{stars}](https://r-spatial.github.io/stars/) est bien adapté à la manipulation des données spatio-temporelles.
 
 ```{r}
 #| label: donnees-climat
@@ -391,16 +432,21 @@ Le maïs a une température de base de 6 °C et il lui faut 1700 DJ (variable 
 
 [^4]: [Céré'Obs. *FranceAgrimer*](https://cereobs.franceagrimer.fr/cereobs-sp/assets/pdfjs/web/viewer.html?file=blob:https://cereobs.franceagrimer.fr/f05c19c6-aff4-4701-9af4-80fdef7118d3)
 
-On considère que la température moyenne journalière ERA5 correspond à $\frac{T_{max} - T_{min}}{2}$.
+On considère que la température moyenne journalière ERA5 correspond bien à $\frac{T_{max} - T_{min}}{2}$.
+
+NB : la date n'est pas un bon indicateur pour suivre précisémment une évolution journalière à cause des années bissextiles. Par exemple le 1er avril ne correspondra pas toujours au même nombre de jours dans l'avancement de la saison de végétation :
+
+```{r}
+#| label: exemple-doy
+#| code-fold: show
+yday(ymd("2020-04-01"))
+yday(ymd("2023-04-01"))
+```
+
+Cela peut-être important si on recherche des tendances qui sont de l'ordre de grandeur du jour. On utilisera donc le jour de l'année (*day of year* ou *doy*).
 
 ```{r}
 #| label: calcul-degres-jours
-
-# la date n'est pas un bon indicateur pour suivre précisémment une évolution 
-# journalière à cause des années bissextiles. Ex :
-# yday(ymd("2020-04-01"))
-# yday(ymd("2023-04-01"))
-#   -> on utilisera le day of year (doy)
 
 # base de calcul pour maïs : 6 °C
 base <- 6 # °C
