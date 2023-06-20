@@ -568,6 +568,7 @@ Au cours des quatre dernières décennies, la date de récolte potentielle moyen
 #| label: tbl-tendance
 #| tbl-cap: !expr "glue('Évolution de la date de récolte : environ {evol} jour par an')"
 
+set_gtsummary_theme(list("pkgwide-str:ci.sep" = " – "))
 theme_gtsummary_language("fr")
 
 mod_simple %>% 
