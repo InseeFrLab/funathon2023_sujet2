@@ -35,7 +35,7 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
 
 -   Utiliser le **langage R**.
 -   Manipuler des **données géographiques** : vecteurs et rasters avec les packages {sf}, {terra}, {stars}.
--   Requêter en *SQL sur PostgreSQL/PostGIS* avec {RPostgres} et {sf}.
+-   Requêter en **SQL sur PostgreSQL/PostGIS** avec {RPostgres} et {sf}.
 -   Utiliser le **lissage spatial** pour synthétiser les données géographiques avec {btb}.
 -   Créer une **carte web interactive** avec {leaflet}.
 -   Estimer et visualiser des **tendances** : modèle linéaire simple et {ggplot2}.
