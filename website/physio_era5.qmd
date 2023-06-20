@@ -49,7 +49,7 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
 -   [ERA5 agrometeorological indicators](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators) est un jeu de données issu d'un projet de réanalyse météorologique qui vise à uniformiser et corriger les données historiques ([ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land)).
     Il fournit des paramètres agro-météorologiques de surface quotidiens sur les quarante dernières années à une résolution spatiale de 0,1 ° (soit environ 8×11 km en France métropolitaine).
 
-    Les données de température moyenne journalière 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1.1 Go).
+    Les données de température moyenne journalière 1979-2022 (87 Go à l'origine) ont été préchargées sur Minio et limitées à l'emprise de la métropole, représentant au final 16 000 fichiers de 76 ko = 1,1 Go).
 
     Elles sont au format [NetCDF](https://fr.wikipedia.org/wiki/NetCDF). 
     Un package R existe pour importer et requêter ce jeu de données particulier : [{ag5Tools}](https://github.com/AgrDataSci/ag5Tools). 
@@ -354,12 +354,14 @@ On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/k
 plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2021 (> {seuil_lissage} ha/km²)"))
 ```
 
-- Filtrer le raster ;
-- Vectoriser le raster en polygones ;
-- Calculer les surfaces ;
-- Conserver les plus grands polygones ;
-- Faire une jointure spatiale avec les points des communes ;
-- Déterminer la plus grande commune de chaque polygone et le nommer.
+Suggestions : 
+
+- filtrer le raster ;
+- vectoriser le raster en polygones ;
+- calculer les surfaces ;
+- conserver les plus grands polygones ;
+- faire une jointure spatiale avec les points des communes ;
+- déterminer la plus grande commune de chaque polygone et le nommer.
 
 NB : Le centroïde d'un polygone tarabiscoté peut se trouver en dehors du polygone ; on utilise `st_point_on_surface()` plutôt que `st_centroid()` pour garantir qu'il est bien dans le polygone.
 
