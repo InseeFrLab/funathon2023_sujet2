@@ -573,9 +573,11 @@ mod_simple %>%
   tbl_regression(label = list(annee ~ "année",
                               nom ~ "bassin de production")) %>% 
   as_gt() %>%
-  tab_source_note(source_note = glue("Maïs grain France {min(recolte$annee)}-{max(recolte$annee)} 
-                                      d'après données agroclimatiques ERA5 pour une précocité 
-                                      moyenne ({besoin} DJ, base {base} °C)"))
+  tab_source_note(source_note = glue("Maïs grain France 
+                                      {min(recolte$annee)}-{max(recolte$annee)} 
+                                      d'après données agroclimatiques ERA5 pour 
+                                      une précocité moyenne ({besoin} DJ, base
+                                      {base} °C)"))
 ```
 
 ## Validation
@@ -584,5 +586,5 @@ Des données d'observation ponctuelles permettent de confronter notre modèle à
 
 À Toulouse (proche du bassin de Pau) sur 1977-2003, la "*date de semis passe de début mai à début avril en 20 ans*". [...] "*Cet écart au semis ne se retrouve pas à la récolte (très variable entre la mi-septembre et la mi-octobre), d'une part parce que le choix des semences a glissé vers des variétes un peu plus tardives (...) et/ou d'autre part, parce que le grain récolté est plus sec (« pour tenir compte de l'augmentation du coût de séchage »)*". [...] "*Le cycle de culture a augmenté d'une dizaine de jours depuis 1977 ; il est d'environ 160 jours*".
 
-Ainsi, même si on voit que la variété utilisée a probablement un impact important et que des changements de techniques culturales ont eu lieu, une précocité de semis d'un mois combiné à 10 jours de cultures de plus représente, pour cet exemple, une date de récolte de `r round((-30 + 10) / (2003 - 1977), 1)` jour par an, ce qui n'est pas très éloigné de notre estimation globale.
+Ainsi, même si on voit que la variété utilisée a probablement un impact important et que des changements de techniques culturales ont eu lieu, une précocité de semis d'un mois combinée à 10 jours de culture de plus représente, pour cet exemple, une date de récolte de `r round((-30 + 10) / (2003 - 1977), 1)` jour par an, ce qui n'est pas très éloigné de notre estimation globale.
 
