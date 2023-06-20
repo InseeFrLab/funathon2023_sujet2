@@ -33,12 +33,12 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
 
 ### Compétences mises en œuvre
 
--   Langage R.
--   Manipulation de données SIG : vecteurs et rasters avec les packages {sf}, {terra}, {stars}.
--   Requêtes SQL simples sur PostGIS avec {RPostgres} et {sf}.
--   Utiliser le lissage spatial pour synthétiser les données géographiques avec {btb}.
--   Carte web interactive avec {leaflet}.
--   Estimer et visualiser des tendances : modèle linéaire simple et {ggplot2}.
+-   Utiliser le **langage R**.
+-   Manipuler des **données géographiques** : vecteurs et rasters avec les packages {sf}, {terra}, {stars}.
+-   Requêter en *SQL sur PstgreSQL/PostGIS* avec {RPostgres} et {sf}.
+-   Utiliser le **lissage spatial** pour synthétiser les données géographiques avec {btb}.
+-   Créer une **carte web interactive** avec {leaflet}.
+-   Estimer et visualiser des **tendances** : modèle linéaire simple et {ggplot2}.
 
 ### Données utilisées
 
@@ -60,24 +60,22 @@ Il fournit des paramètres agro-météorologiques de surface quotidiens sur les 
 
 ## Préparation
 
-Si configuré au lancement de la session RStudio, le *pull* de https://github.com/InseeFrLab/funathon2023_sujet2 a dû être fait.
+Le pas-à-pas détaillé est décrit sur [la page de démarrage](app0.html), mais en résumé :
 
-Ouvrir le projet RStudio *funathon2023_sujet2.Rproj*. 
+- Si configuré au lancement de la session RStudio, le *pull* depuis <https://github.com/InseeFrLab/funathon2023_sujet2> a dû être fait.
+- Ouvrir le projet RStudio *funathon2023_sujet2.Rproj*. 
+- Restaurer les packages à utiliser : `renv::restore()` (11 min).
+- Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO :
 
-Restaurer les packages à utiliser : `renv::restore()` (11 min).
-
-Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO :
-
-`$ mc cp -r s3/projet-funathon/2023/sujet2/diffusion/era5/ funathon2023_sujet2/data/era5/`
-
-Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme variable d'environnement par exemple en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et relancer la session (ctrl+maj+F10).
+  `$ mc cp -r s3/projet-funathon/2023/sujet2/diffusion/era5/ funathon2023_sujet2/data/era5/`
+- Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme variable d'environnement par exemple en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et relancer la session (ctrl+maj+F10).
 
 ```{r}
 #| label: setup
 #| code-fold: false
 
-library(stars) # manipulation de rasters
-library(terra) # manipulation de rasters
+library(stars)     # manipulation de rasters
+library(terra)     # manipulation de rasters
 library(tidyverse) # manipulation des données
 library(glue)      # interpolation de chaine de caractères
 library(fs)        # gestion du système de fichier
