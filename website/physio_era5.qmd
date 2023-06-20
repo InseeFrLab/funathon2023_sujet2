@@ -81,13 +81,13 @@ library(terra) # manipulation de rasters
 library(tidyverse) # manipulation des données
 library(glue)      # interpolation de chaine de caractères
 library(fs)        # gestion du système de fichier
-library(gtsummary) # tableaux de modèles stat
 library(RPostgres) # connexion PostgreSQL
 library(sf)        # manipulation de données spatiales vecteur
 library(leaflet)   # carto web
-library(knitr)     # génération du document
+library(gt)        # mise en forme tableaux
+library(gtsummary) # tableaux de modèles stat
 library(ggrepel)   # étiquettage graphiques
-# D'autres packages sont nécessaires mais seront appelés directement avec leur
+# D'autres packages sont à installer et seront appelés directement avec leur
 # namespace : btb, raster, fasterize, rlang, memoise
 
 # localisation des données dans le stockage "local"
@@ -164,7 +164,7 @@ mais <- read_sf(cnx, query = "
 ### Lissage
 
 ```{r}
-#| label: bassins-params
+#| label: lissage-params
 seuil_lissage  <- 8     # seuil de densité à prendre en compte (ha/km²)
 nb_bassins     <- 10    # combien de bassins on conserve
 bande_passante <- 10000 # "étalement" du lissage en m
@@ -435,9 +435,20 @@ temp_points <- era5 %>%
 
 ## Calcul des degrés jour et des dates de récolte
 
+```{r}
+#| label: params-degres-jours
+
+# base de calcul pour maïs : 6 °C
+base <- 6 # °C
+
+# besoin total à récolte pour un maïs grain de précocité moyenne : 1700 DJ
+besoin <- 1700 # DJ
+```
+
+
 $$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{max, j} - T_{min, j}}{2} - T_{base}}$$
 
-Le maïs a une température de base de 6 °C et il lui faut 1700 DJ (variable selon la précocité de la variété) pour être récolté pour le grain[^3]. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^4].
+Le maïs a une température de base de `r base` °C et il lui faut `r besoin` DJ (variable selon la précocité de la variété) pour être récolté pour le grain[^3]. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^4].
 
 [^3]: [*Spotifarm*](https://blog.spotifarm.fr/tour-de-plaine-spotifarm/somme-de-temperature-pourquoi-suivre-levolution-des-degres-jours)
 
@@ -459,12 +470,6 @@ Cela peut-être important si on recherche des tendances qui sont de l'ordre de g
 ```{r}
 #| label: calcul-degres-jours
 
-# base de calcul pour maïs : 6 °C
-base <- 6 # °C
-
-# besoin total à récolte pour un maïs grain de précocité moyenne : 1700 DJ
-besoin <- 1700 # DJ
-
 recolte <- temp_points %>% 
   select(date, nom, temp_moy_c) %>% 
   group_by(nom, annee = year(date)) %>% 
@@ -483,7 +488,7 @@ recolte <- temp_points %>%
 ```{r}
 #| label: tbl-resultats
 #| echo: false
-#| tbl-cap: Dates de récolte potentielles
+#| tbl-cap: Dates de récolte potentielles (extrait)
 
 recolte %>% 
   st_drop_geometry() %>% 
@@ -491,8 +496,13 @@ recolte %>%
   group_by(nom) %>%
   slice_head(n = 2) %>% 
   ungroup() %>% 
-  add_row(nom = "<i>etc.</i>") %>% 
-  kable()
+  add_row(nom = "*etc.*") %>% 
+  gt() %>% 
+  cols_label(annee ~ "année",
+             doy   ~ "jour (doy)",
+             nom   ~ "bassin de production") %>% 
+  sub_missing(missing_text = "...") %>% 
+  fmt_markdown(nom)
 ```
 
 ## Visualisation des tendances
@@ -562,10 +572,10 @@ Au cours des quatre dernières décennies, la date de récolte potentielle moyen
 theme_gtsummary_language("fr")
 
 mod_simple %>% 
-  tbl_regression(label = list(annee ~ "Année",
-                              nom ~ "Bassin de production")) %>% 
+  tbl_regression(label = list(annee ~ "année",
+                              nom ~ "bassin de production")) %>% 
   as_gt() %>%
-  gt::tab_source_note(source_note = glue("Maïs grain France {min(recolte$annee)}-{max(recolte$annee)} 
-                                         d'après données agroclimatiques ERA5 pour une précocité 
-                                         moyenne ({besoin} DJ, base {base} °C)"))
+  tab_source_note(source_note = glue("Maïs grain France {min(recolte$annee)}-{max(recolte$annee)} 
+                                      d'après données agroclimatiques ERA5 pour une précocité 
+                                      moyenne ({besoin} DJ, base {base} °C)"))
 ```
