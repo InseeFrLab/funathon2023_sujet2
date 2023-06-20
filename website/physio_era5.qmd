@@ -346,7 +346,7 @@ mais_liss <- mais %>%
 plot(mais_liss, main = "Densité de culture de maïs grain 2021 (ha/km²)")
 ```
 
-On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/km² et on conservera les `r nb_bassins` plus grandes zones, que nous nommerons avec le nom de la plus grande ville de la zone.
+On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/km² et on conservera les `r nb_bassins` plus grandes zones, que nous nommerons avec le nom de la plus grande ville de la zone.
 
 ```{r}
 #| label: fig-lissage-carte-filtree
@@ -355,12 +355,12 @@ On peut garder par exemple les densités supérieures à `r seuil_lissage` ha/k
 plot(mais_liss > seuil_lissage, main = glue("Zones de culture de maïs grain 2021 (> {seuil_lissage} ha/km²)"))
 ```
 
-- Filtrer le raster
-- Le vectoriser en polygones
-- Calculer les surfaces
-- Conserver les plus grands polygones
-- Faire une jointure spatiales avec les points des communes
-- Déterminer la plus grande commune de chaque polygone et le nommer
+- Filtrer le raster ;
+- Vectoriser le raster en polygones ;
+- Calculer les surfaces ;
+- Conserver les plus grands polygones ;
+- Faire une jointure spatiale avec les points des communes ;
+- Déterminer la plus grande commune de chaque polygone et le nommer.
 
 NB : Le centroïde d'un polygone tarabiscoté peut se trouver en dehors du polygone ; on utilise `st_point_on_surface()` plutôt que `st_centroid()` pour garantir qu'il est bien dans le polygone.
 
@@ -463,7 +463,7 @@ yday(ymd("2020-04-01"))
 yday(ymd("2023-04-01"))
 ```
 
-Cela peut-être important si on recherche des tendances qui sont de l'ordre de grandeur du jour. On utilisera donc le jour de l'année (*day of year* ou *doy*).
+Cela peut-être impactant si on recherche des tendances qui sont de l'ordre de grandeur du jour. On utilisera donc le jour de l'année (*day of year* ou *doy*).
 
 ```{r}
 #| label: calcul-degres-jours
