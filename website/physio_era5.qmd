@@ -559,7 +559,7 @@ mod_simple <- recolte %>%
 
 evol <- round(mod_simple$coefficients[["annee"]], 1)
 ic95 <- round(confint(mod_simple)[2, ], 1)
-r2 <- round(with(summary(mod_poiss), 1 - deviance / null.deviance), 2)
+r2 <- round(with(summary(mod_simple), 1 - deviance / null.deviance), 2)
 
 # Pour les bayesiens
 #
