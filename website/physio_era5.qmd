@@ -572,7 +572,7 @@ r2 <- round(with(summary(mod_simple), 1 - deviance / null.deviance), 2)
 # describe_posterior(mod_bayes, ci = .95, rope_range = c(-.05, 0.5))
 ```
 
-Au cours des quatre dernières décennies, la date de récolte potentielle moyenne du maïs grain dans les principaux bassins de production français à évolué d'environ `r evol` jour par an (IC~95 %~ \[`r ic95[1]` ; `r ic95[2]`\], r^2^ = `r r2`).
+Au cours des quatre dernières décennies, la date de récolte potentielle moyenne du maïs grain dans les principaux bassins de production français à évolué d'environ `r evol` jour par an (IC~95 %~ \[`r ic95[1]` ; `r ic95[2]`\], *r*^2^ = `r r2`).
 
 ```{r}
 #| label: tbl-tendance
