@@ -60,10 +60,10 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
     
 ### Scénario
 
-- Définir les principaux bassins de production du maïs grain à partir du RPG ;
-- extraire les températures journalières sur un point central de chaque bassin ;
-- calculer les dates de récolte théoriques pour chaque bassin et chaque année ;
-- estimer les tendances par bassin.
+1. Définir les principaux bassins de production du maïs grain à partir du RPG ;
+2. extraire les températures journalières sur un point central de chaque bassin ;
+3. calculer les dates de récolte théoriques pour chaque bassin et chaque année ;
+4. estimer les tendances par bassin.
 
 ## Préparation
 
@@ -479,21 +479,21 @@ besoin <- 1700 # DJ
 
 $$DJ_{n} = \sum_{j=1}^{n}{\frac{T_{max, j} - T_{min, j}}{2} - T_{base}}$$
 
-Le maïs a une température de base de `r base` °C et il lui faut `r besoin` DJ (variable selon la précocité de la variété) pour être récolté pour le grain[^3]. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis se fait début avril[^4].
+Le maïs a une température de base de `r base` °C et il lui faut `r besoin` DJ (variable selon la précocité de la variété) pour être récolté pour le grain[^3]. Les températures supérieures à 30 °C stoppent le développement végétatif. Le semis commence fin mars et est réalisé à 50 % mi-avril[^4].
 
 [^3]: [*Spotifarm*](https://blog.spotifarm.fr/tour-de-plaine-spotifarm/somme-de-temperature-pourquoi-suivre-levolution-des-degres-jours)
 
-[^4]: [Céré'Obs. *FranceAgrimer*](https://cereobs.franceagrimer.fr/cereobs-sp/assets/pdfjs/web/viewer.html?file=blob:https://cereobs.franceagrimer.fr/f05c19c6-aff4-4701-9af4-80fdef7118d3)
+[^4]: [Céré'Obs. *FranceAgrimer*](https://cereobs.franceagrimer.fr/cereobs-sp/#/publications) > Rapport Céré'Obs
 
 On considère que la température moyenne journalière ERA5 correspond bien à $\frac{T_{max} - T_{min}}{2}$.
 
-NB : la date n'est pas un bon indicateur pour suivre précisémment une évolution journalière à cause des années bissextiles. Par exemple le 1er avril ne correspondra pas toujours au même nombre de jours dans l'avancement de la saison de végétation :
+NB : la date n'est pas un bon indicateur pour suivre précisémment une évolution journalière à cause des années bissextiles. Par exemple le 15 avril ne correspondra pas toujours au même nombre de jours dans l'avancement de la saison de végétation :
 
 ```{r}
 #| label: exemple-doy
 #| code-fold: false
-yday(ymd("2020-04-01"))
-yday(ymd("2023-04-01"))
+yday(ymd("2020-04-15"))
+yday(ymd("2023-04-15"))
 ```
 
 Cela peut-être impactant si on recherche des tendances qui sont de l'ordre de grandeur du jour. On utilisera donc le jour de l'année (*day of year* ou *doy*).
@@ -504,7 +504,7 @@ Cela peut-être impactant si on recherche des tendances qui sont de l'ordre de g
 recolte <- temp_points %>% 
   select(date, nom, temp_moy_c) %>% 
   group_by(nom, annee = year(date)) %>% 
-  mutate(dj = case_when(yday(date) < 91 ~ 0,
+  mutate(dj = case_when(yday(date) < 105 ~ 0,
                         temp_moy_c >= 30 ~ 0,
                         temp_moy_c < base ~ 0,
                         TRUE ~ temp_moy_c - base),
@@ -571,7 +571,7 @@ recolte %>%
                   nudge_x = 1.5, size = 3, direction = "y", lineheight = 0.6) +
   scale_y_date(date_breaks = "months", date_labels = "%b") +
   coord_cartesian(xlim = c(min(recolte$annee) - .5, max(recolte$annee) + 5),
-                  ylim = as.Date(c(NA, "2020-11-08")),
+                  ylim = as.Date(c(NA, "2020-11-15")),
                   expand = FALSE) +
   labs(title = "Date de récolte potentielle",
        subtitle = "Maïs grain, par bassin de production",
