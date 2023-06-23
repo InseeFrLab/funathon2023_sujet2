@@ -60,7 +60,7 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
     
 ### Scénario
 
-- définir les 10 principaux bassins de production du maïs grain à partir du RPG ;
+- Définir les principaux bassins de production du maïs grain à partir du RPG ;
 - extraire les températures journalières sur un point central de chaque bassin ;
 - calculer les dates de récolte théoriques pour chaque bassin et chaque année ;
 - estimer les tendances par bassin.
