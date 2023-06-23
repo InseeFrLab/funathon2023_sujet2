@@ -117,7 +117,6 @@ cnx <- dbConnect(Postgres(),
 Vous pouvez vous contenter de la description succinte du scénario ci-dessus pour vous lancer ou poursuivre la lecture pour être plus guidé.
 Vous pouvez aussi bien sûr afficher le code si vous êtes bloqués, si vous voulez des pistes de démarrage ou si vous souhaitez comparer nos approches.
 
-
 ## Définition des bassins de production du maïs grain
 
 ```{r}
@@ -143,12 +142,12 @@ surf <- function(code){
 }
 ```
 
-Le maïs grain (code culture : `MIS`) représente, avec une surface de `r round(surf("MIS") / 1e6, 2)`·10^6^ ha, la moitié du maïs cultivé[^2] en France en 2021, soit environ `r round(surf("MIS") / surf_tot_pac * 100)` % des surfaces déclarées à la PAC. 
+Le maïs grain (code culture : `MIS`) représente, avec une surface de `r round(surf("MIS") / 1e6, 2)`·10^6^ ha, la moitié du maïs cultivé[^2] en France en 2021, soit environ `r round(surf("MIS") / surf_tot_pac$surf_ha * 100)` % des surfaces déclarées à la PAC. 
 Il est utilisé pour l'alimentation animale (essentiellement) et humaine, la transformation en amidon, les agrocarburants...
 
-[^2]: Les autres cultures étant le maïs ensilage (`MIE`, `r round(surf("MIE") / 1e6, 2)`·10^6^ ha, broyé et fermenté) destiné à nourrir le bétail et le maïs doux (`MID`, `r format(round(surf("MID"), -3), big.mark = " ")` ha) pour l'alimentation humaine.
+[^2]: Les autres cultures étant le maïs ensilage (`MIE`, `r round(surf("MIE") / 1e6, 2)`·10^6^ ha, broyé et fermenté) destiné à nourrir le bétail et le maïs doux (`MID`, environ `r format(round(surf("MID"), -3), big.mark = " ")` ha) pour l'alimentation humaine.
 
--> Pouvez-vous confirmer ces chiffres ? La table `rpg.parcelles` liste chaque parcelle avec son `code_cultu` et sa `surf_parc`en hectare.
+&rarr; Pouvez-vous confirmer ces chiffres ? La table `rpg.parcelles` liste chaque parcelle avec son `code_cultu` et sa `surf_parc` en hectare.
 
 Pour déterminer les aires principales de culture on peut, par exemple, extraire les principales zones où la densité de culture du maïs grain est la plus forte. Cela peut se faire par commune, par clustering ou avec un lissage[voir chapitre 8 @loonisManuelAnalyseSpatiale2018].
 
