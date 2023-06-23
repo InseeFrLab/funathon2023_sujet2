@@ -57,6 +57,13 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
 
 -   [Admin Express](https://geoservices.ign.fr/adminexpress) est le référentiel des limites administratives de l'IGN.
     Des tables simplifiées des communes et des régions 2023 ont été intégrées dans la base PostgreSQL/PostGIS.
+    
+### Scénario
+
+- définir les 10 principaux bassins de production du maïs grain à partir du RPG ;
+- extraire les températures journalières sur un point central de chaque bassin ;
+- calculer les dates de récolte théoriques pour chaque bassin et chaque année ;
+- estimer les tendances par bassin.
 
 ## Préparation
 
@@ -106,6 +113,10 @@ cnx <- dbConnect(Postgres(),
                  port = 5432,
                  check_interrupts = TRUE)
 ```
+
+Vous pouvez vous contenter de la description succinte du scénario ci-dessus pour vous lancer ou poursuivre la lecture pour être plus guidé.
+Vous pouvez aussi bien sûr afficher le code si vous êtes bloqués, si vous voulez des pistes de démarrage ou si vous souhaitez comparer nos approches.
+
 
 ## Définition des bassins de production du maïs grain
 
@@ -328,11 +339,13 @@ lissage <- function(df, field, bandwidth, resolution, zone = NULL, out_crs = 303
 }
 ```
 
+<!-- 
+NB : le lissage ne peut pas être mis en cache par Quarto car les objets 
+{terra} ne sont pas cachables.
+-->
 ```{r}
 #| label: lissage-traitement
 
-# NB : le lissage ne peut pas être mis en cache par quarto car les objets 
-# {terra} ne sont pas cachables.
 mais_liss <- mais %>% 
   lissage(surf_parc, bandwidth = bande_passante, resolution = pixel, zone = fr) %>% 
   rast()
@@ -432,6 +445,25 @@ temp_points <- era5 %>%
   full_join(points, ., by = "geometry")
 ```
 
+```{r}
+#| label: tbl-climat
+#| echo: false
+#| tbl-cap: Températures moyennes journalières (extrait)
+
+temp_points %>% 
+  head() %>% 
+  select(date, nom, temp_moy_c) %>% 
+  st_drop_geometry() %>% 
+  add_row(nom = "*etc.*") %>% 
+  gt() %>% 
+  cols_label(date ~ "date",
+             temp_moy_c   ~ "température moy. (°C)",
+             nom   ~ "bassin de production") %>% 
+  sub_missing(missing_text = "...") %>% 
+  fmt_markdown(nom)
+```
+
+
 ## Calcul des degrés jour et des dates de récolte
 
 ```{r}
@@ -504,7 +536,9 @@ recolte %>%
   fmt_markdown(nom)
 ```
 
-## Visualisation des tendances
+## Tendances
+
+### Visualisation des tendances
 
 ```{r}
 #| label: tendance-avec-interaction
@@ -549,7 +583,7 @@ recolte %>%
         plot.caption = element_text(size = 6))
 ```
 
-## Tendance
+### Paramètres des tendances
 
 ```{r}
 #| label: tendance-simple
@@ -592,7 +626,7 @@ mod_simple %>%
                                       {base} °C)"))
 ```
 
-## Validation
+### Validation
 
 Des données d'observation ponctuelles permettent de confronter notre modèle à la réalité[@torreChangementClimatiqueObservations2004] :
 
