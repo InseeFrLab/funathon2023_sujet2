@@ -120,10 +120,35 @@ Vous pouvez aussi bien sûr afficher le code si vous êtes bloqués, si vous vou
 
 ## Définition des bassins de production du maïs grain
 
-Le maïs grain (code culture : `MIS`) représente, avec une surface de 1,5·10^6^ ha, la moitié du maïs cultivé[^2] en France en 2021, soit environ 6 % des surfaces déclarées à la PAC. 
+```{r}
+#| label: donnee-generales-mais
+#| cache: true
+surf_mais <- dbGetQuery(cnx, "
+  SELECT 
+    code_cultu,
+    SUM(surf_parc) AS surf_ha
+  FROM rpg.parcelles
+  WHERE code_cultu IN ('MIS', 'MIE', 'MID')
+  GROUP BY code_cultu")
+
+surf_tot_pac <- dbGetQuery(cnx, "
+  SELECT 
+    SUM(surf_parc) AS surf_ha
+  FROM rpg.parcelles")
+
+surf <- function(code){
+  surf_mais %>% 
+    filter(code_cultu == code) %>% 
+    pull(surf_ha)
+}
+```
+
+Le maïs grain (code culture : `MIS`) représente, avec une surface de `r round(surf("MIS") / 1e6, 2)`·10^6^ ha, la moitié du maïs cultivé[^2] en France en 2021, soit environ `r round(surf("MIS") / surf_tot_pac * 100)` % des surfaces déclarées à la PAC. 
 Il est utilisé pour l'alimentation animale (essentiellement) et humaine, la transformation en amidon, les agrocarburants...
 
-[^2]: Les autres cultures étant le maïs ensilage (1,3·10^6^ ha, broyé et fermenté) destiné à nourrir le bétail et le maïs doux (23 000 ha) pour l'alimentation humaine.
+[^2]: Les autres cultures étant le maïs ensilage (`MIE`, `r round(surf("MIE") / 1e6, 2)`·10^6^ ha, broyé et fermenté) destiné à nourrir le bétail et le maïs doux (`MID`, `r format(round(surf("MID"), -3), big.mark = " ")` ha) pour l'alimentation humaine.
+
+-> Pouvez-vous confirmer ces chiffres ? La table `rpg.parcelles` liste chaque parcelle avec son `code_cultu` et sa `surf_parc`en hectare.
 
 Pour déterminer les aires principales de culture on peut, par exemple, extraire les principales zones où la densité de culture du maïs grain est la plus forte. Cela peut se faire par commune, par clustering ou avec un lissage[voir chapitre 8 @loonisManuelAnalyseSpatiale2018].
 
