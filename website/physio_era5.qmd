@@ -74,7 +74,7 @@ Le pas-à-pas détaillé est décrit sur [la page de démarrage](app0.html), mai
 - Restaurer les packages à utiliser : `renv::restore()` (11 min).
 - Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO :
 
-  `$ mc cp -r s3/projet-funathon/2023/sujet2/diffusion/era5/ funathon2023_sujet2/data/era5/`
+  `$ mc cp -r s3/projet-funathon/2023/sujet2/diffusion/era5/ ~/work/funathon2023_sujet2/data/era5/`
 - Pour se connecter à la base PostgreSQL, il faudra avoir défini votre mot de passe comme variable d'environnement par exemple en ajoutant `PASS_POSTGRESQL=xxxx` dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et relancer la session (ctrl+maj+F10).
 
 ```{r}

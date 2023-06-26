@@ -1,6 +1,6 @@
 # Contexte et description du sujet {.unnumbered}
 
-Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous et disponibles sur les pages suivantes. Ces applications sont des points de départ - n'hésitez pas à aller plus loin !
+Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous et disponibles sur les pages suivantes. Ces applications sont des points de départ, tout comme les solutions proposées - n'hésitez pas à aller plus loin !
 
 Avec ce sujet, vous allez pouvoir :
 
@@ -8,11 +8,23 @@ Avec ce sujet, vous allez pouvoir :
 - Manipuler des données spatiales : vecteurs et rasters avec les packages `sf`, `terra`, `stars`;
 - Utiliser une base de données `PostgreSQL` et son extension `PostGIS`;
 - Créer des visualisations avec `ggplot2`;
-- Développer un tableau de bord interactif avec `Shiny`;
+- Développer un tableau de bord interactif avec `shiny`;
 - Utiliser le lissage spatial pour synthétiser des données géographiques avec `btb`;
 - Estimer des tendances avec un modèle linéaire.
 
-Pour traiter le sujet, commencez par restaurer les packages à utiliser avec `renv::restore()` (~10 min). Bien sûr si vous avez besoin de packages supplémentaires à un moment donné, n'hésitez pas à les installer !
+### Mise en route {.unnumbered}
+
+Avant tout, il faut qu'une personne dans l'équipe commence par *fork* ce [dépôt de code sur Gitlab](https://git.lab.sspcloud.fr/ssplab/funathon2023/funathon_sujet2), et donne les droits d'écriture sur le *fork* à ses partenaires (tout ceci est expliqué dans [cette vidéo](https://inseefrlab.github.io/funathon2023/additional.html) de présentation du Funathon). Tous les membres de l'équipe peuvent maintenant ouvrir un service `RStudio` sur le `SSP Cloud` et créer un nouveau projet à partir du dépôt *forké* (**`File`** > **`New project`** > **`Version Control`** > **`Git`**), sur lequel ils pourront pousser leur code !
+
+Pour disposer de toutes les librairies nécessaires, il est possible de faire toutes les installations avec `renv::restore()` (~10 min). Bien sûr si vous avez besoin de packages supplémentaires à un moment donné, n'hésitez pas à les installer !
+
+Pour traiter le sujet, nous vous laissons libres de vous organiser comme vous le souhaitez. Vous pouvez par exemple créer vous-mêmes vos scripts (par exemple un script par application et par personne, avant de mutualiser les avancées - sauf pour l'application `shiny` où nous suggérons explicitement de créer plusieurs scripts à placer dans un répertoire *ad hoc*), et lorsque vous en ressentez le besoin aller tirer des bouts de code des solutions que nous proposons sur ce site.
+
+::: {.callout-note icon=false}
+## Note sur l'accès à l'espace de stockage
+
+Si vous lancez un service interactif `RStudio` au cours de la première journée et que utilisez le même lors de la seconde journée, vos identifiants permettant l'accès à l'espace de stockage du `SSP Cloud` auront expiré. Vous trouverez sur [cette page](https://datalab.sspcloud.fr/account/storage) des scripts (`R` notamment) permettant de mettre à jour les variables d'environnement concernées.
+:::
 
 ### Les données utilisées {.unnumbered}
 
@@ -28,7 +40,7 @@ Les données du RPG étant volumineuses, il faut pouvoir les requêter depuis un
 
 ### Etape 1 : Première manipulation du RPG {.unnumbered}
 
-L'objectif de cette première étape est d'effectuer des premières requêtes géographiques permettant d'examiner les cultures à proximité d'un point géographique donné, de comparer la composition observée avec les compositions départementale, régionale, etc. Pour aller plus loin, on développera une interface graphique de type tableau de bord permettant d'obtenir ces informations interactivement en cliquant sur une carte.
+L'objectif de cette étape est d'effectuer des premières requêtes géographiques permettant d'examiner les cultures à proximité d'un point géographique donné, de comparer la composition observée avec les compositions départementale, régionale, etc. Pour aller plus loin, nous proposons de développer une interface graphique de type tableau de bord permettant d'obtenir ces informations interactivement en cliquant sur une carte.
 
 ### Etape 2 : Exposition des cultures au déficit de précipitations {.unnumbered}
 
@@ -36,4 +48,4 @@ Cette deuxième étape est fortement inspirée de l'excellente [étude](https://
 
 ### Etape 3 : Evolution des cultures, lien avec le climat passé {.unnumbered}
 
-Après avoir regardé vers l'avenir, il est temps de jeter un coup d'oeil dans le rétroviseur, et de regarder comment l'évolution des températures au cours des 40 dernières années a pu influencer certaines cultures en France. On estimera l'évolution des dates potentielles de récolte du maïs grain dans les différents bassins de production français depuis 1980.
+Après avoir regardé vers l'avenir, il est temps de jeter un coup d'oeil dans le rétroviseur, et de regarder comment l'évolution des températures au cours des 40 dernières années a pu influencer certaines cultures en France. Nous estimerons l'évolution des dates potentielles de récolte du maïs grain dans les différents bassins de production français depuis 1980.
