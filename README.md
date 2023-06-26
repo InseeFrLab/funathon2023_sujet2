@@ -1,10 +1,8 @@
 # Funathon 2023 - Sujet 2
 
-[![Onyxia](https://img.shields.io/badge/Launch-Datalab-orange?logo=R)](https://datalab.sspcloud.fr/launcher/ide/rstudio?autoLaunch=true&onyxia.friendlyName=%C2%ABSujet%202%C2%BB&init.personalInit=%C2%ABhttps%3A%2F%2Fraw.githubusercontent.com%2FInseeFrLab%2Ffunathon2023_sujet2%2Fmain%2Finit.sh%C2%BB)
-
 ## Explorer la géographie des cultures agricoles françaises
 
-Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous qui sont disponible sur ce [site](https://inseefrlab.github.io/funathon2023_sujet2/).
+Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous qui sont disponibles **sur ce [site](https://inseefrlab.github.io/funathon2023_sujet2/)**.
 
 ### Les données utilisées
 

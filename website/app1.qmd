@@ -9,9 +9,9 @@ knitr:
     out.width: 100%
 ---
 
-Dans cette application, nous souhaitons effectuer des premières requêtes géographiques sur une base PostgreSQL contenant les données du RPG. L'objectif est d'examiner les cultures à proximité d'un point géographique donné, puis de comparer la composition observée avec les compositions départementale, régionale, etc. Dans un second temps, on verra comment développer un tableau de bord pour obtenir des visualisations interactives des résultats de ces requêtes. 
+Dans cette application, nous souhaitons effectuer des premières requêtes géographiques sur une base PostgreSQL contenant les données du RPG. L'objectif est d'examiner les cultures à proximité d'un point géographique donné, puis de comparer la composition observée avec les compositions départementale et nationale. Dans un second temps, on verra comment développer un tableau de bord pour obtenir une visualisation interactive des résultats de ces requêtes. 
 
-Comme expliqué dans l'application précédente, la base PostgreSQL est accessible depuis tous les services interactifs du cluster. Des indications sur la manière de s'y connecter figurent sur la page. Pour rappel, le schéma `public` est ouvert à tous en écriture pour créer des tables temporaires. Pour ces tables, essayez d'utiliser des noms *uniques* pour éviter d'entrer en conflit avec d'autres équipes.
+Comme expliqué dans l'application précédente, la base PostgreSQL est accessible depuis tous les services interactifs du cluster. Des indications sur la manière de s'y connecter figurent sur la page. Pour rappel, le schéma `public` est ouvert à tous en écriture pour créer des tables temporaires. Pour ces tables, essayez **d'utiliser des noms uniques** pour éviter d'entrer en conflit avec d'autres équipes.
 
 ```{r setup, include=FALSE}
 #| label: setup
@@ -20,7 +20,7 @@ Comme expliqué dans l'application précédente, la base PostgreSQL est accessib
 library(tidyverse) 
 library(aws.s3)
 library(sf)
-library(RPostgreSQL)
+library(RPostgres)
 library(janitor)
 library(kableExtra)
 library(leaflet)
@@ -68,7 +68,7 @@ La table des parcelles agricoles 2021 se trouve sur un serveur PostgreSQL muni d
 #| label: connection PostgreSQL
 
 # Connexion à PostgreSQL
-cnx <- dbConnect(PostgreSQL(),
+cnx <- dbConnect(Postgres(),
                  user = Sys.getenv("USER_POSTGRESQL"),
                  password = Sys.getenv("PASS_POSTGRESQL"),
                  host = Sys.getenv("HOST_POSTGRESQL"),
@@ -80,7 +80,7 @@ cnx <- dbConnect(PostgreSQL(),
 
 ### Sélection des parcelles situées autour d'un point
 
-On souhaite maintenant requêter la base de données PostgreSQL pour récupérer les parcelles se situant dans un cercle du rayon choisi autour du point choisi. Pour cela, une possibilité est de passer par la création d'une table intermédiaire à partir de l'objet `point` défini précédemment (la fonction `write_sf` permet d'écrire des données spatiales dans une table `PostGIS`), puis d'utiliser la fonction [`ST_DWithin`](https://postgis.net/docs/ST_DWithin.html) dans une requête. Stockez les résultats de la requête dans un objet `parc_prox` grâce à la fonction `st_read`.
+On souhaite maintenant requêter la base de données PostgreSQL pour récupérer les parcelles se situant dans un cercle du rayon choisi autour du point choisi. Pour cela, une possibilité est de passer par la création d'une table intermédiaire à partir de l'objet `point` défini précédemment (la fonction `write_sf` permet d'écrire des données spatiales dans une table `PostGIS`), puis d'utiliser la fonction [`ST_DWithin`](https://postgis.net/docs/ST_DWithin.html) dans une requête. Stockez les résultats de la requête dans une variable `parc_prox` grâce à la fonction `st_read`.
 
 ::: {.callout-note icon=false}
 ## Solution
@@ -139,7 +139,7 @@ Pour utiliser `leaflet`, il faut que les données spatiales soient en coordonné
 ## Solution
 
 ```{r}
-#| label: affichage parcelles
+#| label: affichage-parcelles
 
 # Création d'une palette de couleurs associée au groupe de culture
 factpal <- colorFactor("Paired", parc_prox$code_group)
@@ -162,8 +162,8 @@ labels <- sprintf("<strong>id_parcel : </strong>%s<br/>
                   <strong>Département : </strong>%s<br/>
                   <strong>Commune : </strong>%s<br/>",
                   parc_prox$id_parcel,
-                  carte_parc_prox_lib$libelle_groupe_culture,
-                  carte_parc_prox_lib$libelle_culture,
+                  parc_prox_lib$libelle_groupe_culture,
+                  parc_prox_lib$libelle_culture,
                   parc_prox$surf_parc,
                   parc_prox$insee_dep,
                   parc_prox$nom_com) %>% 
@@ -194,6 +194,8 @@ carte_parc_prox_html <- leaflet(parc_prox_lib) %>%
 
 # Pour sauvegarder la carte
 # saveWidget(widget = carte_parc_prox_html, file = "carte_parc_prox.html")
+
+carte_parc_prox_html
 ```
 :::
 
@@ -249,7 +251,7 @@ t1  %>%
 
 ### Comparaison avec la répartition des cultures au niveau départemental et national
 
-On va vouloir comparer la composition des parcelles à proximité du point choisi avec la composition au niveaux départemental et national. Pour ce faire, commencer par faire une jointure spatiale sur PostGIS pour récupérer le département du point. Les géométries des départements se récupèrent avec la commande suivante :
+On va vouloir comparer la composition des parcelles à proximité du point choisi avec la composition au niveaux départemental et national. Pour ce faire, commencer par faire une jointure spatiale sur `PostGIS` pour récupérer le département du point. Les géométries des départements se récupèrent avec la commande suivante :
 
 ```{r}
 #| label: dep-layer
@@ -303,7 +305,7 @@ stat_fm <- s3read_using(
   rename(pct_surf_fm = pct_surf)
 ```
 
-Sélectionnez les statistiques du département concerné et appariez statistiques locales, départementales et nationales par groupe de culture dans un même `data.frame` à afficher.
+Sélectionnez les statistiques du département concerné et appariez statistiques de surfaces locales, départementales et nationales par groupe de culture dans un même `data.frame` à afficher, comme ci-dessous.
 
 ::: {.callout-note icon=false}
 ## Solution
@@ -311,6 +313,14 @@ Sélectionnez les statistiques du département concerné et appariez statistique
 ```{r}
 #| label: compare-structures
 #| tbl-cap: Structure des cultures 
+
+# Calcul des % surfaces autour du point
+stat_pt <- parc_prox %>%
+  st_drop_geometry() %>% 
+  count(code_group, wt = surf_parc) %>%
+  add_tally(n) %>% 
+  mutate(pct_surf_local = round(100 * n / nn, 1)) %>%
+  select(code_group, pct_surf_local) 
 
 # Récupération des statistiques du département concerné
 stat_dep_pt <- stat_dep_pt %>% 
@@ -338,7 +348,6 @@ stat_compar %>%
        "font-size: 20pt !important;",.)%>%
   kable_styling(bootstrap_options = c("striped", "hover")) %>% 
   row_spec(nrow(stat_compar), bold = T, color = "white", background = "grey")
-
 ```
 :::
 
@@ -351,7 +360,6 @@ On souhaite faire un graphique avec `ggplot2` pour visualiser la comparaison ét
 
 ```{r}
 #| label: faire un graphique comparant les structures
-#| fig-cap: différences de structure locale, departementale, nationale  
 
 # Sélection des 10 groupes de cultures les plus répandus au niveau local 
 tab <- stat_compar %>%
@@ -365,8 +373,10 @@ tab_piv <- tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur = na
 # Valeurs manquantes à
 tab_piv[is.na(tab_piv)] <- 0
 
-# On réordonne les secteurs dans le "bon" ordre, avec factor  
-tab_piv$secteur <- factor(tab_piv$secteur, levels = c("france", "departement", "local"))
+# On réordonne les secteurs dans le "bon" ordre, avec factor
+tab_piv$secteur <- factor(
+  tab_piv$secteur,
+  levels = c("france", "departement", "local"))
 tab_piv <- tab_piv %>% arrange(desc(secteur), desc(value))
 
 # On réordonne les cultures par surface décroissante au niveau local, avec factor
@@ -375,12 +385,14 @@ y <- pull(x, libelle_groupe_culture)
 
 tab_piv$libelle_groupe_culture <- factor(tab_piv$libelle_groupe_culture, levels = y)
 
-# Visualisation avec geom_col 
-p <- ggplot(tab_piv, aes(x =libelle_groupe_culture,
+# Visualisation avec `geom_col`
+p <- ggplot(tab_piv, aes(x = libelle_groupe_culture,
                          y = value, 
-                         fill = factor(secteur, levels=c("france", "departement", "local")))) + 
+                         fill = factor(
+                           secteur,
+                           levels = c("france", "departement", "local")))) + 
   geom_col(position = "dodge") +
-  labs(title = "Surfaces comparées des 10 principales cultures locales, en %", x="Culture", y = "%", fill = "Secteur") +
+  labs(title = "Surfaces comparées des 10\nprincipales cultures locales, en %", x="Culture", y = "%", fill = "Secteur") +
   theme_classic()
 
 # Flip du graphique pour avoir des barres horizontales  
@@ -390,49 +402,31 @@ p + coord_flip()
 
 ### Graphique par secteur
 
-La fonction `facet_wrap` permet de ...
+La fonction [`facet_wrap`](https://ggplot2.tidyverse.org/reference/facet_wrap.html) permet d'afficher plusieurs graphiques côte-à-côte. En utilisant cette fonction, réalisez le graphique affiché ci-dessous.
+
+::: {.callout-note icon=false}
+## Solution
 
 ```{r}
-#| label: faire un graphique facet_wrap 
-#| fig-cap: différences de structure locale, departementale, nationale  
+#| label: facet-wrap 
 
-# je sélectionne les 10 groupes de cultures les plus répandus au niveau local 
-tab<-stat_compar %>% filter(libelle_groupe_culture!="Total") %>% slice_head(n=10) %>% 
-  rename(local=pct_surf_local, departement=pct_surf_dep, france=pct_surf_fm)
-
-# je transpose la table pour rassembler toutes les valeurs dans une seule variable value (ggplot oblige)
-tab_piv<-tab %>% pivot_longer(!libelle_groupe_culture) %>% rename(secteur=name) 
-
-# je mets à 0 les valeurs manquantes
-#tab_piv<-tab_piv %>% coalesce(value,0L)  
-tab_piv[is.na(tab_piv)] <- 0
-
-# je réordonne les secteurs dans le "bon" ordre, avec factor  
-tab_piv$secteur<-factor(tab_piv$secteur,levels=c("local","departement","france"))
-
-# je réordonne les cultures par surface décroissante au niveau local, avec factor
-x <- tab_piv %>% filter(secteur == "local") %>% arrange(value) %>% select(libelle_groupe_culture)
-y <- pull(x, libelle_groupe_culture)
-
-tab_piv$libelle_groupe_culture <- factor(tab_piv$libelle_groupe_culture, levels = y)
-
-# ggplot => problème de tri : affichage des prairies avant le maïs ?    
-ggplot(tab_piv, aes(x = libelle_groupe_culture, 
-                       y = value)) + 
-  geom_col(fill = "lightblue", colour = "black",position = "dodge") +
-  labs(title="Surface par culture", x="Culture", y = "%", fill = "Secteur") +
+# Visualisation avec `geom_col` et `facet_wrap`   
+ggplot(tab_piv, 
+       aes(x = libelle_groupe_culture,
+           y = value)) + 
+  geom_col(fill = "lightblue", colour = "black", position = "dodge") +
+  labs(title = "Surface par culture", x= "Culture", y = "%", fill = "Secteur") +
   geom_text(aes(label = value), hjust = -0.3, size = 8/.pt, colour = "black") +
   theme_classic() + coord_flip() + 
-  facet_wrap(~secteur,nrow=3,scales='free')
+  facet_wrap(~secteur, nrow=3, scales='free')
 ```
-
-### Pour aller plus loin, comparer la taille moyenne des parcelles selon les secteurs
+:::
 
 ## Création d'un dashboard de visualisation
 
-On souhaiterait intégrer les analyses faites ci-dessus à un tableau de bord qui offrirait des visualisations interactives. Une solution est d'utiliser `Shiny`, une librairie qui permet la création de telles applications avec `R` notamment.
+On souhaiterait intégrer les analyses faites ci-dessus à un tableau de bord qui offrirait des visualisations interactives. Une solution est d'utiliser `shiny`, une librairie qui permet la création de telles applications avec `R` notamment.
 
-Une application `Shiny` simple a deux composants principaux :
+Une application `shiny` simple a deux composants principaux :
 
 -   Un objet d'interface utilisateur (UI) qui contrôle la disposition et l'apparence du tableau de bord ;
 -   Une fonction serveur qui contient les instructions nécessaires au fonctionnement de l'application.

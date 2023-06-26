@@ -40,7 +40,7 @@ Les données du RPG étant volumineuses, il faut pouvoir les requêter depuis un
 
 ### Etape 1 : Première manipulation du RPG {.unnumbered}
 
-L'objectif de cette étape est d'effectuer des premières requêtes géographiques permettant d'examiner les cultures à proximité d'un point géographique donné, de comparer la composition observée avec les compositions départementale, régionale, etc. Pour aller plus loin, nous proposons de développer une interface graphique de type tableau de bord permettant d'obtenir ces informations interactivement en cliquant sur une carte.
+L'objectif de cette étape est d'effectuer des premières requêtes géographiques permettant d'examiner les cultures à proximité d'un point géographique donné, de comparer la composition observée avec les compositions départementale et nationale. Pour aller plus loin, nous proposons de développer une interface graphique de type tableau de bord permettant d'obtenir ces informations interactivement en cliquant sur une carte.
 
 ### Etape 2 : Exposition des cultures au déficit de précipitations {.unnumbered}
 
