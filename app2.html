@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.361">
+<meta name="generator" content="quarto-1.3.427">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -66,7 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./physio_era5.html" rel="next">
-<link href="./Sujet2-Etape1.html" rel="prev">
+<link href="./app1.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -127,8 +127,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Funathon 2023 - Sujet 2</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
-    <a href="./Funathon-2023---Sujet-2.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Funathon-2023---Sujet-2.pdf" rel="" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
 </div>
     </div>
       </div>
@@ -153,8 +153,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Sujet2-Etape1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Sujet2-Etape1</span></span></a>
+  <a href="./app1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Première manipulation du RPG</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -173,7 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">References</span></a>
+ <span class="menu-text">Références</span></a>
   </div>
 </li>
     </ul>
@@ -191,6 +191,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#requêtes-postgresql" id="toc-requêtes-postgresql" class="nav-link" data-scroll-target="#requêtes-postgresql"><span class="header-section-number">3.3</span> Requêtes PostgreSQL</a></li>
   <li><a href="#appariement-spatial-entre-données-drias-et-rpg" id="toc-appariement-spatial-entre-données-drias-et-rpg" class="nav-link" data-scroll-target="#appariement-spatial-entre-données-drias-et-rpg"><span class="header-section-number">3.4</span> Appariement spatial entre données DRIAS et RPG</a></li>
   <li><a href="#calcul-dindicateurs-par-type-de-culture" id="toc-calcul-dindicateurs-par-type-de-culture" class="nav-link" data-scroll-target="#calcul-dindicateurs-par-type-de-culture"><span class="header-section-number">3.5</span> Calcul d’indicateurs par type de culture</a></li>
+  <li><a href="#pour-aller-plus-loin" id="toc-pour-aller-plus-loin" class="nav-link" data-scroll-target="#pour-aller-plus-loin"><span class="header-section-number">3.6</span> Pour aller plus loin</a></li>
   </ul>
 </nav>
     </div>
@@ -224,9 +225,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="visualisations" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="visualisations"><span class="header-section-number">3.2</span> Visualisations</h2>
+<p>On initialise une nouvelle fois la connexion à PostgreSQL comme expliqué à la fin de l’application 0.</p>
 <div class="cell">
-<details>
-<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aws.s3)</span>
@@ -236,27 +236,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># pour avoir les noms de dates en français</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Pour avoir les noms de dates en français</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">Sys.setlocale</span>(<span class="st">"LC_ALL"</span>, <span class="st">"fr_FR.UTF-8"</span>))</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">knitr.kable.NA =</span> <span class="st">""</span>)</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>cnx <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">Postgres</span>(),</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">user =</span> <span class="st">"projet-funathon"</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">user =</span> <span class="fu">Sys.getenv</span>(<span class="st">"USER_POSTGRESQL"</span>),</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                 <span class="at">password =</span> <span class="fu">Sys.getenv</span>(<span class="st">"PASS_POSTGRESQL"</span>),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                 <span class="at">host =</span> <span class="st">"postgresql-438832"</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                 <span class="at">host =</span> <span class="fu">Sys.getenv</span>(<span class="st">"HOST_POSTGRESQL"</span>),</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>                 <span class="at">dbname =</span> <span class="st">"defaultdb"</span>,</span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>                 <span class="at">port =</span> <span class="dv">5432</span>,</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                 <span class="at">check_interrupts =</span> <span class="cn">TRUE</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
-<p>On souhaite tout d’abord visualiser les données DRIAS. On peut passer par les données sauvegardées au format raster qui sont stockées dans l’espace de stockage du SSP Cloud. Ces données correspondent à des prévisions à horizon proche (2021-2050) dans un scénario sans réduction des gaz à effet de serre, la période de référence étant 1976-2005.</p>
+<p>On souhaite tout d’abord visualiser les données DRIAS. On peut passer par les données sauvegardées au format raster qui sont stockées dans l’espace de stockage du SSP Cloud. Ces données correspondent à des prévisions à horizon proche (2021-2050) dans un scénario sans réduction des gaz à effet de serre, la période de référence étant 1976-2005. Le code ci-dessous permet de récupérer les données.</p>
 <div class="cell">
-<details>
-<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>drias_raster <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(f) <span class="fu">readAll</span>(<span class="fu">brick</span>(f)),</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/resultats/drias.tif"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/resultats/drias.tif"</span>,</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>))</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -282,7 +279,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>drias_df <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
@@ -327,122 +323,122 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">633293.9</td>
-<td style="text-align: right;">7102526</td>
-<td style="text-align: right;">456.2670</td>
-<td style="text-align: right;">1922.013</td>
-<td style="text-align: right;">3166.204</td>
+<td style="text-align: right;">633222.7</td>
+<td style="text-align: right;">7102519</td>
+<td style="text-align: right;">456.2780</td>
+<td style="text-align: right;">1922.019</td>
+<td style="text-align: right;">3166.208</td>
 <td style="text-align: right;">1.970000</td>
 <td style="text-align: right;">37.00000</td>
-<td style="text-align: right;">246.0130</td>
+<td style="text-align: right;">246.0152</td>
 <td style="text-align: right;">155.0000</td>
-<td style="text-align: right;">39.48190</td>
-<td style="text-align: right;">186.3422</td>
-<td style="text-align: right;">242.3578</td>
+<td style="text-align: right;">39.49532</td>
+<td style="text-align: right;">186.3507</td>
+<td style="text-align: right;">242.3591</td>
 <td style="text-align: right;">0.1700000</td>
 <td style="text-align: right;">-6.000000</td>
-<td style="text-align: right;">-13.02608</td>
-<td style="text-align: right;">9.934794</td>
+<td style="text-align: right;">-13.03036</td>
+<td style="text-align: right;">9.924110</td>
 <td style="text-align: right;">2.000000</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">641293.9</td>
-<td style="text-align: right;">7102526</td>
-<td style="text-align: right;">443.9363</td>
-<td style="text-align: right;">1991.938</td>
-<td style="text-align: right;">3238.004</td>
-<td style="text-align: right;">1.703398</td>
+<td style="text-align: right;">641222.7</td>
+<td style="text-align: right;">7102519</td>
+<td style="text-align: right;">443.9634</td>
+<td style="text-align: right;">1991.784</td>
+<td style="text-align: right;">3237.846</td>
+<td style="text-align: right;">1.703987</td>
 <td style="text-align: right;">37.00000</td>
-<td style="text-align: right;">231.1888</td>
-<td style="text-align: right;">156.9748</td>
-<td style="text-align: right;">35.79594</td>
-<td style="text-align: right;">182.8340</td>
-<td style="text-align: right;">240.3554</td>
-<td style="text-align: right;">0.1305034</td>
+<td style="text-align: right;">231.2215</td>
+<td style="text-align: right;">156.9705</td>
+<td style="text-align: right;">35.80390</td>
+<td style="text-align: right;">182.8417</td>
+<td style="text-align: right;">240.3598</td>
+<td style="text-align: right;">0.1305907</td>
 <td style="text-align: right;">-6.000000</td>
-<td style="text-align: right;">-15.96224</td>
-<td style="text-align: right;">1.113275</td>
+<td style="text-align: right;">-15.95570</td>
+<td style="text-align: right;">1.132903</td>
 <td style="text-align: right;">2.000000</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">649293.9</td>
-<td style="text-align: right;">7102526</td>
-<td style="text-align: right;">443.9973</td>
-<td style="text-align: right;">1995.349</td>
-<td style="text-align: right;">3242.516</td>
-<td style="text-align: right;">1.867938</td>
+<td style="text-align: right;">649222.7</td>
+<td style="text-align: right;">7102519</td>
+<td style="text-align: right;">443.9969</td>
+<td style="text-align: right;">1995.343</td>
+<td style="text-align: right;">3242.508</td>
+<td style="text-align: right;">1.867559</td>
 <td style="text-align: right;">37.00000</td>
-<td style="text-align: right;">227.0485</td>
-<td style="text-align: right;">157.9879</td>
-<td style="text-align: right;">31.54168</td>
-<td style="text-align: right;">181.4070</td>
-<td style="text-align: right;">241.3870</td>
-<td style="text-align: right;">0.3670885</td>
+<td style="text-align: right;">227.0574</td>
+<td style="text-align: right;">157.9856</td>
+<td style="text-align: right;">31.55116</td>
+<td style="text-align: right;">181.4101</td>
+<td style="text-align: right;">241.3846</td>
+<td style="text-align: right;">0.3665546</td>
 <td style="text-align: right;">-6.000000</td>
-<td style="text-align: right;">-21.92721</td>
-<td style="text-align: right;">1.987869</td>
-<td style="text-align: right;">1.012131</td>
+<td style="text-align: right;">-21.91386</td>
+<td style="text-align: right;">1.985644</td>
+<td style="text-align: right;">1.014356</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">657293.9</td>
-<td style="text-align: right;">7102526</td>
-<td style="text-align: right;">436.6220</td>
-<td style="text-align: right;">2002.273</td>
-<td style="text-align: right;">3246.039</td>
-<td style="text-align: right;">2.067665</td>
+<td style="text-align: right;">657222.7</td>
+<td style="text-align: right;">7102519</td>
+<td style="text-align: right;">436.6389</td>
+<td style="text-align: right;">2002.257</td>
+<td style="text-align: right;">3246.031</td>
+<td style="text-align: right;">2.067211</td>
 <td style="text-align: right;">37.00000</td>
-<td style="text-align: right;">232.9299</td>
+<td style="text-align: right;">232.9163</td>
 <td style="text-align: right;">158.0000</td>
-<td style="text-align: right;">24.67677</td>
-<td style="text-align: right;">188.7414</td>
-<td style="text-align: right;">250.9591</td>
-<td style="text-align: right;">0.4688323</td>
+<td style="text-align: right;">24.69242</td>
+<td style="text-align: right;">188.7246</td>
+<td style="text-align: right;">250.9371</td>
+<td style="text-align: right;">0.4686055</td>
 <td style="text-align: right;">-6.000000</td>
-<td style="text-align: right;">-18.04671</td>
-<td style="text-align: right;">6.941618</td>
-<td style="text-align: right;">2.524666</td>
+<td style="text-align: right;">-18.05578</td>
+<td style="text-align: right;">6.930274</td>
+<td style="text-align: right;">2.521252</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">665293.9</td>
-<td style="text-align: right;">7102526</td>
-<td style="text-align: right;">435.9528</td>
-<td style="text-align: right;">2000.971</td>
+<td style="text-align: right;">665222.7</td>
+<td style="text-align: right;">7102519</td>
+<td style="text-align: right;">435.9542</td>
+<td style="text-align: right;">2000.975</td>
 <td style="text-align: right;">3246.324</td>
-<td style="text-align: right;">2.058306</td>
+<td style="text-align: right;">2.058347</td>
 <td style="text-align: right;">37.00000</td>
-<td style="text-align: right;">230.7806</td>
-<td style="text-align: right;">158.4439</td>
-<td style="text-align: right;">24.02635</td>
-<td style="text-align: right;">186.6487</td>
-<td style="text-align: right;">248.8539</td>
-<td style="text-align: right;">0.4583059</td>
+<td style="text-align: right;">230.7862</td>
+<td style="text-align: right;">158.4427</td>
+<td style="text-align: right;">24.02779</td>
+<td style="text-align: right;">186.6543</td>
+<td style="text-align: right;">248.8595</td>
+<td style="text-align: right;">0.4583470</td>
 <td style="text-align: right;">-6.000000</td>
-<td style="text-align: right;">-17.55612</td>
-<td style="text-align: right;">3.791823</td>
-<td style="text-align: right;">2.349045</td>
+<td style="text-align: right;">-17.55724</td>
+<td style="text-align: right;">3.799755</td>
+<td style="text-align: right;">2.349262</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">673293.9</td>
-<td style="text-align: right;">7102526</td>
-<td style="text-align: right;">435.9154</td>
-<td style="text-align: right;">2000.555</td>
-<td style="text-align: right;">3245.984</td>
-<td style="text-align: right;">2.050102</td>
+<td style="text-align: right;">673222.7</td>
+<td style="text-align: right;">7102519</td>
+<td style="text-align: right;">435.9155</td>
+<td style="text-align: right;">2000.556</td>
+<td style="text-align: right;">3245.985</td>
+<td style="text-align: right;">2.050125</td>
 <td style="text-align: right;">37.00000</td>
-<td style="text-align: right;">230.5032</td>
-<td style="text-align: right;">158.4994</td>
-<td style="text-align: right;">23.95581</td>
-<td style="text-align: right;">186.3682</td>
-<td style="text-align: right;">248.5634</td>
-<td style="text-align: right;">0.4501025</td>
+<td style="text-align: right;">230.5039</td>
+<td style="text-align: right;">158.4992</td>
+<td style="text-align: right;">23.95599</td>
+<td style="text-align: right;">186.3690</td>
+<td style="text-align: right;">248.5641</td>
+<td style="text-align: right;">0.4501251</td>
 <td style="text-align: right;">-6.000000</td>
-<td style="text-align: right;">-17.50064</td>
-<td style="text-align: right;">3.503203</td>
-<td style="text-align: right;">2.498078</td>
+<td style="text-align: right;">-17.50078</td>
+<td style="text-align: right;">3.503910</td>
+<td style="text-align: right;">2.497654</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">609293.9</td>
-<td style="text-align: right;">7094526</td>
+<td style="text-align: right;">609222.7</td>
+<td style="text-align: right;">7094519</td>
 <td style="text-align: right;">479.2000</td>
 <td style="text-align: right;">1851.100</td>
 <td style="text-align: right;">3046.770</td>
@@ -460,75 +456,94 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: right;">66.000000</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">617293.9</td>
-<td style="text-align: right;">7094526</td>
-<td style="text-align: right;">468.7586</td>
-<td style="text-align: right;">1908.667</td>
-<td style="text-align: right;">3134.378</td>
-<td style="text-align: right;">1.729833</td>
-<td style="text-align: right;">38.00558</td>
-<td style="text-align: right;">244.9832</td>
-<td style="text-align: right;">152.9944</td>
-<td style="text-align: right;">51.20793</td>
-<td style="text-align: right;">195.0927</td>
-<td style="text-align: right;">248.4005</td>
-<td style="text-align: right;">-0.0694416</td>
-<td style="text-align: right;">-7.005584</td>
-<td style="text-align: right;">-17.02234</td>
+<td style="text-align: right;">617222.7</td>
+<td style="text-align: right;">7094519</td>
+<td style="text-align: right;">468.7802</td>
+<td style="text-align: right;">1908.548</td>
+<td style="text-align: right;">3134.198</td>
+<td style="text-align: right;">1.729771</td>
+<td style="text-align: right;">38.00763</td>
+<td style="text-align: right;">244.9771</td>
+<td style="text-align: right;">152.9924</td>
+<td style="text-align: right;">51.21084</td>
+<td style="text-align: right;">195.0900</td>
+<td style="text-align: right;">248.3969</td>
+<td style="text-align: right;">-0.0692365</td>
+<td style="text-align: right;">-7.007635</td>
+<td style="text-align: right;">-17.03054</td>
 <td style="text-align: right;">6.000000</td>
-<td style="text-align: right;">20.256855</td>
+<td style="text-align: right;">20.351189</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">625293.9</td>
-<td style="text-align: right;">7094526</td>
-<td style="text-align: right;">461.2848</td>
-<td style="text-align: right;">1925.042</td>
-<td style="text-align: right;">3168.804</td>
-<td style="text-align: right;">1.968771</td>
-<td style="text-align: right;">37.00512</td>
-<td style="text-align: right;">246.9898</td>
-<td style="text-align: right;">154.9898</td>
-<td style="text-align: right;">45.70827</td>
-<td style="text-align: right;">190.3049</td>
-<td style="text-align: right;">242.9682</td>
-<td style="text-align: right;">0.1687707</td>
-<td style="text-align: right;">-6.005122</td>
-<td style="text-align: right;">-15.01024</td>
-<td style="text-align: right;">5.005122</td>
-<td style="text-align: right;">1.603427</td>
+<td style="text-align: right;">625222.7</td>
+<td style="text-align: right;">7094519</td>
+<td style="text-align: right;">461.3004</td>
+<td style="text-align: right;">1925.008</td>
+<td style="text-align: right;">3168.732</td>
+<td style="text-align: right;">1.968268</td>
+<td style="text-align: right;">37.00722</td>
+<td style="text-align: right;">246.9856</td>
+<td style="text-align: right;">154.9856</td>
+<td style="text-align: right;">45.71983</td>
+<td style="text-align: right;">190.3150</td>
+<td style="text-align: right;">242.9796</td>
+<td style="text-align: right;">0.1682681</td>
+<td style="text-align: right;">-6.007217</td>
+<td style="text-align: right;">-15.01443</td>
+<td style="text-align: right;">5.007217</td>
+<td style="text-align: right;">1.642246</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">633293.9</td>
-<td style="text-align: right;">7094526</td>
-<td style="text-align: right;">456.2235</td>
-<td style="text-align: right;">1921.995</td>
-<td style="text-align: right;">3166.193</td>
+<td style="text-align: right;">633222.7</td>
+<td style="text-align: right;">7094519</td>
+<td style="text-align: right;">456.2343</td>
+<td style="text-align: right;">1922.001</td>
+<td style="text-align: right;">3166.199</td>
 <td style="text-align: right;">1.970000</td>
 <td style="text-align: right;">37.00000</td>
-<td style="text-align: right;">246.0047</td>
+<td style="text-align: right;">246.0068</td>
 <td style="text-align: right;">155.0000</td>
-<td style="text-align: right;">39.42927</td>
-<td style="text-align: right;">186.3086</td>
-<td style="text-align: right;">242.3528</td>
+<td style="text-align: right;">39.44270</td>
+<td style="text-align: right;">186.3171</td>
+<td style="text-align: right;">242.3540</td>
 <td style="text-align: right;">0.1700000</td>
 <td style="text-align: right;">-6.000000</td>
-<td style="text-align: right;">-13.00932</td>
-<td style="text-align: right;">9.976699</td>
-<td style="text-align: right;">1.997750</td>
+<td style="text-align: right;">-13.01360</td>
+<td style="text-align: right;">9.966008</td>
+<td style="text-align: right;">1.996718</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) : - RRA : cumul de précipitations d’avril à octobre (mm) - STM6 : somme de température base 6°C d’avril à octobre (°C) - STM0 : somme de température base 0°C d’octobre (année-1) à juillet (année) (°C) - SDA : nombre de jours d’été d’avril à juin (jour(s)) - DATEVEG : date de reprise de végétation en jour julien (date) - DATEDG : Date de dernière gelée avec 1er juillet comme référence (date) - DATEPG : Date de première gelée avec 1er juillet comme référence (date)</p>
-<p>On visualise la variable ARRA, qui correspond à l’écart de cumul de précipitations d’avril à octobre en mm.</p>
+<p>Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) :</p>
+<ul>
+<li>RRA : cumul de précipitations d’avril à octobre (mm)</li>
+<li>STM6 : somme de température base 6°C d’avril à octobre (°C)</li>
+<li>STM0 : somme de température base 0°C d’octobre (année-1) à juillet (année) (°C)</li>
+<li>SDA : nombre de jours d’été d’avril à juin (jour(s))</li>
+<li>DATEVEG : date de reprise de végétation en jour julien (date)</li>
+<li>DATEDG : Date de dernière gelée avec 1er juillet comme référence (date)</li>
+<li>DATEPG : Date de première gelée avec 1er juillet comme référence (date)</li>
+</ul>
+<p>On souhaite visualiser la variable ARRA, qui correspond à la huitième couche du raster et correspond à l’écart de cumul de précipitations d’avril à octobre en mm. Pour faire cela, on pourra récupérer spécifiquement la couche désirée lors de l’utilisation de la fonction <a href="https://www.rdocumentation.org/packages/raster/versions/3.6-20/topics/raster"><code>raster::raster</code></a>. Pour la visualisation, on pourra utiliser <a href="https://www.rdocumentation.org/packages/raster/versions/3.6-20/topics/plot"><code>raster::plot</code></a>.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bande ARRA</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>drias_raster_arra <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(f) <span class="fu">readAll</span>(<span class="fu">raster</span>(f, <span class="at">band =</span> <span class="dv">8</span>)),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/resultats/drias.tif"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/resultats/drias.tif"</span>,</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>))</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
@@ -539,17 +554,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>raster<span class="sc">::</span><span class="fu">plot</span>(<span class="at">x =</span> drias_raster_arra,</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">col =</span> <span class="fu">rev</span>(palette),</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">breaks =</span> breaks,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">main =</span> <span class="st">"Ecart de cumul de précipitations d'avril à octobre (mm) entre 2021-2050 et 1976-2005"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">main =</span> <span class="st">"Ecart de cumul de précipitations d'avril à octobre (mm)</span><span class="sc">\n</span><span class="st">entre 2021-2050 et 1976-2005"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="app2_files/figure-html/drias_vis_raster-1.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 </div>
-<p>Sur la période 2021-2050, les précipitations vont augmenter presque partout, sauf Sud-Ouest de la France (détails…).</p>
+</div>
+</div>
+<p>Sur la période 2021-2050, les précipitations vont augmenter presque partout, sauf dans le Sud-Ouest de la France.</p>
 </section>
 <section id="requêtes-postgresql" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="requêtes-postgresql"><span class="header-section-number">3.3</span> Requêtes PostgreSQL</h2>
-<p>Les données sont également stockées dans une base PostgreSQL qu’il est possible de requêter. La table <code>drias.previsions</code> contient une grille équivalente aux données raster précédemment utilisées.</p>
+<p>Les données DRIAS sont également stockées dans une base PostgreSQL qu’il est possible de requêter. La table <code>drias.previsions</code> contient une grille équivalente aux données raster précédemment utilisées. On souhaite obtenir la même visualisation que celle obtenue précédemment en requêtant la base de données. Pour ce faire, utiliser la fonction <code>sf::st_read</code> avec une requête sur la table <code>drias.previsions</code>. Pour la création de la carte, on peut utiliser le package <code>ggplot2</code> et sa fonction <a href="https://ggplot2.tidyverse.org/reference/ggsf.html"><code>geom_sf</code></a>.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -570,10 +597,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="app2_files/figure-html/drias_vis_postgresql-1.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 </div>
+</div>
+</div>
 </section>
 <section id="appariement-spatial-entre-données-drias-et-rpg" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="appariement-spatial-entre-données-drias-et-rpg"><span class="header-section-number">3.4</span> Appariement spatial entre données DRIAS et RPG</h2>
-<p>On souhaite effectuer cet appariement pour obtenir par carreau de la grille DRIAS la surface de parcelles pour chaque type de culture.</p>
+<p>On aimerait associer chaque culture à une évolution en terme de cumul de précipitation. Pour ceci il faut tout d’abord récupérer pour chaque culture la surface des parcelles existantes dans chaque carreau de la grille DRIAS. Pour ceci on peut procéder à un appariement spatial des tables <code>drias.previsions</code> et <code>rpg.parcelles</code> de la base de données. On pourra s’aider de <a href="https://postgis.net/workshops/postgis-intro/joins.html">cette page</a> de documentation, et utiliser <a href="https://postgis.net/docs/ST_Intersects.html"><code>ST_Intersects</code></a>.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -665,11 +704,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
-<p>On a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.</p>
+</div>
+</div>
+<p>A ce stade, on a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.</p>
 </section>
 <section id="calcul-dindicateurs-par-type-de-culture" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="calcul-dindicateurs-par-type-de-culture"><span class="header-section-number">3.5</span> Calcul d’indicateurs par type de culture</h2>
-<p>On peut maintenant calculer un écart moyen de cumul de précipitation (d’avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche.</p>
+<p>On peut maintenant calculer un écart moyen de cumul de précipitation (d’avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche. Un fichier <code>.csv</code> contenant les intitulés complets des différentes cultures est disponible sur MinIO (bucket <code>"projet-funathon"</code>, objet <code>"2023/sujet2/diffusion/ign/rpg/CULTURE.csv"</code>).</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -677,7 +728,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>culture_mapping <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> read.csv,</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">sep =</span> <span class="st">";"</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/ign/rpg/CULTURE.csv"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/ign/rpg/CULTURE.csv"</span>,</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -789,7 +840,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
-<p>Le maïs doux est une culture qui sera touchée par les baisses de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ?</p>
+</div>
+</div>
+<p>On observe que maïs doux est une culture qui va connaître une baisse de cumul de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ? On souhaite dessiner une carte indiquant l’emplacement de ces parcelles. Pour ce faire, faire une requête de la table <code>rpg.parcelles</code> et utiliser <code>ggplot2</code> et sa fonction <code>geom_sf</code> pour tracer la carte. Pour que les parcelles soient visibles, on pourra artificiellement augmenter leur surface grâce à la fonction <a href="https://r-spatial.github.io/sf/reference/geos_unary.html"><code>st_buffer</code></a>.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -818,7 +881,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="app2_files/figure-html/localisation-mais-1.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 </div>
-<p>On observe en effet beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.</p>
+</div>
+</div>
+<p>On observe comme attendu beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.</p>
+</section>
+<section id="pour-aller-plus-loin" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="pour-aller-plus-loin"><span class="header-section-number">3.6</span> Pour aller plus loin</h2>
+<p>Pour aller plus loin, plusieurs idées :</p>
+<ul>
+<li>Calculer des écarts en pourcentage par rapport au niveau sur la période de référence pour avoir une idée plus parlante de la diminution ou de l’augmentation du cumul de précipitations;</li>
+<li>Regarder plutôt les prévisions climatiques à long terme, en utilisant la table <code>drias.previsions_hl</code> qui concerne la période 2071-2100;</li>
+<li>S’intéresser aux autres indicateurs qui existent dans les données DRIAS;</li>
+</ul>
 
 
 <!-- -->
@@ -1112,8 +1186,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./Sujet2-Etape1.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Sujet2-Etape1</span></span>
+      <a href="./app1.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Première manipulation du RPG</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
@@ -1125,7 +1199,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Cultures et prévisions climatiques"</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="an">pagetitle:</span><span class="co"> "Prévisions"</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="an">keywords:</span><span class="co"> ["RPG", "prévisions, cultures"]</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="an">keywords:</span><span class="co"> ["RPG", "prévisions", "cultures"]</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="an">knitr:</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">  opts_chunk: </span></span>
@@ -1143,203 +1217,236 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visualisations</span></span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aws.s3)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co"># pour avoir les noms de dates en français</span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">Sys.setlocale</span>(<span class="st">"LC_ALL"</span>, <span class="st">"fr_FR.UTF-8"</span>))</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">knitr.kable.NA =</span> <span class="st">""</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>On initialise une nouvelle fois la connexion à PostgreSQL comme expliqué à la fin de l'application 0.</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aws.s3)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Pour avoir les noms de dates en français</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">Sys.setlocale</span>(<span class="st">"LC_ALL"</span>, <span class="st">"fr_FR.UTF-8"</span>))</span>
 <span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>cnx <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">Postgres</span>(),</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>                 <span class="at">user =</span> <span class="st">"projet-funathon"</span>,</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>                 <span class="at">password =</span> <span class="fu">Sys.getenv</span>(<span class="st">"PASS_POSTGRESQL"</span>),</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>                 <span class="at">host =</span> <span class="st">"postgresql-438832"</span>,</span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>                 <span class="at">dbname =</span> <span class="st">"defaultdb"</span>,</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>                 <span class="at">port =</span> <span class="dv">5432</span>,</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>                 <span class="at">check_interrupts =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>On souhaite tout d'abord visualiser les données DRIAS. On peut passer par les données sauvegardées au format raster qui sont stockées dans l'espace de stockage du SSP Cloud. Ces données correspondent à des prévisions à horizon proche (2021-2050) dans un scénario sans réduction des gaz à effet de serre, la période de référence étant 1976-2005.</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">knitr.kable.NA =</span> <span class="st">""</span>)</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>cnx <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">Postgres</span>(),</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>                 <span class="at">user =</span> <span class="fu">Sys.getenv</span>(<span class="st">"USER_POSTGRESQL"</span>),</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>                 <span class="at">password =</span> <span class="fu">Sys.getenv</span>(<span class="st">"PASS_POSTGRESQL"</span>),</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>                 <span class="at">host =</span> <span class="fu">Sys.getenv</span>(<span class="st">"HOST_POSTGRESQL"</span>),</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>                 <span class="at">dbname =</span> <span class="st">"defaultdb"</span>,</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>                 <span class="at">port =</span> <span class="dv">5432</span>,</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>                 <span class="at">check_interrupts =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: get-drias-raster</span></span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>drias_raster <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(f) <span class="fu">readAll</span>(<span class="fu">brick</span>(f)),</span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/resultats/drias.tif"</span>,</span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>))</span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>drias_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(drias_raster, <span class="at">xy =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> tidyr<span class="sc">::</span><span class="fu">drop_na</span>()</span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(drias_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>  <span class="st">"x"</span>,</span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>  <span class="st">"y"</span>,</span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORRRA"</span>,</span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORSTM6"</span>,</span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORSTM0"</span>,</span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORSDA"</span>,</span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORDATEVEG"</span>,</span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORDATEDG"</span>,</span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORDATEPG"</span>,</span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ARRA"</span>,</span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ASTM6"</span>,</span>
-<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ASTM0"</span>,</span>
-<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ASDA"</span>,</span>
-<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ADATEVEG"</span>,</span>
-<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ADATEDG"</span>,</span>
-<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ADATEPG"</span>,</span>
-<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ALTI"</span></span>
-<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>drias_df <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span>
-<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>On souhaite tout d'abord visualiser les données DRIAS. On peut passer par les données sauvegardées au format raster qui sont stockées dans l'espace de stockage du SSP Cloud. Ces données correspondent à des prévisions à horizon proche (2021-2050) dans un scénario sans réduction des gaz à effet de serre, la période de référence étant 1976-2005. Le code ci-dessous permet de récupérer les données.</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: get-drias-raster</span></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>drias_raster <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(f) <span class="fu">readAll</span>(<span class="fu">brick</span>(f)),</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/resultats/drias.tif"</span>,</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>))</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>drias_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(drias_raster, <span class="at">xy =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> tidyr<span class="sc">::</span><span class="fu">drop_na</span>()</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(drias_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>  <span class="st">"x"</span>,</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>  <span class="st">"y"</span>,</span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORRRA"</span>,</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORSTM6"</span>,</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORSTM0"</span>,</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORSDA"</span>,</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORDATEVEG"</span>,</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORDATEDG"</span>,</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>  <span class="st">"NORDATEPG"</span>,</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ARRA"</span>,</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ASTM6"</span>,</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ASTM0"</span>,</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ASDA"</span>,</span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ADATEVEG"</span>,</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ADATEDG"</span>,</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ADATEPG"</span>,</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ALTI"</span></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) :</span>
-<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>RRA : cumul de précipitations d'avril à octobre (mm)</span>
-<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>STM6 : somme de température base 6°C d'avril à octobre (°C)</span>
-<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>STM0 : somme de température base 0°C d'octobre (année-1) à juillet (année) (°C)</span>
-<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>SDA : nombre de jours d'été d'avril à juin (jour(s))</span>
-<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>DATEVEG : date de reprise de végétation en jour julien (date)</span>
-<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>DATEDG : Date de dernière gelée avec 1er juillet comme référence (date)</span>
-<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>DATEPG : Date de première gelée avec 1er juillet comme référence (date)</span>
-<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>On visualise la variable ARRA, qui correspond à l'écart de cumul de précipitations d'avril à octobre en mm.</span>
-<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: drias_vis_raster</span></span>
-<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="co"># Bande ARRA</span></span>
-<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>drias_raster_arra <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
-<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(f) <span class="fu">readAll</span>(<span class="fu">raster</span>(f, <span class="at">band =</span> <span class="dv">8</span>)),</span>
-<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/resultats/drias.tif"</span>,</span>
-<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
-<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>))</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>drias_df <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>Les variables disponibles dans les données DRIAS sont systématiquement calculées sur la période 2021-2050 (préfixe NOR), et en écart avec la période de référence (préfixe A) :</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>RRA : cumul de précipitations d'avril à octobre (mm)</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>STM6 : somme de température base 6°C d'avril à octobre (°C)</span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>STM0 : somme de température base 0°C d'octobre (année-1) à juillet (année) (°C)</span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>SDA : nombre de jours d'été d'avril à juin (jour(s))</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>DATEVEG : date de reprise de végétation en jour julien (date)</span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>DATEDG : Date de dernière gelée avec 1er juillet comme référence (date)</span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>DATEPG : Date de première gelée avec 1er juillet comme référence (date)</span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a>On souhaite visualiser la variable ARRA, qui correspond à la huitième couche du raster et correspond à l'écart de cumul de précipitations d'avril à octobre en mm. Pour faire cela, on pourra récupérer spécifiquement la couche désirée lors de l'utilisation de la fonction <span class="co">[</span><span class="ot">`raster::raster`</span><span class="co">](https://www.rdocumentation.org/packages/raster/versions/3.6-20/topics/raster)</span>. Pour la visualisation, on pourra utiliser <span class="co">[</span><span class="ot">`raster::plot`</span><span class="co">](https://www.rdocumentation.org/packages/raster/versions/3.6-20/topics/plot)</span>.</span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>::: {.callout-note icon=false}</span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: drias_vis_raster</span></span>
 <span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Avec palette custom</span></span>
-<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>palette <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#1457ff"</span>, <span class="st">"#3c9aff"</span>, <span class="st">"#6dc4ff"</span>, <span class="st">"#a8e1ff"</span>, <span class="st">"#dff1fb"</span>, <span class="st">"#f8e9eb"</span>, <span class="st">"#fca8ab"</span>, <span class="st">"#f9575d"</span>, <span class="st">"#f2060b"</span>, <span class="st">"#a20102"</span>)</span>
-<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">200</span>, <span class="sc">-</span><span class="dv">160</span>, <span class="sc">-</span><span class="dv">120</span>, <span class="sc">-</span><span class="dv">80</span>, <span class="sc">-</span><span class="dv">40</span>, <span class="sc">-</span><span class="dv">0</span>, <span class="dv">40</span>, <span class="dv">80</span>, <span class="dv">120</span>, <span class="dv">160</span>, <span class="dv">200</span>)</span>
-<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>raster<span class="sc">::</span><span class="fu">plot</span>(<span class="at">x =</span> drias_raster_arra,</span>
-<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>             <span class="at">col =</span> <span class="fu">rev</span>(palette),</span>
-<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>             <span class="at">breaks =</span> breaks,</span>
-<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>             <span class="at">main =</span> <span class="st">"Ecart de cumul de précipitations d'avril à octobre (mm) entre 2021-2050 et 1976-2005"</span>)</span>
-<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>Sur la période 2021-2050, les précipitations vont augmenter presque partout, sauf Sud-Ouest de la France (détails...).</span>
-<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a><span class="fu">## Requêtes PostgreSQL </span></span>
-<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a>Les données sont également stockées dans une base PostgreSQL qu'il est possible de requêter. La table <span class="in">`drias.previsions`</span> contient une grille équivalente aux données raster précédemment utilisées.</span>
-<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: drias_vis_postgresql</span></span>
-<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"</span></span>
-<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT *</span></span>
-<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a><span class="st">FROM drias.previsions</span></span>
-<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
-<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a>drias_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(cnx, <span class="at">query =</span> query)</span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Bande ARRA</span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>drias_raster_arra <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(f) <span class="fu">readAll</span>(<span class="fu">raster</span>(f, <span class="at">band =</span> <span class="dv">8</span>)),</span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/resultats/drias.tif"</span>,</span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>))</span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a><span class="co"># Avec palette custom</span></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>palette <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#1457ff"</span>, <span class="st">"#3c9aff"</span>, <span class="st">"#6dc4ff"</span>, <span class="st">"#a8e1ff"</span>, <span class="st">"#dff1fb"</span>, <span class="st">"#f8e9eb"</span>, <span class="st">"#fca8ab"</span>, <span class="st">"#f9575d"</span>, <span class="st">"#f2060b"</span>, <span class="st">"#a20102"</span>)</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">200</span>, <span class="sc">-</span><span class="dv">160</span>, <span class="sc">-</span><span class="dv">120</span>, <span class="sc">-</span><span class="dv">80</span>, <span class="sc">-</span><span class="dv">40</span>, <span class="sc">-</span><span class="dv">0</span>, <span class="dv">40</span>, <span class="dv">80</span>, <span class="dv">120</span>, <span class="dv">160</span>, <span class="dv">200</span>)</span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>raster<span class="sc">::</span><span class="fu">plot</span>(<span class="at">x =</span> drias_raster_arra,</span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a>             <span class="at">col =</span> <span class="fu">rev</span>(palette),</span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a>             <span class="at">breaks =</span> breaks,</span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a>             <span class="at">main =</span> <span class="st">"Ecart de cumul de précipitations d'avril à octobre (mm)</span><span class="sc">\n</span><span class="st">entre 2021-2050 et 1976-2005"</span>)</span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a>Sur la période 2021-2050, les précipitations vont augmenter presque partout, sauf dans le Sud-Ouest de la France.</span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="fu">## Requêtes PostgreSQL </span></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>Les données DRIAS sont également stockées dans une base PostgreSQL qu'il est possible de requêter. La table <span class="in">`drias.previsions`</span> contient une grille équivalente aux données raster précédemment utilisées. On souhaite obtenir la même visualisation que celle obtenue précédemment en requêtant la base de données. Pour ce faire, utiliser la fonction <span class="in">`sf::st_read`</span> avec une requête sur la table <span class="in">`drias.previsions`</span>. Pour la création de la carte, on peut utiliser le package <span class="in">`ggplot2`</span> et sa fonction <span class="co">[</span><span class="ot">`geom_sf`</span><span class="co">](https://ggplot2.tidyverse.org/reference/ggsf.html)</span>.</span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a>::: {.callout-note icon=false}</span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
 <span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> drias_sf, <span class="fu">aes</span>(<span class="at">fill =</span> arra), <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
-<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a>  <span class="fu">binned_scale</span>(<span class="at">aesthetics =</span> <span class="st">"fill"</span>, <span class="at">scale_name =</span> <span class="st">"custom"</span>, </span>
-<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a>               <span class="at">palette =</span> ggplot2<span class="sc">:::</span><span class="fu">binned_pal</span>(scales<span class="sc">::</span><span class="fu">manual_pal</span>(<span class="at">values =</span> <span class="fu">rev</span>(palette)[<span class="sc">-</span><span class="dv">1</span>])),</span>
-<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>               <span class="at">guide =</span> <span class="st">"bins"</span>,</span>
-<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> breaks)</span>
-<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a><span class="fu">## Appariement spatial entre données DRIAS et RPG</span></span>
-<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a>On souhaite effectuer cet appariement pour obtenir par carreau de la grille DRIAS la surface de parcelles pour chaque type de culture.</span>
-<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: spatial-join</span></span>
-<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="co"># On récupère par carreau de la grille DRIAS la surface pour chaque type de culture</span></span>
-<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"</span></span>
-<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT B.point, code_cultu, Sum(surf_parc) AS surface, B.arra</span></span>
-<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="st">FROM rpg.parcelles AS A</span></span>
-<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a><span class="st">JOIN drias.previsions AS B</span></span>
-<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a><span class="st">ON ST_Intersects(A.geom , B.geometry)</span></span>
-<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY B.point, B.arra, code_cultu</span></span>
-<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
-<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbSendQuery</span>(cnx, query)</span>
-<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>arra_df <span class="ot">&lt;-</span> <span class="fu">dbFetch</span>(res)</span>
-<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a>arra_df <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span>
-<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>On a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.</span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: drias_vis_postgresql</span></span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"</span></span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT *</span></span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a><span class="st">FROM drias.previsions</span></span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>drias_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(cnx, <span class="at">query =</span> query)</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> drias_sf, <span class="fu">aes</span>(<span class="at">fill =</span> arra), <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>  <span class="fu">binned_scale</span>(<span class="at">aesthetics =</span> <span class="st">"fill"</span>, <span class="at">scale_name =</span> <span class="st">"custom"</span>, </span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a>               <span class="at">palette =</span> ggplot2<span class="sc">:::</span><span class="fu">binned_pal</span>(scales<span class="sc">::</span><span class="fu">manual_pal</span>(<span class="at">values =</span> <span class="fu">rev</span>(palette)[<span class="sc">-</span><span class="dv">1</span>])),</span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a>               <span class="at">guide =</span> <span class="st">"bins"</span>,</span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> breaks)</span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## Appariement spatial entre données DRIAS et RPG</span></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a>On aimerait associer chaque culture à une évolution en terme de cumul de précipitation. Pour ceci il faut tout d'abord récupérer pour chaque culture la surface des parcelles existantes dans chaque carreau de la grille DRIAS. Pour ceci on peut procéder à un appariement spatial des tables <span class="in">`drias.previsions`</span> et <span class="in">`rpg.parcelles`</span> de la base de données. On pourra s'aider de <span class="co">[</span><span class="ot">cette page</span><span class="co">](https://postgis.net/workshops/postgis-intro/joins.html)</span> de documentation, et utiliser <span class="co">[</span><span class="ot">`ST_Intersects`</span><span class="co">](https://postgis.net/docs/ST_Intersects.html)</span>.</span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a>::: {.callout-note icon=false}</span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: spatial-join</span></span>
 <span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="fu">## Calcul d'indicateurs par type de culture</span></span>
-<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a>On peut maintenant calculer un écart moyen de cumul de précipitation (d'avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche. </span>
-<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: aggregation-culture</span></span>
-<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a><span class="co"># Récupération des libellés des codes culture</span></span>
-<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>culture_mapping <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
-<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> read.csv,</span>
-<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>  <span class="at">sep =</span> <span class="st">";"</span>,</span>
-<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/ign/rpg/CULTURE.csv"</span>,</span>
-<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
-<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>)</span>
-<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a><span class="co"># On aggrège au niveau national par code culture et on calcule un écart</span></span>
-<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a><span class="co"># moyen du cumul par m2</span></span>
-<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>agg_arra_df <span class="ot">&lt;-</span> arra_df <span class="sc">%&gt;%</span></span>
-<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(code_cultu) <span class="sc">%&gt;%</span></span>
-<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ecart_volume_precip =</span> <span class="fu">sum</span>(surface <span class="sc">*</span> arra), <span class="at">surface =</span> <span class="fu">sum</span>(surface)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ecart_cumul_moyen =</span> ecart_volume_precip <span class="sc">/</span> surface)</span>
-<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a><span class="co"># Récupération des 10 cultures avec une forte perte de précipitation</span></span>
-<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a>agg_arra_df <span class="sc">%&gt;%</span></span>
-<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(culture_mapping, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"code_cultu"</span> <span class="ot">=</span> <span class="st">"Code"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ecart_cumul_moyen) <span class="sc">%&gt;%</span></span>
-<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span>
-<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>Le maïs doux est une culture qui sera touchée par les baisses de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ?</span>
-<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: localisation-mais</span></span>
-<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a><span class="co"># Frontières régionales de métropole</span></span>
-<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a>region_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(</span>
-<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a>  cnx, <span class="at">query =</span> <span class="st">"SELECT * FROM adminexpress.region"</span></span>
-<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>region_sf <span class="ot">&lt;-</span> region_sf <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(</span>
-<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>  <span class="st">"EPSG:2154"</span></span>
-<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a>region_sf <span class="ot">&lt;-</span> region_sf <span class="sc">%&gt;%</span></span>
-<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(insee_reg <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"03"</span>, <span class="st">"04"</span>, <span class="st">"06"</span>, <span class="st">"01"</span>, <span class="st">"02"</span>, <span class="st">"01_SBSM"</span>)))</span>
-<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a><span class="co"># Parcelles de maïs doux</span></span>
-<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a>query_mid <span class="ot">&lt;-</span> <span class="st">"</span></span>
-<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT id_parcel, geom</span></span>
-<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a><span class="st">FROM rpg.parcelles</span></span>
-<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE code_cultu = 'MID'</span></span>
-<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
-<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>cultures_mid <span class="ot">&lt;-</span> <span class="fu">st_read</span>(cnx, <span class="at">query =</span> query_mid)</span>
-<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> region_sf) <span class="sc">+</span></span>
-<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_buffer</span>(cultures_mid, <span class="dv">5000</span>), <span class="at">fill =</span> <span class="st">"#fca8ab"</span>, <span class="at">color =</span> <span class="cn">NA</span>)</span>
-<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a>On observe en effet beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.</span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="co"># On récupère par carreau de la grille DRIAS la surface pour chaque type de culture</span></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"</span></span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT B.point, code_cultu, Sum(surf_parc) AS surface, B.arra</span></span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a><span class="st">FROM rpg.parcelles AS A</span></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a><span class="st">JOIN drias.previsions AS B</span></span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a><span class="st">ON ST_Intersects(A.geom , B.geometry)</span></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY B.point, B.arra, code_cultu</span></span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbSendQuery</span>(cnx, query)</span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a>arra_df <span class="ot">&lt;-</span> <span class="fu">dbFetch</span>(res)</span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a>arra_df <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a>A ce stade, on a récupéré une table avec la surface par type de culture pour chaque carreau de la grille.</span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a><span class="fu">## Calcul d'indicateurs par type de culture</span></span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>On peut maintenant calculer un écart moyen de cumul de précipitation (d'avril à octobre) par unité de surface pour chaque culture, afin identifier celles qui seront impactées par des baisses de précipitations à horizon proche. Un fichier <span class="in">`.csv`</span> contenant les intitulés complets des différentes cultures est disponible sur MinIO (bucket <span class="in">`"projet-funathon"`</span>, objet <span class="in">`"2023/sujet2/diffusion/ign/rpg/CULTURE.csv"`</span>).</span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>::: {.callout-note icon=false}</span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: aggregation-culture</span></span>
+<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a><span class="co"># Récupération des libellés des codes culture</span></span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a>culture_mapping <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> read.csv,</span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>  <span class="at">sep =</span> <span class="st">";"</span>,</span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/ign/rpg/CULTURE.csv"</span>,</span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>)</span>
+<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a><span class="co"># On aggrège au niveau national par code culture et on calcule un écart</span></span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a><span class="co"># moyen du cumul par m2</span></span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>agg_arra_df <span class="ot">&lt;-</span> arra_df <span class="sc">%&gt;%</span></span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(code_cultu) <span class="sc">%&gt;%</span></span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ecart_volume_precip =</span> <span class="fu">sum</span>(surface <span class="sc">*</span> arra), <span class="at">surface =</span> <span class="fu">sum</span>(surface)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ecart_cumul_moyen =</span> ecart_volume_precip <span class="sc">/</span> surface)</span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a><span class="co"># Récupération des 10 cultures avec une forte perte de précipitation</span></span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>agg_arra_df <span class="sc">%&gt;%</span></span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(culture_mapping, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"code_cultu"</span> <span class="ot">=</span> <span class="st">"Code"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ecart_cumul_moyen) <span class="sc">%&gt;%</span></span>
+<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>On observe que maïs doux est une culture qui va connaître une baisse de cumul de précipitations à horizon proche. Où sont situées les parcelles de maïs doux ? On souhaite dessiner une carte indiquant l'emplacement de ces parcelles. Pour ce faire, faire une requête de la table <span class="in">`rpg.parcelles`</span> et utiliser <span class="in">`ggplot2`</span> et sa fonction <span class="in">`geom_sf`</span> pour tracer la carte. Pour que les parcelles soient visibles, on pourra artificiellement augmenter leur surface grâce à la fonction <span class="co">[</span><span class="ot">`st_buffer`</span><span class="co">](https://r-spatial.github.io/sf/reference/geos_unary.html)</span>.</span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>::: {.callout-note icon=false}</span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a><span class="fu">## Solution</span></span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: localisation-mais</span></span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a><span class="co"># Frontières régionales de métropole</span></span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a>region_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(</span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a>  cnx, <span class="at">query =</span> <span class="st">"SELECT * FROM adminexpress.region"</span></span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a>region_sf <span class="ot">&lt;-</span> region_sf <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(</span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a>  <span class="st">"EPSG:2154"</span></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>region_sf <span class="ot">&lt;-</span> region_sf <span class="sc">%&gt;%</span></span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(insee_reg <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"03"</span>, <span class="st">"04"</span>, <span class="st">"06"</span>, <span class="st">"01"</span>, <span class="st">"02"</span>, <span class="st">"01_SBSM"</span>)))</span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a><span class="co"># Parcelles de maïs doux</span></span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a>query_mid <span class="ot">&lt;-</span> <span class="st">"</span></span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT id_parcel, geom</span></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a><span class="st">FROM rpg.parcelles</span></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE code_cultu = 'MID'</span></span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a>cultures_mid <span class="ot">&lt;-</span> <span class="fu">st_read</span>(cnx, <span class="at">query =</span> query_mid)</span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> region_sf) <span class="sc">+</span></span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_buffer</span>(cultures_mid, <span class="dv">5000</span>), <span class="at">fill =</span> <span class="st">"#fca8ab"</span>, <span class="at">color =</span> <span class="cn">NA</span>)</span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a>On observe comme attendu beaucoup de parcelles dans le Sud-Ouest où des baisses de précipitations sont attendues à horizon proche.</span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a><span class="fu">## Pour aller plus loin</span></span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>Pour aller plus loin, plusieurs idées :</span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Calculer des écarts en pourcentage par rapport au niveau sur la période de référence pour avoir une idée plus parlante de la diminution ou de l'augmentation du cumul de précipitations;</span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Regarder plutôt les prévisions climatiques à long terme, en utilisant la table <span class="in">`drias.previsions_hl`</span> qui concerne la période 2071-2100;</span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>S'intéresser aux autres indicateurs qui existent dans les données DRIAS;</span>
 </code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

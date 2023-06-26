@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.361">
+<meta name="generator" content="quarto-1.3.427">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -65,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./Sujet2-Etape1.html" rel="next">
+<link href="./app1.html" rel="next">
 <link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -127,8 +127,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Funathon 2023 - Sujet 2</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
-    <a href="./Funathon-2023---Sujet-2.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Funathon-2023---Sujet-2.pdf" rel="" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
 </div>
     </div>
       </div>
@@ -153,8 +153,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Sujet2-Etape1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Sujet2-Etape1</span></span></a>
+  <a href="./app1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Première manipulation du RPG</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -173,7 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">References</span></a>
+ <span class="menu-text">Références</span></a>
   </div>
 </li>
     </ul>
@@ -182,7 +182,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table des matières</h2>
+   
+  <ul>
+  <li><a href="#création-dun-service-postgresql" id="toc-création-dun-service-postgresql" class="nav-link active" data-scroll-target="#création-dun-service-postgresql"><span class="header-section-number">1.1</span> Création d’un service PostgreSQL</a></li>
+  <li><a href="#pgadmin" id="toc-pgadmin" class="nav-link" data-scroll-target="#pgadmin"><span class="header-section-number">1.2</span> pgAdmin</a></li>
+  <li><a href="#connexion-au-service-postgresql" id="toc-connexion-au-service-postgresql" class="nav-link" data-scroll-target="#connexion-au-service-postgresql"><span class="header-section-number">1.3</span> Connexion au service PostgreSQL</a></li>
+  <li><a href="#utilisation-de-lextension-postgis" id="toc-utilisation-de-lextension-postgis" class="nav-link" data-scroll-target="#utilisation-de-lextension-postgis"><span class="header-section-number">1.4</span> Utilisation de l’extension PostGIS</a></li>
+  <li><a href="#base-de-données-à-disposition" id="toc-base-de-données-à-disposition" class="nav-link" data-scroll-target="#base-de-données-à-disposition"><span class="header-section-number">1.5</span> Base de données à disposition</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -204,11 +214,115 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>A compléter.</p>
+<p>Dans cette première application, nous allons voir comment créer une base PostgreSQL sur le SSP Cloud, y importer des données, et enfin la requêter. Cette application est optionnelle, étant donné qu’une base de données PostgreSQL pré-configurée avec les tables nécessaires pour traiter ce sujet est accessible depuis n’importe quel service du SSP Cloud (nous verrons plus tard comment accéder à cette base de données).</p>
+<section id="création-dun-service-postgresql" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="création-dun-service-postgresql"><span class="header-section-number">1.1</span> Création d’un service PostgreSQL</h2>
+<p>Pour créer un service <code>PostgreSQL</code> sur le SSP Cloud, aller dans le catalogue de services et choisir l’onglet <em>Databases</em> avant de sélectionner <code>PostgreSQL</code>. Il est possible de modifier la configuration du service. La configuration par défaut conviendra dans la plupart des cas, mais on souhaitera parfois (et c’est le cas pour ce sujet) installer l’extension <code>PostGIS</code> (onglet <em>Extensions</em> de la configuration). A noter que lorsqu’on travaille en collaboration dans le cadre d’un projet, on préfèrera cliquer sur le bouton <code>Partager le service</code> pour rendre ce dernier plus facilement accessible à ses collaborateurs.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/launch_postgresql.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Partage d’un service PostgreSQL.</figcaption>
+</figure>
+</div>
+</section>
+<section id="pgadmin" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="pgadmin"><span class="header-section-number">1.2</span> pgAdmin</h2>
+<p><code>pgAdmin</code> est une plateforme d’administration et de développement pour <code>PostgreSQL</code> C’est une interface graphique pour <code>PostgreSQL</code>. <code>pgAdmin</code> est disponible dans le catalogue de service du SSP Cloud (toujours dans l’onglet <em>Databases</em>). Une fois le service lancé, se connecter en suivant les instructions données dans le README du service. Le serveur <code>PostgreSQL</code> lancé au préalable devrait être automatiquement détecté par la fonction d’<code>Autodiscovery</code> (panneau de gauche). Il est alors possible d’accéder aux différentes bases de données disponibles sur le serveur, de les requêter (en utilisant la fonctionnalité <code>Query Tool</code>), etc.</p>
+</section>
+<section id="connexion-au-service-postgresql" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="connexion-au-service-postgresql"><span class="header-section-number">1.3</span> Connexion au service PostgreSQL</h2>
+<p>Le serveur <code>PostgreSQL</code> est facilement accessible depuis n’importe quel service interactif (par exemple <code>RStudio</code>). Tous les langages de programmation disposent de librairies qui implémentent une interface avec <code>PostgreSQL</code>. En <code>R</code>, on peut par exemple utiliser la librairie <code>RPostgres</code>, basée sur la librairie <code>DBI</code>.</p>
+<p>Ci-dessous, on crée l’objet <code>conn</code> qui va nous permettre de communiquer avec <code>PostgreSQL</code>. Les paramètres <code>user</code>, <code>password</code> et <code>host</code> sont disponibles dans le README du service <code>PostgreSQL</code> (le paramètre <code>host</code> figure dans l’URL du README et a pour valeur <code>postgresql-xxxxxx</code>). Ici, on choisit de stocker ces différentes valeurs dans des variables d’environnement, <code>USER_POSTGRESQL</code>, <code>PASS_POSTGRESQL</code> et <code>HOST_POSTGRESQL</code>, ce qui est spécifié dans le fichier <code>~/.Renviron</code>. Pour éditer ce fichier, <code>file.edit("~/.Renviron")</code> en y ajoutant les lignes <code>USER_POSTGRESQL = "xxx"</code>, etc. puis relancer la session (ctrl + maj + F10).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aws.s3)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>conn <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">Postgres</span>(),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">user =</span> <span class="fu">Sys.getenv</span>(<span class="st">"USER_POSTGRESQL"</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">password =</span> <span class="fu">Sys.getenv</span>(<span class="st">"PASS_POSTGRESQL"</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">host =</span> <span class="fu">Sys.getenv</span>(<span class="st">"HOST_POSTGRESQL"</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dbname =</span> <span class="st">"defaultdb"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">port =</span> <span class="dv">5432</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">check_interrupts =</span> <span class="cn">TRUE</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A partir de l’objet <code>conn</code>, il est possible d’exécuter des requêtes et de récupérer les résultats petit à petit en utilisant les fonctions <code>dbSendQuery</code>, <code>dbFetch</code> et <code>dbClearResult</code>. Alternativement, pour récupérer tous les résultats de la requête directement lorsqu’ils tiennent en mémoire, on peut utiliser la fonction <code>dbGetQuery</code> qui rassemble les trois fonctions précédentes. Des fonctions utilitaires pour l’écriture de tables sont fournies par la librairie qu’on utilise, comme <code>dbWriteTable</code> pour écrire une table. Ainsi, si on a des données tabulaires stockées dans un <code>data.frame</code>,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">b =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbSendQuery</span>(conn, <span class="st">"CREATE SCHEMA IF NOT EXISTS test_schema"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(conn, <span class="fu">Id</span>(<span class="at">schema =</span> <span class="st">"test_schema"</span>, <span class="at">table =</span> <span class="st">"test_table"</span>), df, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(conn, <span class="st">"SELECT * FROM test_schema.test_table"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>res <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">a</th>
+<th style="text-align: right;">b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">a</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">b</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">c</td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="utilisation-de-lextension-postgis" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="utilisation-de-lextension-postgis"><span class="header-section-number">1.4</span> Utilisation de l’extension PostGIS</h2>
+<p>PostGIS est une extension de PostgreSQL, qui active la manipulation d’informations géographiques sous forme de géométries (points, lignes, polygones). Il permet à PostgreSQL d’être un système de gestion de base de données spatial pouvant être utilisé par les systèmes d’informations géographiques.</p>
+<p>On utilise la librairie <code>sf</code> pour gérer les données spatiales avec <code>R</code>. La fonction <code>write_sf</code> de cette librairie permet d’écrire des données dans une base de données PostGIS. Dans la suite on va illustrer comment créer une table contenant les données du RPG (décrites en détail plus tard, la documentation figure <a href="https://geoservices.ign.fr/documentation/donnees/vecteur/rpg">ici</a>). Ces données sont disponibles sur MinIO au format <code>.gpkg</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>parcelles <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> sf<span class="sc">::</span>read_sf,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">query =</span> <span class="st">'SELECT * FROM parcelles_graphiques LIMIT 10'</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/ign/rpg/PARCELLES_GRAPHIQUES.gpkg"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write_sf</span>(parcelles, conn, <span class="fu">Id</span>(<span class="at">schema =</span> <span class="st">"test_schema"</span>, <span class="at">table =</span> <span class="st">"test_parcelles"</span>), <span class="at">delete_layer =</span> <span class="cn">TRUE</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>On n’a écrit que 10 observations du fichier des parcelles pour cette démontration. On peut les requêter pour vérifier que l’information géographique figure bien dans la base de données.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  conn, <span class="at">query =</span> <span class="st">"SELECT * FROM test_schema.test_parcelles"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(sf))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="app0_files/figure-html/query-postgis-1.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+</section>
+<section id="base-de-données-à-disposition" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="base-de-données-à-disposition"><span class="header-section-number">1.5</span> Base de données à disposition</h2>
+<p>Dans toute la suite du sujet, on propose d’utiliser une base de données déjà préconfigurée, accessible depuis n’importe où sur le SSP Cloud. Pour accéder à cette base de données de la manière décrite ci-dessus, <code>HOST_POSTGRES</code> doit avoir pour valeur <code>postgresql-758156.projet-funathon</code>. Pour récupérer le nom d’utilisateur et le mot de passe, envoyer un message à Tom Seimandi (par mail ou sur Tchap). Dans la base de données <code>defaultdb</code>, les schémas <code>adminexpress</code>, <code>drias</code> et <code>rpg</code> contiennent les données mises à disposition pour traiter le sujet. Les participants ne disposent que des droits de lecture pour ces schémas (commande <code>SELECT</code>). Toutefois, le schéma <code>public</code> est disponible pour créer des tables temporaires, n’hésitez pas à le faire !</p>
 
 
 <!-- -->
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -502,23 +616,117 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./Sujet2-Etape1.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Sujet2-Etape1</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./app1.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Première manipulation du RPG</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Code source</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Utilisation de PostgreSQL"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">pagetitle:</span><span class="co"> "PostgreSQL"</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">keywords:</span><span class="co"> ["PostgreSQL", "base de données"]</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">knitr:</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">  opts_chunk: </span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">    dev: "ragg_png"</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    out.width: 100%</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>A compléter.</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Utilisation de PostgreSQL"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">pagetitle:</span><span class="co"> "PostgreSQL"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">keywords:</span><span class="co"> ["PostgreSQL", "base de données"]</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="an">knitr:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">  opts_chunk: </span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">    dev: "ragg_png"</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">    out.width: 100%</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>Dans cette première application, nous allons voir comment créer une base PostgreSQL sur le SSP Cloud, y importer des données, et enfin la requêter. Cette application est optionnelle, étant donné qu'une base de données PostgreSQL pré-configurée avec les tables nécessaires pour traiter ce sujet est accessible depuis n'importe quel service du SSP Cloud (nous verrons plus tard comment accéder à cette base de données).</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## Création d'un service PostgreSQL</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>Pour créer un service <span class="in">`PostgreSQL`</span> sur le SSP Cloud, aller dans le catalogue de services et choisir l'onglet *Databases* avant de sélectionner `PostgreSQL`. Il est possible de modifier la configuration du service. La configuration par défaut conviendra dans la plupart des cas, mais on souhaitera parfois (et c'est le cas pour ce sujet) installer l'extension `PostGIS` (onglet *Extensions* de la configuration). A noter que lorsqu'on travaille en collaboration dans le cadre d'un projet, on préfèrera cliquer sur le bouton <span class="in">`Partager le service`</span> pour rendre ce dernier plus facilement accessible à ses collaborateurs.</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="al">![Partage d'un service PostgreSQL.](img/launch_postgresql.png)</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## pgAdmin</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="in">`pgAdmin`</span> est une plateforme d'administration et de développement pour <span class="in">`PostgreSQL`</span> C'est une interface graphique pour <span class="in">`PostgreSQL`</span>. <span class="in">`pgAdmin`</span> est disponible dans le catalogue de service du SSP Cloud (toujours dans l'onglet *Databases*). Une fois le service lancé, se connecter en suivant les instructions données dans le README du service. Le serveur <span class="in">`PostgreSQL`</span> lancé au préalable devrait être automatiquement détecté par la fonction d'<span class="in">`Autodiscovery`</span> (panneau de gauche). Il est alors possible d'accéder aux différentes bases de données disponibles sur le serveur, de les requêter (en utilisant la fonctionnalité <span class="in">`Query Tool`</span>), etc.</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">## Connexion au service PostgreSQL</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>Le serveur <span class="in">`PostgreSQL`</span> est facilement accessible depuis n'importe quel service interactif (par exemple <span class="in">`RStudio`</span>). Tous les langages de programmation disposent de librairies qui implémentent une interface avec <span class="in">`PostgreSQL`</span>. En <span class="in">`R`</span>, on peut par exemple utiliser la librairie <span class="in">`RPostgres`</span>, basée sur la librairie <span class="in">`DBI`</span>. </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>Ci-dessous, on crée l'objet <span class="in">`conn`</span> qui va nous permettre de communiquer avec <span class="in">`PostgreSQL`</span>. Les paramètres <span class="in">`user`</span>, <span class="in">`password`</span> et <span class="in">`host`</span> sont disponibles dans le README du service <span class="in">`PostgreSQL`</span> (le paramètre <span class="in">`host`</span> figure dans l'URL du README et a pour valeur <span class="in">`postgresql-xxxxxx`</span>). Ici, on choisit de stocker ces différentes valeurs dans des variables d'environnement, <span class="in">`USER_POSTGRESQL`</span>, <span class="in">`PASS_POSTGRESQL`</span> et <span class="in">`HOST_POSTGRESQL`</span>, ce qui est spécifié dans le fichier <span class="in">`~/.Renviron`</span>. Pour éditer ce fichier, <span class="in">`file.edit("~/.Renviron")`</span> en y ajoutant les lignes <span class="in">`USER_POSTGRESQL = "xxx"`</span>, etc. puis relancer la session (ctrl + maj + F10).</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: connect-db</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aws.s3)</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>conn <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">Postgres</span>(),</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>                  <span class="at">user =</span> <span class="fu">Sys.getenv</span>(<span class="st">"USER_POSTGRESQL"</span>),</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>                  <span class="at">password =</span> <span class="fu">Sys.getenv</span>(<span class="st">"PASS_POSTGRESQL"</span>),</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>                  <span class="at">host =</span> <span class="fu">Sys.getenv</span>(<span class="st">"HOST_POSTGRESQL"</span>),</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dbname =</span> <span class="st">"defaultdb"</span>,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                  <span class="at">port =</span> <span class="dv">5432</span>,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                  <span class="at">check_interrupts =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>A partir de l'objet <span class="in">`conn`</span>, il est possible d'exécuter des requêtes et de récupérer les résultats petit à petit en utilisant les fonctions <span class="in">`dbSendQuery`</span>, <span class="in">`dbFetch`</span> et <span class="in">`dbClearResult`</span>. Alternativement, pour récupérer tous les résultats de la requête directement lorsqu'ils tiennent en mémoire, on peut utiliser la fonction <span class="in">`dbGetQuery`</span> qui rassemble les trois fonctions précédentes. Des fonctions utilitaires pour l'écriture de tables sont fournies par la librairie qu'on utilise, comme <span class="in">`dbWriteTable`</span> pour écrire une table. Ainsi, si on a des données tabulaires stockées dans un <span class="in">`data.frame`</span>, </span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: write-query</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>),</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">b =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbSendQuery</span>(conn, <span class="st">"CREATE SCHEMA IF NOT EXISTS test_schema"</span>)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(conn, <span class="fu">Id</span>(<span class="at">schema =</span> <span class="st">"test_schema"</span>, <span class="at">table =</span> <span class="st">"test_table"</span>), df, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(conn, <span class="st">"SELECT * FROM test_schema.test_table"</span>)</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>res <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## Utilisation de l'extension PostGIS</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>PostGIS est une extension de PostgreSQL, qui active la manipulation d'informations géographiques sous forme de géométries (points, lignes, polygones). Il permet à PostgreSQL d'être un système de gestion de base de données spatial pouvant être utilisé par les systèmes d'informations géographiques.</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>On utilise la librairie <span class="in">`sf`</span> pour gérer les données spatiales avec <span class="in">`R`</span>. La fonction <span class="in">`write_sf`</span> de cette librairie permet d'écrire des données dans une base de données PostGIS. Dans la suite on va illustrer comment créer une table contenant les données du RPG (décrites en détail plus tard, la documentation figure <span class="co">[</span><span class="ot">ici</span><span class="co">](https://geoservices.ign.fr/documentation/donnees/vecteur/rpg)</span>). Ces données sont disponibles sur MinIO au format <span class="in">`.gpkg`</span>.</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: write-postgis</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>parcelles <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> sf<span class="sc">::</span>read_sf,</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>  <span class="at">query =</span> <span class="st">'SELECT * FROM parcelles_graphiques LIMIT 10'</span>,</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> <span class="st">"2023/sujet2/diffusion/ign/rpg/PARCELLES_GRAPHIQUES.gpkg"</span>,</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>  <span class="at">bucket =</span> <span class="st">"projet-funathon"</span>,</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>  <span class="at">opts =</span> <span class="fu">list</span>(<span class="st">"region"</span> <span class="ot">=</span> <span class="st">""</span>)</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="fu">write_sf</span>(parcelles, conn, <span class="fu">Id</span>(<span class="at">schema =</span> <span class="st">"test_schema"</span>, <span class="at">table =</span> <span class="st">"test_parcelles"</span>), <span class="at">delete_layer =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>On n'a écrit que 10 observations du fichier des parcelles pour cette démontration. On peut les requêter pour vérifier que l'information géographique figure bien dans la base de données.</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: query-postgis</span></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>  conn, <span class="at">query =</span> <span class="st">"SELECT * FROM test_schema.test_parcelles"</span></span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(sf))</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a><span class="fu">## Base de données à disposition</span></span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>Dans toute la suite du sujet, on propose d'utiliser une base de données déjà préconfigurée, accessible depuis n'importe où sur le SSP Cloud. Pour accéder à cette base de données de la manière décrite ci-dessus, <span class="in">`HOST_POSTGRES`</span> doit avoir pour valeur <span class="in">`postgresql-758156.projet-funathon`</span>. Pour récupérer le nom d'utilisateur et le mot de passe, envoyer un message à Tom Seimandi (par mail ou sur Tchap). Dans la base de données <span class="in">`defaultdb`</span>, les schémas <span class="in">`adminexpress`</span>, <span class="in">`drias`</span> et <span class="in">`rpg`</span> contiennent les données mises à disposition pour traiter le sujet. Les participants ne disposent que des droits de lecture pour ces schémas (commande <span class="in">`SELECT`</span>). Toutefois, le schéma <span class="in">`public`</span> est disponible pour créer des tables temporaires, n'hésitez pas à le faire !</span>
+</code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

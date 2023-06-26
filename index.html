@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.361">
+<meta name="generator" content="quarto-1.3.427">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -128,8 +128,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Funathon 2023 - Sujet 2</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
-    <a href="./Funathon-2023---Sujet-2.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Funathon-2023---Sujet-2.pdf" rel="" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
 </div>
     </div>
       </div>
@@ -154,8 +154,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Sujet2-Etape1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Sujet2-Etape1</span></span></a>
+  <a href="./app1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Première manipulation du RPG</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">References</span></a>
+ <span class="menu-text">Références</span></a>
   </div>
 </li>
     </ul>
@@ -187,7 +187,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table des matières</h2>
    
   <ul>
-  <li><a href="#contexte-et-description-du-sujet" id="toc-contexte-et-description-du-sujet" class="nav-link active" data-scroll-target="#contexte-et-description-du-sujet">Contexte et description du sujet</a></li>
+  <li><a href="#contexte-et-description-du-sujet" id="toc-contexte-et-description-du-sujet" class="nav-link active" data-scroll-target="#contexte-et-description-du-sujet">Contexte et description du sujet</a>
+  <ul class="collapse">
+  <li><a href="#mise-en-route" id="toc-mise-en-route" class="nav-link" data-scroll-target="#mise-en-route">Mise en route</a></li>
+  <li><a href="#les-données-utilisées" id="toc-les-données-utilisées" class="nav-link" data-scroll-target="#les-données-utilisées">Les données utilisées</a></li>
+  <li><a href="#etape-0-optionnel-création-dune-base-de-données-postgresql" id="toc-etape-0-optionnel-création-dune-base-de-données-postgresql" class="nav-link" data-scroll-target="#etape-0-optionnel-création-dune-base-de-données-postgresql">Etape 0 (optionnel) : Création d’une base de données PostgreSQL</a></li>
+  <li><a href="#etape-1-première-manipulation-du-rpg" id="toc-etape-1-première-manipulation-du-rpg" class="nav-link" data-scroll-target="#etape-1-première-manipulation-du-rpg">Etape 1 : Première manipulation du RPG</a></li>
+  <li><a href="#etape-2-exposition-des-cultures-au-déficit-de-précipitations" id="toc-etape-2-exposition-des-cultures-au-déficit-de-précipitations" class="nav-link" data-scroll-target="#etape-2-exposition-des-cultures-au-déficit-de-précipitations">Etape 2 : Exposition des cultures au déficit de précipitations</a></li>
+  <li><a href="#etape-3-evolution-des-cultures-lien-avec-le-climat-passé" id="toc-etape-3-evolution-des-cultures-lien-avec-le-climat-passé" class="nav-link" data-scroll-target="#etape-3-evolution-des-cultures-lien-avec-le-climat-passé">Etape 3 : Evolution des cultures, lien avec le climat passé</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -215,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading"></div>
     <div class="quarto-title-meta-contents">
-      <p class="date">12 juin 2023</p>
+      <p class="date">26 juin 2023</p>
     </div>
   </div>
   
@@ -227,16 +235,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="contexte-et-description-du-sujet" class="level1 unnumbered">
 <h1 class="unnumbered">Contexte et description du sujet</h1>
+<p>Ce sujet s’articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous et disponibles sur les pages suivantes. Ces applications sont des points de départ, tout comme les solutions proposées - n’hésitez pas à aller plus loin !</p>
 <p>Avec ce sujet, vous allez pouvoir :</p>
 <ul>
-<li>Utiliser une base de données PostgreSQL</li>
-<li>Travailler avec des données géographiques</li>
-<li>A compléter</li>
+<li>Travailler avec le langage <code>R</code>;</li>
+<li>Manipuler des données spatiales : vecteurs et rasters avec les packages <code>sf</code>, <code>terra</code>, <code>stars</code>;</li>
+<li>Utiliser une base de données <code>PostgreSQL</code> et son extension <code>PostGIS</code>;</li>
+<li>Créer des visualisations avec <code>ggplot2</code>;</li>
+<li>Développer un tableau de bord interactif avec <code>shiny</code>;</li>
+<li>Utiliser le lissage spatial pour synthétiser des données géographiques avec <code>btb</code>;</li>
+<li>Estimer des tendances avec un modèle linéaire.</li>
 </ul>
+<section id="mise-en-route" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="mise-en-route">Mise en route</h3>
+<p>Avant tout, il faut qu’une personne dans l’équipe commence par <em>fork</em> ce <a href="https://git.lab.sspcloud.fr/ssplab/funathon2023/funathon_sujet2">dépôt de code sur Gitlab</a>, et donne les droits d’écriture sur le <em>fork</em> à ses partenaires (tout ceci est expliqué dans <a href="https://inseefrlab.github.io/funathon2023/additional.html">cette vidéo</a> de présentation du Funathon). Tous les membres de l’équipe peuvent maintenant ouvrir un service <code>RStudio</code> sur le <code>SSP Cloud</code> et créer un nouveau projet à partir du dépôt <em>forké</em> (<strong><code>File</code></strong> &gt; <strong><code>New project</code></strong> &gt; <strong><code>Version Control</code></strong> &gt; <strong><code>Git</code></strong>), sur lequel ils pourront pousser leur code !</p>
+<p>Pour disposer de toutes les librairies nécessaires, il est possible de faire toutes les installations avec <code>renv::restore()</code> (~10 min). Bien sûr si vous avez besoin de packages supplémentaires à un moment donné, n’hésitez pas à les installer !</p>
+<p>Pour traiter le sujet, nous vous laissons libres de vous organiser comme vous le souhaitez. Vous pouvez par exemple créer vous-mêmes vos scripts (par exemple un script par application et par personne, avant de mutualiser les avancées - sauf pour l’application <code>shiny</code> où nous suggérons explicitement de créer plusieurs scripts à placer dans un répertoire <em>ad hoc</em>), et lorsque vous en ressentez le besoin aller tirer des bouts de code des solutions que nous proposons sur ce site.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note sur l’accès à l’espace de stockage
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Si vous lancez un service interactif <code>RStudio</code> au cours de la première journée et que utilisez le même lors de la seconde journée, vos identifiants permettant l’accès à l’espace de stockage du <code>SSP Cloud</code> auront expiré. Vous trouverez sur <a href="https://datalab.sspcloud.fr/account/storage">cette page</a> des scripts (<code>R</code> notamment) permettant de mettre à jour les variables d’environnement concernées.</p>
+</div>
+</div>
+</section>
+<section id="les-données-utilisées" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="les-données-utilisées">Les données utilisées</h3>
+<p>Ce sujet propose de manipuler :</p>
+<ul>
+<li>Le <a href="https://www.data.gouv.fr/fr/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/">Registre Parcellaire Graphique (RPG)</a>;</li>
+<li>Des données du <a href="http://www.drias-climat.fr/decouverte">Drias</a> de simulation de l’évolution climatique pour le siècle en cours sur la France;</li>
+<li>Des données <a href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators">ERA5</a> agro-météorologiques de surface <strong>quotidiens</strong> pour la période allant de 1979 à aujourd’hui.</li>
+</ul>
+</section>
+<section id="etape-0-optionnel-création-dune-base-de-données-postgresql" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="etape-0-optionnel-création-dune-base-de-données-postgresql">Etape 0 (optionnel) : Création d’une base de données PostgreSQL</h3>
+<p>Les données du RPG étant volumineuses, il faut pouvoir les requêter depuis une base de données. Les gentils organisateurs vous ont déjà préparé une base de données PostgreSQL (avec l’extension PostGIS) prête à l’emploi pour ce sujet. Néanmoins, nous vous expliquons comment procéder si vous souhaitez être en mesure de le faire vous-mêmes sur la plateforme SSP Cloud.</p>
+</section>
+<section id="etape-1-première-manipulation-du-rpg" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="etape-1-première-manipulation-du-rpg">Etape 1 : Première manipulation du RPG</h3>
+<p>L’objectif de cette étape est d’effectuer des premières requêtes géographiques permettant d’examiner les cultures à proximité d’un point géographique donné, de comparer la composition observée avec les compositions départementale et nationale. Pour aller plus loin, nous proposons de développer une interface graphique de type tableau de bord permettant d’obtenir ces informations interactivement en cliquant sur une carte.</p>
+</section>
+<section id="etape-2-exposition-des-cultures-au-déficit-de-précipitations" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="etape-2-exposition-des-cultures-au-déficit-de-précipitations">Etape 2 : Exposition des cultures au déficit de précipitations</h3>
+<p>Cette deuxième étape est fortement inspirée de l’excellente <a href="https://www.insee.fr/fr/statistiques/6522912">étude</a> réalisée par C. Fontès-Rousseau, R. Lardellier (DR Occitanie Insee) et JM Soubeyroux (Météo France). Son objectif est de mettre en regard cultures et prévisions climatiques localement, pour identifier des cultures particulièrement mises en danger par le changement climatique en France.</p>
+</section>
+<section id="etape-3-evolution-des-cultures-lien-avec-le-climat-passé" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="etape-3-evolution-des-cultures-lien-avec-le-climat-passé">Etape 3 : Evolution des cultures, lien avec le climat passé</h3>
+<p>Après avoir regardé vers l’avenir, il est temps de jeter un coup d’oeil dans le rétroviseur, et de regarder comment l’évolution des températures au cours des 40 dernières années a pu influencer certaines cultures en France. Nous estimerons l’évolution des dates potentielles de récolte du maïs grain dans les différents bassins de production français depuis 1980.</p>
 
 
 <!-- -->
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -535,11 +592,55 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Code source</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
 <div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Contexte et description du sujet {.unnumbered}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Avec ce sujet, vous allez pouvoir :</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous et disponibles sur les pages suivantes. Ces applications sont des points de départ, tout comme les solutions proposées - n'hésitez pas à aller plus loin !</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Utiliser une base de données PostgreSQL</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Travailler avec des données géographiques</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A compléter</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>Avec ce sujet, vous allez pouvoir :</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Travailler avec le langage <span class="in">`R`</span>;</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Manipuler des données spatiales : vecteurs et rasters avec les packages <span class="in">`sf`</span>, <span class="in">`terra`</span>, <span class="in">`stars`</span>;</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Utiliser une base de données <span class="in">`PostgreSQL`</span> et son extension <span class="in">`PostGIS`</span>;</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Créer des visualisations avec <span class="in">`ggplot2`</span>;</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Développer un tableau de bord interactif avec <span class="in">`shiny`</span>;</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Utiliser le lissage spatial pour synthétiser des données géographiques avec <span class="in">`btb`</span>;</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Estimer des tendances avec un modèle linéaire.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mise en route {.unnumbered}</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>Avant tout, il faut qu'une personne dans l'équipe commence par *fork* ce [dépôt de code sur Gitlab](https://git.lab.sspcloud.fr/ssplab/funathon2023/funathon_sujet2), et donne les droits d'écriture sur le *fork* à ses partenaires (tout ceci est expliqué dans [cette vidéo](https://inseefrlab.github.io/funathon2023/additional.html) de présentation du Funathon). Tous les membres de l'équipe peuvent maintenant ouvrir un service `RStudio` sur le `SSP Cloud` et créer un nouveau projet à partir du dépôt *forké* (**`File`** &gt; **`New project`** &gt; **`Version Control`** &gt; **`Git`**), sur lequel ils pourront pousser leur code !</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>Pour disposer de toutes les librairies nécessaires, il est possible de faire toutes les installations avec <span class="in">`renv::restore()`</span> (~10 min). Bien sûr si vous avez besoin de packages supplémentaires à un moment donné, n'hésitez pas à les installer !</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>Pour traiter le sujet, nous vous laissons libres de vous organiser comme vous le souhaitez. Vous pouvez par exemple créer vous-mêmes vos scripts (par exemple un script par application et par personne, avant de mutualiser les avancées - sauf pour l'application <span class="in">`shiny`</span> où nous suggérons explicitement de créer plusieurs scripts à placer dans un répertoire *ad hoc*), et lorsque vous en ressentez le besoin aller tirer des bouts de code des solutions que nous proposons sur ce site.</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>::: {.callout-note icon=false}</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">## Note sur l'accès à l'espace de stockage</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>Si vous lancez un service interactif <span class="in">`RStudio`</span> au cours de la première journée et que utilisez le même lors de la seconde journée, vos identifiants permettant l'accès à l'espace de stockage du <span class="in">`SSP Cloud`</span> auront expiré. Vous trouverez sur <span class="co">[</span><span class="ot">cette page</span><span class="co">](https://datalab.sspcloud.fr/account/storage)</span> des scripts (<span class="in">`R`</span> notamment) permettant de mettre à jour les variables d'environnement concernées.</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">### Les données utilisées {.unnumbered}</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>Ce sujet propose de manipuler :</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Le <span class="co">[</span><span class="ot">Registre Parcellaire Graphique (RPG)</span><span class="co">](https://www.data.gouv.fr/fr/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/)</span>;</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Des données du <span class="co">[</span><span class="ot">Drias</span><span class="co">](http://www.drias-climat.fr/decouverte)</span> de simulation de l'évolution climatique pour le siècle en cours sur la France;</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Des données <span class="co">[</span><span class="ot">ERA5</span><span class="co">](https://cds.climate.copernicus.eu/cdsapp#!/dataset/sis-agrometeorological-indicators)</span> agro-météorologiques de surface **quotidiens** pour la période allant de 1979 à aujourd'hui.</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">### Etape 0 (optionnel) : Création d'une base de données PostgreSQL {.unnumbered}</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>Les données du RPG étant volumineuses, il faut pouvoir les requêter depuis une base de données. Les gentils organisateurs vous ont déjà préparé une base de données PostgreSQL (avec l'extension PostGIS) prête à l'emploi pour ce sujet. Néanmoins, nous vous expliquons comment procéder si vous souhaitez être en mesure de le faire vous-mêmes sur la plateforme SSP Cloud.</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### Etape 1 : Première manipulation du RPG {.unnumbered}</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>L'objectif de cette étape est d'effectuer des premières requêtes géographiques permettant d'examiner les cultures à proximité d'un point géographique donné, de comparer la composition observée avec les compositions départementale et nationale. Pour aller plus loin, nous proposons de développer une interface graphique de type tableau de bord permettant d'obtenir ces informations interactivement en cliquant sur une carte.</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="fu">### Etape 2 : Exposition des cultures au déficit de précipitations {.unnumbered}</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>Cette deuxième étape est fortement inspirée de l'excellente <span class="co">[</span><span class="ot">étude</span><span class="co">](https://www.insee.fr/fr/statistiques/6522912)</span> réalisée par C. Fontès-Rousseau, R. Lardellier (DR Occitanie Insee) et JM Soubeyroux (Météo France). Son objectif est de mettre en regard cultures et prévisions climatiques localement, pour identifier des cultures particulièrement mises en danger par le changement climatique en France.</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">### Etape 3 : Evolution des cultures, lien avec le climat passé {.unnumbered}</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>Après avoir regardé vers l'avenir, il est temps de jeter un coup d'oeil dans le rétroviseur, et de regarder comment l'évolution des températures au cours des 40 dernières années a pu influencer certaines cultures en France. Nous estimerons l'évolution des dates potentielles de récolte du maïs grain dans les différents bassins de production français depuis 1980.</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
