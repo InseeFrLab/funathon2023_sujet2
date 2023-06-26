@@ -25,7 +25,7 @@ Pour créer un service `PostgreSQL` sur le SSP Cloud, aller dans le catalogue de
 
 Le serveur `PostgreSQL` est facilement accessible depuis n'importe quel service interactif (par exemple `RStudio`). Tous les langages de programmation disposent de librairies qui implémentent une interface avec `PostgreSQL`. En `R`, on peut par exemple utiliser la librairie `RPostgres`, basée sur la librairie `DBI`. 
 
-Ci-dessous, on crée l'objet `conn` qui va nous permettre de communiquer avec `PostgreSQL`. Les paramètres `user`, `password` et `host` sont disponibles dans le README du service `PostgreSQL` (le paramètre `host` figure dans l'URL du README et a pour valeur `postgresql-xxxxxx`). Ici, on choisit de stocker ces différentes valeurs dans des variables d'environnement, `USER_POSTGRES`, `PASS_POSTGRES` et `HOST_POSTGRES`, ce qui est spécifié dans le fichier `~/.Renviron`. Pour éditer ce fichier, `file.edit("~/.Renviron")` puis relancer la session (ctrl + maj + F10).
+Ci-dessous, on crée l'objet `conn` qui va nous permettre de communiquer avec `PostgreSQL`. Les paramètres `user`, `password` et `host` sont disponibles dans le README du service `PostgreSQL` (le paramètre `host` figure dans l'URL du README et a pour valeur `postgresql-xxxxxx`). Ici, on choisit de stocker ces différentes valeurs dans des variables d'environnement, `USER_POSTGRESQL`, `PASS_POSTGRESQL` et `HOST_POSTGRESQL`, ce qui est spécifié dans le fichier `~/.Renviron`. Pour éditer ce fichier, `file.edit("~/.Renviron")` puis relancer la session (ctrl + maj + F10).
 
 ```{r}
 #| label: connect-db
