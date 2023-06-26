@@ -75,7 +75,7 @@ Le pas-à-pas détaillé est décrit sur [la page de démarrage](app0.html), mai
 - Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO :
 
   `mc cp -r s3/projet-funathon/2023/sujet2/diffusion/era5/ ~/work/funathon2023_sujet2/data/era5/`
-- Pour se connecter à la base PostgreSQL, il faudra avoir défini les bonnes variables d'environnements par exemple en ajoutant `PASS_POSTGRESQL=xxxx`, etc. dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et en ayant relancé la session (ctrl+maj+F10).
+- Pour se connecter à la base PostgreSQL, il faudra avoir défini les bonnes variables d'environnements par exemple en ajoutant `PASS_POSTGRESQL = "xxxx"`, etc. dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et en ayant relancé la session (ctrl+maj+F10).
 
 ```{r}
 #| label: setup
