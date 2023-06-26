@@ -13,21 +13,6 @@ Dans cette application, nous souhaitons effectuer des premières requêtes géog
 
 Comme expliqué dans l'application précédente, la base PostgreSQL est accessible depuis tous les services interactifs du cluster. Des indications sur la manière de s'y connecter figurent sur la page. Pour rappel, le schéma `public` est ouvert à tous en écriture pour créer des tables temporaires. Pour ces tables, essayez **d'utiliser des noms uniques** pour éviter d'entrer en conflit avec d'autres équipes.
 
-```{r setup, include=FALSE}
-#| label: setup
-#| echo: false
-
-library(tidyverse) 
-library(aws.s3)
-library(sf)
-library(RPostgres)
-library(janitor)
-library(kableExtra)
-library(leaflet)
-library(htmlwidgets)
-library(RColorBrewer)
-```
-
 ## Récupération des coordonnées d'un point
 
 Commençons par récupérer les coordonnées d'un point sur Google Maps et par les stocker dans un objet spatial grâce au package [`sf`](https://r-spatial.github.io/sf/). Choisissez un point sur [la carte](https://www.google.fr/maps) et copiez ses coordonnées dans le presse-papier grâce à un clic droit. Créez ensuite deux variables `lat` et `lon` contenant la latitude et la longitude du point, ainsi qu'une variable `rayon` contenant le rayon souhaité pour la suite de l'analyse (en mètres).
@@ -39,6 +24,16 @@ Créez ensuite un objet `point` contenant les informations spatiales du point et
 
 ```{r}
 #| label: choix coordonnées + rayon
+
+library(tidyverse) 
+library(aws.s3)
+library(sf)
+library(RPostgres)
+library(janitor)
+library(kableExtra)
+library(leaflet)
+library(htmlwidgets)
+library(RColorBrewer)
 
 coord_gmaps <- "43.447894436406216, 1.2886163291688764"
 lat <- as.numeric(str_split(coord_gmaps, fixed(","), simplify = TRUE)[,1])
