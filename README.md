@@ -2,7 +2,7 @@
 
 ## Explorer la géographie des cultures agricoles françaises
 
-Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous qui sont disponibles **sur ce [site](https://inseefrlab.github.io/funathon2023_sujet2/)**.
+Ce sujet s'articule autour de la question suivante : dans quelle mesure notre système actuel de cultures est-il exposé au changement climatique ? Il est composé de plusieurs applications décrites ci-dessous qui sont disponibles **sur ce [site](https://inseefrlab.github.io/funathon2023_sujet2/)**, dont le contenu est défini dans le répertoire `website` : le code peut être lancé directement dans les fichiers `.qmd` qui s'y trouvent.
 
 ### Les données utilisées
 
