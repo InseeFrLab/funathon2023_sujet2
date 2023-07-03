@@ -196,7 +196,7 @@ carte_parc_prox_html
 
 ### Composition des parcelles agricoles récupérées
 
-On souhaite calculer des statistiques sur les parcelles récupérées. Dans une table `t1`, inclure le nombre de parcelles par groupe de culture, ainsi que le nombre total de parcelles parmi l'échantillon issu de la requête. Faites la même chose sur la surface des parcelles, puis calculez la surface moyenne par unité de surface et groupe de culture.
+On souhaite calculer des statistiques sur les parcelles récupérées. Dans une table `t1`, inclure le nombre de parcelles par groupe de culture, ainsi que le nombre total de parcelles parmi l'échantillon issu de la requête. Faites la même chose sur la surface des parcelles, puis calculez la surface moyenne par parcelle et groupe de culture.
 
 ::: {.callout-note icon=false}
 ## Solution

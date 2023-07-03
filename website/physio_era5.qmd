@@ -67,14 +67,16 @@ Des données anciennes existent pour certaines cultures, par exemple pour la vig
 
 ## Préparation
 
-Le pas-à-pas détaillé est décrit sur [la page de démarrage](app0.html), mais en résumé :
+Le pas-à-pas détaillé est décrit sur [la page de démarrage](app0.html):
 
-- Si configuré au lancement de la session RStudio, le *pull* depuis <https://github.com/InseeFrLab/funathon2023_sujet2> a dû être fait.
-- Ouvrir le projet RStudio *funathon2023_sujet2.Rproj*. 
-- Restaurer les packages à utiliser : `renv::restore()` (11 min).
-- Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO :
+- Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO. Pour cela commencez par exécuter la commande "MC client" de cette page dans votre Terminal, puis les commandes suivantes :
+```
+mc cp minio/projet-funathon/2023/sujet2/diffusion/era5.zip ~/work/funathon_sujet2/data/era5.zip
+unzip ~/work/funathon_sujet2/data/era5.zip -d ~/work/funathon_sujet2/data/
+rm ~/work/funathon_sujet2/data/era5.zip
+```
+A noter qu'avec ces commandes on copie dans un projet qui se trouve dans un répertoire `funathon_sujet2`, si votre projet se trouve dans un répertoire `funathon2023_sujet2` (ce qui est probablement le cas si vous avez cloné le dépôt Github plutôt que Gitlab), il faut modifier ces commandes légèrement en fonction de ça;
 
-  `mc cp -r s3/projet-funathon/2023/sujet2/diffusion/era5/ ~/work/funathon2023_sujet2/data/era5/`
 - Pour se connecter à la base PostgreSQL, il faudra avoir défini les bonnes variables d'environnements par exemple en ajoutant `PASS_POSTGRESQL = "xxxx"`, etc. dans le fichier *\~/.Renviron* : `file.edit("~/.Renviron")` et en ayant relancé la session (ctrl+maj+F10).
 
 ```{r}
