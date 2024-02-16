@@ -581,7 +581,7 @@ connect_to_db <- function() {
   cnx <- dbConnect(Postgres(),
                    user = Sys.getenv("USER_POSTGRESQL"),
                    password = Sys.getenv("PASS_POSTGRESQL"),
-                   host = "postgresql-758156.projet-funathon",
+                   host = "postgresql-100400.projet-funathon",
                    dbname = "defaultdb",
                    port = 5432,
                    check_interrupts = TRUE)
