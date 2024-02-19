@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.361">
+<meta name="generator" content="quarto-1.4.549">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -65,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./physio_era5.html" rel="next">
+<link href="./app3.html" rel="next">
 <link href="./app1.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -82,7 +82,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "Pas de résultats",
     "search-matching-documents-text": "documents trouvés",
@@ -91,6 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "correspondance de plus dans ce document",
     "search-more-matches-text": "correspondances de plus dans ce document",
     "search-clear-button-title": "Effacer",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Annuler",
     "search-submit-button-title": "Envoyer",
     "search-label": "Recherche"
@@ -107,12 +114,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./app2.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Cultures et prévisions climatiques</span></a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./app2.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Cultures et prévisions climatiques</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
@@ -122,12 +129,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Funathon 2023 - Sujet 2</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/InseeFrLab/funathon2023_sujet2/tree/main/website/" title="Code source" class="quarto-navigation-tool px-1" aria-label="Code source"><i class="bi bi-github"></i></a>
     <a href="./Funathon-2023---Sujet-2.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
 </div>
     </div>
@@ -165,7 +172,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./physio_era5.html" class="sidebar-item-text sidebar-link">
+  <a href="./app3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Évolution de la date théorique de récolte</span></span></a>
   </div>
 </li>
@@ -179,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -213,7 +220,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+<div>
+  <div class="keywords">
+    <div class="block-title">Mots clés</div>
+    <p>RPG, prévisions, cultures</p>
+  </div>
+</div>
+
 </header>
+
 
 <p>Le changement climatique aura des changements importants sur les cultures en France, en particulier à cause de la diminution des précipitations dans certaines régions au cours des années à venir. Dans cette application, on souhaite identifier les cultures avec le niveau de risque le plus élevé.</p>
 <section id="données" class="level2" data-number="3.1">
@@ -538,8 +553,8 @@ Solution
 </div>
 <div class="callout-body-container callout-body">
 <div class="cell">
-<details>
-<summary>Code</summary>
+<details class="code-fold">
+<summary>voir le code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bande ARRA</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>drias_raster_arra <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(f) <span class="fu">readAll</span>(<span class="fu">raster</span>(f, <span class="at">band =</span> <span class="dv">8</span>)),</span>
@@ -557,7 +572,11 @@ Solution
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">main =</span> <span class="st">"Ecart de cumul de précipitations d'avril à octobre (mm)</span><span class="sc">\n</span><span class="st">entre 2021-2050 et 1976-2005"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="app2_files/figure-html/drias_vis_raster-1.png" class="img-fluid" style="width:100.0%"></p>
+<div>
+<figure class="figure">
+<p><img src="app2_files/figure-html/drias_vis_raster-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -578,8 +597,8 @@ Solution
 </div>
 <div class="callout-body-container callout-body">
 <div class="cell">
-<details>
-<summary>Code</summary>
+<details class="code-fold">
+<summary>voir le code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT *</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM drias.previsions</span></span>
@@ -594,7 +613,11 @@ Solution
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> breaks)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="app2_files/figure-html/drias_vis_postgresql-1.png" class="img-fluid" style="width:100.0%"></p>
+<div>
+<figure class="figure">
+<p><img src="app2_files/figure-html/drias_vis_postgresql-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -614,8 +637,8 @@ Solution
 </div>
 <div class="callout-body-container callout-body">
 <div class="cell">
-<details>
-<summary>Code</summary>
+<details class="code-fold">
+<summary>voir le code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On récupère par carreau de la grille DRIAS la surface pour chaque type de culture</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT B.point, code_cultu, Sum(surf_parc) AS surface, B.arra</span></span>
@@ -641,64 +664,64 @@ Solution
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">5343</td>
-<td style="text-align: left;">CZH</td>
-<td style="text-align: right;">78.79</td>
-<td style="text-align: right;">10.30</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">BOP</td>
+<td style="text-align: right;">1.59</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">4803</td>
-<td style="text-align: left;">BTH</td>
-<td style="text-align: right;">18.06</td>
-<td style="text-align: right;">23.71</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">CEE</td>
+<td style="text-align: right;">4.61</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">3903</td>
-<td style="text-align: left;">BTA</td>
-<td style="text-align: right;">25.21</td>
-<td style="text-align: right;">-36.38</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">FLA</td>
+<td style="text-align: right;">0.96</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">3498</td>
-<td style="text-align: left;">VRG</td>
-<td style="text-align: right;">10.59</td>
-<td style="text-align: right;">0.66</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">MLO</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">5078</td>
-<td style="text-align: left;">VRN</td>
-<td style="text-align: right;">0.65</td>
-<td style="text-align: right;">12.48</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">OLI</td>
+<td style="text-align: right;">19.55</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">4939</td>
-<td style="text-align: left;">ORH</td>
-<td style="text-align: right;">186.01</td>
-<td style="text-align: right;">10.59</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">PPH</td>
+<td style="text-align: right;">204.84</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">3624</td>
-<td style="text-align: left;">TTH</td>
-<td style="text-align: right;">90.12</td>
-<td style="text-align: right;">-13.35</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">SNE</td>
+<td style="text-align: right;">1343.38</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">4636</td>
-<td style="text-align: left;">FAG</td>
-<td style="text-align: right;">0.80</td>
-<td style="text-align: right;">35.12</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">SPH</td>
+<td style="text-align: right;">104.11</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">5108</td>
-<td style="text-align: left;">J6S</td>
-<td style="text-align: right;">5.05</td>
-<td style="text-align: right;">0.70</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">SPL</td>
+<td style="text-align: right;">1980.23</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">4640</td>
-<td style="text-align: left;">VRG</td>
-<td style="text-align: right;">0.31</td>
-<td style="text-align: right;">23.72</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">TOM</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">26.85</td>
 </tr>
 </tbody>
 </table>
@@ -722,8 +745,8 @@ Solution
 </div>
 <div class="callout-body-container callout-body">
 <div class="cell">
-<details>
-<summary>Code</summary>
+<details class="code-fold">
+<summary>voir le code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Récupération des libellés des codes culture</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>culture_mapping <span class="ot">&lt;-</span> <span class="fu">s3read_using</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> read.csv,</span>
@@ -854,8 +877,8 @@ Solution
 </div>
 <div class="callout-body-container callout-body">
 <div class="cell">
-<details>
-<summary>Code</summary>
+<details class="code-fold">
+<summary>voir le code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Frontières régionales de métropole</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>region_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  cnx, <span class="at">query =</span> <span class="st">"SELECT * FROM adminexpress.region"</span></span>
@@ -878,7 +901,11 @@ Solution
 <span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_buffer</span>(cultures_mid, <span class="dv">5000</span>), <span class="at">fill =</span> <span class="st">"#fca8ab"</span>, <span class="at">color =</span> <span class="cn">NA</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="app2_files/figure-html/localisation-mais-1.png" class="img-fluid" style="width:100.0%"></p>
+<div>
+<figure class="figure">
+<p><img src="app2_files/figure-html/localisation-mais-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1030,10 +1057,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1043,8 +1069,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1057,6 +1092,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1100,6 +1254,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1125,6 +1280,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1186,12 +1367,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./app1.html" class="pagination-link">
+      <a href="./app1.html" class="pagination-link  aria-label=" &lt;span="" manipulation="" du="" rpg&lt;="" span&gt;"="">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Première manipulation du RPG</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./physio_era5.html" class="pagination-link">
+      <a href="./app3.html" class="pagination-link" aria-label="<span class='chapter-number'>4</span>&nbsp; <span class='chapter-title'>Évolution de la date théorique de récolte</span>">
         <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Évolution de la date théorique de récolte</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
@@ -1450,6 +1631,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
+
 
 
 
