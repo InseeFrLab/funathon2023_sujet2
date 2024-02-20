@@ -71,7 +71,7 @@ Le pas-à-pas détaillé est décrit sur [la page de démarrage](app0.html):
 
 - Si ce n'est pas déjà fait, il faut avoir préalablement copié les données depuis le stockage MinIO. Pour cela commencez par exécuter la commande "MC client" de cette page dans votre Terminal, puis les commandes suivantes :
 ```
-mc cp minio/projet-funathon/2023/sujet2/diffusion/era5.zip ~/work/funathon_sujet2/data/era5.zip
+mc cp s3/projet-funathon/2023/sujet2/diffusion/era5.zip ~/work/funathon_sujet2/data/era5.zip
 unzip ~/work/funathon_sujet2/data/era5.zip -d ~/work/funathon_sujet2/data/
 rm ~/work/funathon_sujet2/data/era5.zip
 ```
